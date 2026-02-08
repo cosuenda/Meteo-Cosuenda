@@ -1,0 +1,27 @@
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #0b1d2a;
+  color: #ffffff;
+  text-align: center;
+  padding: 20px;
+}
+
+h1 {
+  margin-bottom: 30px;
+}
+
+#datos {
+  background: #132f44;
+  padding: 20px;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+p {
+  font-size: 1.2em;
+}
+
+#estado {
+  margin-top: 20px;
+  color: #cccccc;
+}
