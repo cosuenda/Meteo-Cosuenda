@@ -1,0 +1,8 @@
+{
+  "name": "Meteo Cosuenda",
+  "short_name": "Meteo",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0b1d2a",
+  "theme_color": "#0b1d2a"
+}
