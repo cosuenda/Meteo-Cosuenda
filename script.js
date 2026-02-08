@@ -1,8 +1,6 @@
 const APP_KEY = 26C4D6AD21CF8F8C4F3BA85E1CAF6701;
 const API_KEY = adf65434-1ace-43dd-b9a9-27915843d243;
 const MAC = 84:CC:A8:B4:B1:F6;
-
-const url =https://www.ecowitt.net/home/index?id=61227 ;
 // Elementos en la página
 const tempEl = document.getElementById("temp");
 const humEl  = document.getElementById("hum");
@@ -26,7 +24,6 @@ async function obtenerDatos() {
       throw new Error("Datos de la estación no disponibles");
     }
 
-    // Actualiza la página
     tempEl.textContent = data.data.outdoor.temperature?.value ?? "--";
     humEl.textContent  = data.data.outdoor.humidity?.value ?? "--";
     presEl.textContent = data.data.pressure?.relative?.value ?? "--";
@@ -46,5 +43,4 @@ async function obtenerDatos() {
 obtenerDatos();
 setInterval(obtenerDatos, 60000);
 
-// Evitar "eval" y CSP warnings: no hay ninguna función peligrosa
 
