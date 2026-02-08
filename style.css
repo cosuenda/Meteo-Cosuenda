@@ -40,7 +40,8 @@ form label {
   margin-top: 10px;
 }
 
-form input {
+form input,
+form textarea {
   width: 100%;
   padding: 5px;
   margin-top: 5px;
@@ -57,3 +58,4 @@ form button {
   border-radius: 5px;
   cursor: pointer;
 }
+
