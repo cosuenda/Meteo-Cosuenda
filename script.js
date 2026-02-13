@@ -15,28 +15,23 @@ async function obtenerDatos() {
     if (!response.ok) throw new Error(`Error en la API: ${response.status}`);
 
     const json = await response.json();
-    console.log(json); // para depuración
+    console.log(json);
 
     if (json.data && json.data[MAC] && json.data[MAC].gw) {
       const datos = json.data[MAC].gw;
-
       document.getElementById("temperatura").textContent = datos.temp + " °C";
       document.getElementById("humedad").textContent = datos.humidity + " %";
       document.getElementById("presion").textContent = datos.bar + " hPa";
       document.getElementById("viento").textContent = datos.wind_spd + " m/s";
-    } else {
-      console.warn("No se recibieron datos de la estación");
     }
   } catch (error) {
     console.error("Error obteniendo los datos:", error);
   }
 }
 
-// Llamar al cargar la página
 window.addEventListener("load", obtenerDatos);
-
-// Actualizar cada 5 minutos
 setInterval(obtenerDatos, 300000);
+
 
 
 
