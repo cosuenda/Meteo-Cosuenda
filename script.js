@@ -1,14 +1,11 @@
-// ----------------------------
-// script.js para GitHub Pages
-// ----------------------------
+// script.js limpio para GitHub Pages
 
-// ⚠️ Sustituye estos valores por los de tu estación Ecowitt
-const APP_KEY = "26C4D6AD21CF8F8C4F3BA85E1CAF6701";
-const API_KEY = "adf65434-1ace-43dd-b9a9-27915843d243";
-const MAC = "84:CC:A8:B4:B1:F6";
+const APP_KEY = "26C4D6AD21CF8F8C4F3BA85E1CAF6701";      // reemplaza por tu APP_KEY
+const API_KEY = "adf65434-1ace-43dd-b9a9-27915843d243";      // reemplaza por tu API_KEY
+const MAC = "84:CC:A8:B4:B1:F6";      // reemplaza por tu MAC
 
-// URL de la API
-const url = "https://www.ecowitt.net/home/index?id=61227&app_key=${APP_KEY}&api_key=${API_KEY}&mac=${MAC}&call_back=all`;
+const url = `https://www.ecowitt.net/home/index?id=61227?application_key=${APP_KEY}&api_key=${API_KEY}&mac=${MAC}&call_back=all`;
+
 async function obtenerDatos() {
   try {
     const response = await fetch(url);
@@ -31,6 +28,7 @@ async function obtenerDatos() {
 
 window.addEventListener("load", obtenerDatos);
 setInterval(obtenerDatos, 300000);
+
 
 
 
