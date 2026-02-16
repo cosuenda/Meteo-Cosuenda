@@ -122,13 +122,40 @@ async function obtenerDatos() {
 
     localStorage.setItem("stats", JSON.stringify(stats));
 
-    // ====== Mostrar máximos y mínimos ======
+    // Mostrar máximos y mínimos
     document.getElementById("tempMax").textContent = stats.tempMax + " °C";
     document.getElementById("tempMin").textContent = stats.tempMin + " °C";
     document.getElementById("humMax").textContent = stats.humMax + " %";
     document.getElementById("humMin").textContent = stats.humMin + " %";
     document.getElementById("rainMax").textContent = stats.rainMax + " mm";
     document.getElementById("rainMin").textContent = stats.rainMin + " mm";
+
+    // ====== Icono dinámico de clima ======
+    const weatherIcon = document.getElementById("weather-icon");
+    const weatherText = document.getElementById("weather-text");
+
+    let iconUrl = "https://img.icons8.com/color/48/000000/temperature.png";
+    let text = "Desconocido";
+
+    if (rainMm > 0.5) {
+      iconUrl = "https://img.icons8.com/color/48/000000/rain.png";
+      text = "Lluvia";
+    } else if (tempC <= 0 && rainMm > 0) {
+      iconUrl = "https://img.icons8.com/color/48/000000/snow.png";
+      text = "Nieve";
+    } else if (solar.value > 400) {
+      iconUrl = "https://img.icons8.com/color/48/000000/sun.png";
+      text = "Soleado";
+    } else if (solar.value > 100) {
+      iconUrl = "https://img.icons8.com/color/48/000000/partly-cloudy-day.png";
+      text = "Parcialmente nublado";
+    } else {
+      iconUrl = "https://img.icons8.com/color/48/000000/cloud.png";
+      text = "Nublado";
+    }
+
+    weatherIcon.src = iconUrl;
+    weatherText.textContent = text;
 
   } catch (error) {
     console.error("Error de conexión:", error);
@@ -138,6 +165,7 @@ async function obtenerDatos() {
 // ====== Carga inicial y actualización cada 10 minutos ======
 obtenerDatos();
 setInterval(obtenerDatos, 600000);
+
 
 
 
