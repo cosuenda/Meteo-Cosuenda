@@ -4,7 +4,7 @@ const mac = "84:CC:A8:B4:B1:F6";
 
 
 // ===== URL CORRECTA =====
-const url = `https://www.ecowitt.net/home/index?id=61227?application_key=${APP_KEY}&api_key=${API_KEY}&mac=${MAC}&call_back=all`;
+const url = `https://www.ecowitt.net/home/index?id=61227${APP_KEY}&api_key=${API_KEY}&mac=${MAC}&call_back=all`;
 
 async function obtenerDatos() {
   try {
