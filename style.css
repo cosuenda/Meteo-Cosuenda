@@ -1,51 +1,79 @@
+/* ====== Estilo general ====== */
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
   background: linear-gradient(to bottom, #87CEEB, #f0f8ff);
   color: #333;
-  display: flex;
-  justify-content: center;
-  padding: 20px;
+  transition: background 1s ease;
 }
 
+/* ====== Contenedor principal ====== */
 .weather-panel {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 15px;
-  padding: 20px;
   max-width: 900px;
-  width: 100%;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  margin: 40px auto;
+  padding: 20px 30px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
 .weather-panel h2 {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  color: #222;
 }
 
+/* ====== Filas de datos ====== */
 .weather-row {
   display: flex;
   justify-content: space-around;
-  margin-bottom: 15px;
+  flex-wrap: wrap;
+  margin-bottom: 25px;
 }
 
 .weather-item {
+  flex: 1 1 200px;
   text-align: center;
-  flex: 1;
+  margin: 10px;
 }
 
 .weather-item img {
-  width: 50px;
-  height: 50px;
-  margin-bottom: 5px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 10px;
+  transition: transform 1s ease;
 }
 
+/* ====== Valores ====== */
 .weather-item p {
-  margin: 3px 0;
-  font-weight: bold;
+  margin: 5px 0;
+  font-size: 1.1em;
 }
 
+.weather-item p span {
+  font-weight: bold;
+  display: inline-block;
+  transition: color 0.8s ease, transform 0.8s ease;
+}
+
+/* ====== Última actualización ====== */
 .update {
   text-align: center;
   font-size: 0.9em;
-  margin-top: 10px;
+  margin-top: 20px;
   color: #555;
 }
+
+/* ====== Responsive ====== */
+@media (max-width: 600px) {
+  .weather-row {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .weather-item {
+    margin: 15px 0;
+  }
+}
+
