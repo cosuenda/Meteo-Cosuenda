@@ -1,10 +1,13 @@
+const appKey = "26C4D6AD21CF8F8C4F3BA85E1CAF6701";
+const apiKey = "adf65434-1ace-43dd-b9a9-27915843d243";
+const mac = "84:CC:A8:B4:B1:F6";
 
-const rssUrl = "https://api.allorigins.win/raw?url=" + 
-  encodeURIComponent("https://www.meteoclimatic.net/feed/rss_es.xml");
+const url = `https://www.ecowitt.net/home/index?id=61227${appKey}&api_key=${apiKey}&mac=${mac}`;
 
-fetch(rssUrl)
-  .then(res => res.text())
+fetch(url)
+  .then(res => res.json())
   .then(data => {
-    console.log(data.includes("ESARA5000000050409A"));
+    console.log(data); // aquí aparecen tus datos
   });
+
 
