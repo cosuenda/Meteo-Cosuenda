@@ -8,6 +8,7 @@ const url = `https://api.ecowitt.net/api/v3/device/real_time?application_key=${a
 // ====== Funciones de conversión ======
 const fToC = f => ((parseFloat(f) - 32) * 5 / 9).toFixed(1);
 const mphToKmh = mph => (parseFloat(mph) * 1.60934).toFixed(1);
+const inToMm = inches => (parseFloat(inches) * 25.4).toFixed(1); // ✅ conversión lluvia
 
 // ====== Animación de valores ======
 function animarValor(element, nuevoValor, unidad = "") {
@@ -52,8 +53,8 @@ async function obtenerDatos() {
     animarValor(document.getElementById("feels"), fToC(outdoor.feels_like.value), " °C");
     animarValor(document.getElementById("dew"), fToC(outdoor.dew_point.value), " °C");
     animarValor(document.getElementById("wind"), mphToKmh(wind.wind_speed.value), " km/h");
-    animarValor(document.getElementById("rain"), rainfall.value, " in");
-    animarValor(document.getElementById("hum"), outdoor.humidity.value, " %"); // ✅ humedad animada
+    animarValor(document.getElementById("hum"), outdoor.humidity.value, " %"); // humedad animada
+    animarValor(document.getElementById("rain"), inToMm(rainfall.value), " mm"); // lluvia en mm
 
     // Valores fijos
     document.getElementById("winddir").textContent = wind.wind_direction.value + " º";
@@ -92,9 +93,9 @@ async function obtenerDatos() {
     else windText.style.color = "#f00";
 
     // Lluvia
-    const rainVal = parseFloat(rainfall.value);
+    const rainVal = inToMm(rainfall.value);
     const rainText = document.getElementById("rain");
-    rainText.style.color = rainVal === 0 ? "#555" : "#00f";
+    rainText.style.color = rainVal == 0 ? "#555" : "#00f";
 
     // ====== Giro icono viento ======
     const windIcon = document.querySelector('img[alt="Viento"]');
@@ -111,6 +112,7 @@ async function obtenerDatos() {
 // ====== Carga inicial y actualización cada 10 minutos ======
 obtenerDatos();
 setInterval(obtenerDatos, 600000);
+
 
 
 
