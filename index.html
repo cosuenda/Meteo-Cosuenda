@@ -1,17 +1,56 @@
-<div>
-  <h2>Meteo-Cosuenda (Estación en tiempo real)</h2>
-  <p>Temperatura: <span id="temp">--</span></p>
-  <p>Sensación térmica: <span id="feels">--</span></p>
-  <p>Punto de rocío: <span id="dew">--</span></p>
-  <p>Humedad: <span id="hum">--</span></p>
-  <p>Viento: <span id="wind">--</span></p>
-  <p>Dirección viento: <span id="winddir">--</span></p>
-  <p>Presión: <span id="press">--</span></p>
-  <p>Radiación solar: <span id="solar">--</span></p>
-  <p>Índice UV: <span id="uvi">--</span></p>
-  <p>Precipitación diaria: <span id="rain">--</span></p>
-  <p>Última actualización: <span id="update">--</span></p>
+<div class="weather-panel">
+  <h2>Meteo-Cosuenda (Tiempo Real)</h2>
+  
+  <div class="weather-row">
+    <div class="weather-item">
+      <img src="icons/temperature.png" alt="Temperatura">
+      <p>Temperatura: <span id="temp">--</span></p>
+    </div>
+    <div class="weather-item">
+      <img src="icons/feels_like.png" alt="Sensación térmica">
+      <p>Sensación: <span id="feels">--</span></p>
+    </div>
+    <div class="weather-item">
+      <img src="icons/dew.png" alt="Punto de rocío">
+      <p>Punto de rocío: <span id="dew">--</span></p>
+    </div>
+  </div>
+  
+  <div class="weather-row">
+    <div class="weather-item">
+      <img src="icons/humidity.png" alt="Humedad">
+      <p>Humedad: <span id="hum">--</span></p>
+    </div>
+    <div class="weather-item">
+      <img src="icons/wind.png" alt="Viento">
+      <p>Viento: <span id="wind">--</span></p>
+      <p>Dirección: <span id="winddir">--</span></p>
+    </div>
+    <div class="weather-item">
+      <img src="icons/pressure.png" alt="Presión">
+      <p>Presión: <span id="press">--</span></p>
+    </div>
+  </div>
+  
+  <div class="weather-row">
+    <div class="weather-item">
+      <img src="icons/solar.png" alt="Radiación solar">
+      <p>Solar: <span id="solar">--</span></p>
+    </div>
+    <div class="weather-item">
+      <img src="icons/uv.png" alt="Índice UV">
+      <p>UV: <span id="uvi">--</span></p>
+    </div>
+    <div class="weather-item">
+      <img src="icons/rain.png" alt="Precipitación diaria">
+      <p>Lluvia: <span id="rain">--</span></p>
+    </div>
+  </div>
+
+  <p class="update">Última actualización: <span id="update">--</span></p>
 </div>
 
+<link rel="stylesheet" href="style.css">
 <script src="script.js"></script>
+
 
