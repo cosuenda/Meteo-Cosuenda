@@ -36,7 +36,7 @@ async function obtenerDatos() {
     const rainMm = parseFloat(inToMm(rainfall.value));
     const pressHpa = parseFloat(inHgToHpa(pressure.relative.value));
 
-    // ===== Mostrar datos sin animación =====
+    // ===== Mostrar valores directamente =====
     document.getElementById("temp").textContent = tempC + " °C";
     document.getElementById("hum").textContent = humVal + " %";
     document.getElementById("wind").textContent = windKm + " km/h";
@@ -46,7 +46,7 @@ async function obtenerDatos() {
     document.getElementById("solar").textContent = solar.value + " W/m²";
     document.getElementById("uvi").textContent = uvi.value;
 
-    // ===== Timestamp y fondo dinámico =====
+    // ===== Timestamp y fondo día/noche =====
     const timestamp = new Date(data.time * 1000);
     document.getElementById("update").textContent = timestamp.toLocaleString();
 
@@ -76,7 +76,7 @@ async function obtenerDatos() {
     document.getElementById("rainMax").textContent = stats.rainMax + " mm";
     document.getElementById("rainMin").textContent = stats.rainMin + " mm";
 
-    // ===== Icono dinámico de clima =====
+    // ===== Icono dinámico =====
     const weatherIcon = document.getElementById("weather-icon");
     const weatherText = document.getElementById("weather-text");
 
@@ -111,6 +111,7 @@ async function obtenerDatos() {
 // ===== Carga inicial y actualización cada 10 minutos =====
 obtenerDatos();
 setInterval(obtenerDatos, 600000);
+
 
 
 
