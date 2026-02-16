@@ -10,7 +10,8 @@ async function obtenerDatos() {
     const response = await fetch(url);
     const data = await response.json();
 
-    console.log("Datos recibidos:", data);
+    console.log(JSON.stringify(data, null, 2));
+
 
     if (data.code === 0) {
       const outdoor = data.data.outdoor;
