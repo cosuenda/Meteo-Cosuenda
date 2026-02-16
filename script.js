@@ -50,20 +50,25 @@ async function obtenerDatos() {
     const rainfall = data.data.rainfall.daily;
 
     // ====== Convertir unidades ======
-    const rainMm = inToMm(rainfall.value);
-    const pressureHpa = inHgToHpa(pressure.relative.value);
+    const tempC = parseFloat(fToC(outdoor.temperature.value));
+    const feelsC = parseFloat(fToC(outdoor.feels_like.value));
+    const dewC = parseFloat(fToC(outdoor.dew_point.value));
+    const humVal = parseInt(outdoor.humidity.value);
+    const windKm = parseFloat(mphToKmh(wind.wind_speed.value));
+    const rainMm = parseFloat(inToMm(rainfall.value));
+    const pressHpa = parseFloat(inHgToHpa(pressure.relative.value));
 
     // ====== Animar valores ======
-    animarValor(document.getElementById("temp"), fToC(outdoor.temperature.value), " °C");
-    animarValor(document.getElementById("feels"), fToC(outdoor.feels_like.value), " °C");
-    animarValor(document.getElementById("dew"), fToC(outdoor.dew_point.value), " °C");
-    animarValor(document.getElementById("wind"), mphToKmh(wind.wind_speed.value), " km/h");
-    animarValor(document.getElementById("hum"), outdoor.humidity.value, " %");
+    animarValor(document.getElementById("temp"), tempC, " °C");
+    animarValor(document.getElementById("feels"), feelsC, " °C");
+    animarValor(document.getElementById("dew"), dewC, " °C");
+    animarValor(document.getElementById("hum"), humVal, " %");
+    animarValor(document.getElementById("wind"), windKm, " km/h");
     animarValor(document.getElementById("rain"), rainMm, " mm");
 
     // ====== Valores fijos ======
     document.getElementById("winddir").textContent = wind.wind_direction.value + " º";
-    document.getElementById("press").textContent = pressureHpa + " hPa"; // ✅ presión en hPa
+    document.getElementById("press").textContent = pressHpa + " hPa";
     document.getElementById("solar").textContent = solar.value + " W/m²";
     document.getElementById("uvi").textContent = uvi.value;
 
@@ -73,30 +78,25 @@ async function obtenerDatos() {
 
     const hour = timestamp.getHours();
     const body = document.body;
-    if (hour >= 6 && hour < 18) body.style.background = "linear-gradient(to bottom, #87CEEB, #f0f8ff)";
-    else body.style.background = "linear-gradient(to bottom, #001848, #0a1f44)";
+    body.style.background = hour >= 6 && hour < 18 
+      ? "linear-gradient(to bottom, #87CEEB, #f0f8ff)" 
+      : "linear-gradient(to bottom, #001848, #0a1f44)";
 
     // ====== Colores dinámicos ======
-    const tempC = parseFloat(fToC(outdoor.temperature.value));
     const tempEl = document.getElementById("temp");
-    if (tempC <= 0) tempEl.style.color = "#00f";
-    else if (tempC <= 15) tempEl.style.color = "#0aa";
-    else if (tempC <= 25) tempEl.style.color = "#0a0";
-    else if (tempC <= 35) tempEl.style.color = "#fa0";
-    else tempEl.style.color = "#f00";
+    tempEl.style.color = tempC <= 0 ? "#00f" :
+                          tempC <= 15 ? "#0aa" :
+                          tempC <= 25 ? "#0a0" :
+                          tempC <= 35 ? "#fa0" : "#f00";
 
-    const humVal = parseInt(outdoor.humidity.value);
     const humEl = document.getElementById("hum");
     humEl.style.color = humVal < 50 ? "#0aa" : "#0055aa";
 
-    const windVal = parseFloat(wind.wind_speed.value) * 1.60934;
     const windText = document.getElementById("wind");
-    if (windVal < 10) windText.style.color = "#0a0";
-    else if (windVal < 30) windText.style.color = "#fa0";
-    else windText.style.color = "#f00";
+    windText.style.color = windKm < 10 ? "#0a0" : windKm < 30 ? "#fa0" : "#f00";
 
     const rainText = document.getElementById("rain");
-    rainText.style.color = rainMm == 0 ? "#555" : "#00f";
+    rainText.style.color = rainMm === 0 ? "#555" : "#00f";
 
     // ====== Giro icono viento ======
     const windIcon = document.querySelector('img[alt="Viento"]');
@@ -104,6 +104,31 @@ async function obtenerDatos() {
       windIcon.style.transform = `rotate(${wind.wind_direction.value}deg)`;
       windIcon.style.transition = "transform 1s ease";
     }
+
+    // ====== Guardar máximos y mínimos en localStorage ======
+    const stats = JSON.parse(localStorage.getItem("stats") || "{}");
+
+    // Temperatura
+    stats.tempMax = Math.max(stats.tempMax || tempC, tempC);
+    stats.tempMin = stats.tempMin === undefined ? tempC : Math.min(stats.tempMin, tempC);
+
+    // Humedad
+    stats.humMax = Math.max(stats.humMax || humVal, humVal);
+    stats.humMin = stats.humMin === undefined ? humVal : Math.min(stats.humMin, humVal);
+
+    // Lluvia acumulada
+    stats.rainMax = Math.max(stats.rainMax || rainMm, rainMm);
+    stats.rainMin = stats.rainMin === undefined ? rainMm : Math.min(stats.rainMin, rainMm);
+
+    localStorage.setItem("stats", JSON.stringify(stats));
+
+    // ====== Mostrar máximos y mínimos ======
+    document.getElementById("tempMax").textContent = stats.tempMax + " °C";
+    document.getElementById("tempMin").textContent = stats.tempMin + " °C";
+    document.getElementById("humMax").textContent = stats.humMax + " %";
+    document.getElementById("humMin").textContent = stats.humMin + " %";
+    document.getElementById("rainMax").textContent = stats.rainMax + " mm";
+    document.getElementById("rainMin").textContent = stats.rainMin + " mm";
 
   } catch (error) {
     console.error("Error de conexión:", error);
@@ -113,6 +138,7 @@ async function obtenerDatos() {
 // ====== Carga inicial y actualización cada 10 minutos ======
 obtenerDatos();
 setInterval(obtenerDatos, 600000);
+
 
 
 
