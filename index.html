@@ -3,85 +3,55 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meteo-Cosuenda</title>
-  
-  <!-- Estilo principal -->
+  <title>Meteo Cosuenda</title>
   <link rel="stylesheet" href="style.css">
-
-  <!-- Favicon opcional -->
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
+  <div class="container">
+    <h1>Estación Meteorológica Cosuenda</h1>
 
-  <div class="weather-panel">
-    <h2>Estación Meteo-Cosuenda</h2>
-
-    <div class="weather-row">
-      <!-- Temperatura -->
-      <div class="weather-item">
-        <img src="https://img.icons8.com/color/48/000000/temperature.png" alt="Temperatura">
-        <p>Temperatura: <span id="temp" data-valor="0">--</span></p>
-      </div>
-
-      <!-- Sensación térmica -->
-      <div class="weather-item">
-        <img src="https://img.icons8.com/color/48/000000/thermometer.png" alt="Sensación">
-        <p>Sensación: <span id="feels" data-valor="0">--</span></p>
-      </div>
-
-      <!-- Punto de rocío -->
-      <div class="weather-item">
-        <img src="https://img.icons8.com/color/48/000000/dew-point.png" alt="Punto de rocío">
-        <p>Punto de rocío: <span id="dew" data-valor="0">--</span></p>
-      </div>
-
-      <!-- Humedad -->
-      <div class="weather-item">
-        <img src="https://img.icons8.com/color/48/000000/humidity.png" alt="Humedad">
-        <p>Humedad: <span id="hum" data-valor="0">--</span></p>
-      </div>
-
-      <!-- Viento -->
-      <div class="weather-item">
-        <img src="https://img.icons8.com/color/48/000000/wind.png" alt="Viento">
-        <p>Viento: <span id="wind" data-valor="0">--</span></p>
-        <p>Dirección: <span id="winddir">--</span></p>
-      </div>
-
-      <!-- Lluvia -->
-      <div class="weather-item">
-        <img src="https://img.icons8.com/color/48/000000/rain.png" alt="Lluvia">
-        <p>Lluvia diaria: <span id="rain" data-valor="0">--</span></p>
-      </div>
+    <div class="weather-card">
+      <img src="https://img.icons8.com/color/48/000000/temperature.png" alt="Temperatura">
+      <p>Temperatura: <span id="temp">--</span></p>
+      <p>Máx: <span id="tempMax">--</span> | Mín: <span id="tempMin">--</span></p>
     </div>
 
-    <div class="weather-row">
-      <!-- Presión -->
-      <div class="weather-item">
-        <img src="https://img.icons8.com/color/48/000000/pressure.png" alt="Presión">
-        <p>Presión: <span id="press">--</span></p>
-      </div>
+    <div class="weather-card">
+      <img src="https://img.icons8.com/color/48/000000/humidity.png" alt="Humedad">
+      <p>Humedad: <span id="hum">--</span></p>
+      <p>Máx: <span id="humMax">--</span> | Mín: <span id="humMin">--</span></p>
+    </div>
 
-      <!-- Solar -->
-      <div class="weather-item">
-        <img src="https://img.icons8.com/color/48/000000/sun.png" alt="Solar">
-        <p>Solar: <span id="solar">--</span></p>
-      </div>
+    <div class="weather-card">
+      <img src="https://img.icons8.com/color/48/000000/rain.png" alt="Lluvia">
+      <p>Lluvia diaria: <span id="rain">--</span></p>
+      <p>Máx: <span id="rainMax">--</span> | Mín: <span id="rainMin">--</span></p>
+    </div>
 
-      <!-- UV Index -->
-      <div class="weather-item">
-        <img src="https://img.icons8.com/color/48/000000/uv-index.png" alt="UVI">
-        <p>UVI: <span id="uvi">--</span></p>
-      </div>
+    <div class="weather-card">
+      <img src="https://img.icons8.com/color/48/000000/wind.png" alt="Viento">
+      <p>Viento: <span id="wind">--</span></p>
+      <p>Dirección: <span id="winddir">--</span></p>
+    </div>
+
+    <div class="weather-card">
+      <img src="https://img.icons8.com/color/48/000000/barometer.png" alt="Presión">
+      <p>Presión: <span id="press">--</span></p>
+    </div>
+
+    <div class="weather-card">
+      <img src="https://img.icons8.com/color/48/000000/sun.png" alt="Solar">
+      <p>Radiación solar: <span id="solar">--</span></p>
+      <p>Índice UV: <span id="uvi">--</span></p>
     </div>
 
     <p class="update">Última actualización: <span id="update">--</span></p>
   </div>
 
-  <!-- Script principal -->
   <script src="script.js"></script>
 </body>
 </html>
+
 
 
 
