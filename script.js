@@ -6,10 +6,10 @@ const mac = "84:CC:A8:B4:B1:F6";
 const url = `https://api.ecowitt.net/api/v3/device/real_time?application_key=${appKey}&api_key=${apiKey}&mac=${mac}&call_back=all`;
 
 // ====== Funciones de conversión ======
-const fToC = f => ((parseFloat(f) - 32) * 5/9).toFixed(1);
+const fToC = f => ((parseFloat(f) - 32) * 5 / 9).toFixed(1);
 const mphToKmh = mph => (parseFloat(mph) * 1.60934).toFixed(1);
 
-// ====== Animación de valor ======
+// ====== Función de animación de valores ======
 function animarValor(element, nuevoValor, unidad = "") {
   const valorActual = parseFloat(element.getAttribute("data-valor")) || 0;
   const valorFinal = parseFloat(nuevoValor);
@@ -104,7 +104,7 @@ async function obtenerDatos() {
   }
 }
 
-// Carga inicial y actualización cada 10 minutos
+// ====== Carga inicial y actualización cada 10 minutos ======
 obtenerDatos();
 setInterval(obtenerDatos, 600000);
 
