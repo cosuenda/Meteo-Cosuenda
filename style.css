@@ -6,19 +6,11 @@ header h1 { font-size:2em; }
 header p { font-size:0.9em; color:#555; }
 
 .grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(150px,1fr)); gap:15px; margin-bottom:30px; }
-.card { background:white; border-radius:10px; padding:15px; text-align:center; box-shadow:0 4px 8px rgba(0,0,0,0.1); position:relative; transition: background 0.5s, border 0.5s, box-shadow 0.5s; }
+.card { background:white; border-radius:10px; padding:15px; text-align:center; box-shadow:0 4px 8px rgba(0,0,0,0.1); transition: background 0.5s, border 0.5s, box-shadow 0.5s; }
 .card img { width:48px; height:48px; margin-bottom:10px; }
 
-.historico { margin-top:30px; }
-.hist-grid { display:flex; flex-wrap:wrap; gap:20px; justify-content:space-around; }
-.hist-grid > div { background:white; border-radius:10px; padding:15px; box-shadow:0 4px 8px rgba(0,0,0,0.1); width:250px; }
+@media(max-width:600px){ .grid { grid-template-columns: 1fr; } }
 
-button { margin-top:15px; padding:10px 20px; border:none; border-radius:5px; background:#2196f3; color:white; cursor:pointer; font-size:1em; transition:0.3s; }
-button:hover { background:#1976d2; }
-
-#rainCanvas { position:absolute; top:0; left:0; pointer-events:none; }
-
-@media(max-width:600px){ .hist-grid { flex-direction:column; align-items:center; } }
 
 
 
