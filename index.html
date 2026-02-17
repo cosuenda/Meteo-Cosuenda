@@ -1,77 +1,95 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meteo Cosuenda</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meteo Cosuenda</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <div class="container">
-    <h1>Estación Meteorológica Cosuenda</h1>
+  <header>
+    <h1>🌦 Meteo Cosuenda</h1>
+    <p id="update">Última actualización: --</p>
+  </header>
 
-    <!-- Icono principal -->
-    <div class="weather-card">
-      <img id="weather-icon" src="" alt="Clima">
-      <p>Clima: <span id="weather-text">--</span></p>
-    </div>
+  <main>
+    <section class="grid">
+      <div class="card">
+        <img src="icons/temperature.png" alt="Temperatura">
+        <h2>Temperatura</h2>
+        <p><span id="temp">--</span></p>
+      </div>
+      <div class="card">
+        <img src="icons/humidity.png" alt="Humedad">
+        <h2>Humedad</h2>
+        <p><span id="hum">--</span></p>
+      </div>
+      <div class="card">
+        <img src="icons/wind.png" alt="Viento">
+        <h2>Viento</h2>
+        <p><span id="wind">--</span></p>
+      </div>
+      <div class="card">
+        <img src="icons/rain.png" alt="Lluvia">
+        <h2>Lluvia</h2>
+        <p><span id="rain">--</span></p>
+      </div>
+      <div class="card">
+        <img src="icons/pressure.png" alt="Presión">
+        <h2>Presión</h2>
+        <p><span id="press">--</span></p>
+      </div>
+    </section>
 
-    <!-- Temperatura -->
-    <div class="weather-card">
-      <img src="https://img.icons8.com/color/48/000000/temperature.png" alt="Temperatura">
-      <p>Temperatura: <span id="temp">--</span></p>
-      <p>Máx: <span id="tempMax">--</span> | Mín: <span id="tempMin">--</span></p>
-    </div>
+    <section class="historico">
+      <h2>📅 Históricos</h2>
+      <div class="hist-grid">
+        <!-- Diario -->
+        <div>
+          <h3>Diario</h3>
+          <p>Temp Máx: <span id="tempMaxDiario">--</span> °C</p>
+          <p>Temp Mín: <span id="tempMinDiario">--</span> °C</p>
+          <p>Hum Máx: <span id="humMaxDiario">--</span> %</p>
+          <p>Hum Mín: <span id="humMinDiario">--</span> %</p>
+          <p>Pres Máx: <span id="presMaxDiario">--</span> hPa</p>
+          <p>Pres Mín: <span id="presMinDiario">--</span> hPa</p>
+          <p>Lluvia: <span id="lluviaDiario">--</span> mm</p>
+        </div>
 
-    <!-- Humedad -->
-    <div class="weather-card">
-      <img src="https://img.icons8.com/color/48/000000/humidity.png" alt="Humedad">
-      <p>Humedad: <span id="hum">--</span></p>
-      <p>Máx: <span id="humMax">--</span> | Mín: <span id="humMin">--</span></p>
-    </div>
+        <!-- Mensual -->
+        <div>
+          <h3>Mensual</h3>
+          <p>Temp Máx: <span id="tempMaxMensual">--</span> °C</p>
+          <p>Temp Mín: <span id="tempMinMensual">--</span> °C</p>
+          <p>Hum Máx: <span id="humMaxMensual">--</span> %</p>
+          <p>Hum Mín: <span id="humMinMensual">--</span> %</p>
+          <p>Pres Máx: <span id="presMaxMensual">--</span> hPa</p>
+          <p>Pres Mín: <span id="presMinMensual">--</span> hPa</p>
+          <p>Lluvia: <span id="lluviaMensual">--</span> mm</p>
+        </div>
 
-    <!-- Lluvia -->
-    <div class="weather-card">
-      <img src="https://img.icons8.com/color/48/000000/rain.png" alt="Lluvia">
-      <p>Lluvia diaria: <span id="rain">--</span></p>
-      <p>Máx: <span id="rainMax">--</span> | Mín: <span id="rainMin">--</span></p>
-    </div>
+        <!-- Anual -->
+        <div>
+          <h3>Anual</h3>
+          <p>Temp Máx: <span id="tempMaxAnual">--</span> °C</p>
+          <p>Temp Mín: <span id="tempMinAnual">--</span> °C</p>
+          <p>Hum Máx: <span id="humMaxAnual">--</span> %</p>
+          <p>Hum Mín: <span id="humMinAnual">--</span> %</p>
+          <p>Pres Máx: <span id="presMaxAnual">--</span> hPa</p>
+          <p>Pres Mín: <span id="presMinAnual">--</span> hPa</p>
+          <p>Lluvia: <span id="lluviaAnual">--</span> mm</p>
+        </div>
+      </div>
 
-    <!-- Viento -->
-    <div class="weather-card">
-      <img src="https://img.icons8.com/color/48/000000/wind.png" alt="Viento">
-      <p>Viento: <span id="wind">--</span></p>
-      <p>Dirección: <span id="winddir">--</span></p>
-    </div>
-
-    <!-- Presión -->
-    <div class="weather-card">
-      <img src="https://img.icons8.com/color/48/000000/barometer.png" alt="Presión">
-      <p>Presión: <span id="press">--</span></p>
-    </div>
-
-    <!-- Solar y UV -->
-    <div class="weather-card">
-      <img src="https://img.icons8.com/color/48/000000/sun.png" alt="Solar">
-      <p>Radiación solar: <span id="solar">--</span></p>
-      <p>Índice UV: <span id="uvi">--</span></p>
-    </div>
-
-    <!-- Máximos y mínimos anuales -->
-    <div class="weather-card">
-      <img src="https://img.icons8.com/color/48/000000/thermometer.png" alt="Anual">
-      <p>Temp Anual: Máx <span id="tempMaxYear">--</span> | Mín <span id="tempMinYear">--</span></p>
-      <p>Humedad Anual: Máx <span id="humMaxYear">--</span> | Mín <span id="humMinYear">--</span></p>
-      <p>Lluvia Anual: Máx <span id="rainMaxYear">--</span> | Mín <span id="rainMinYear">--</span></p>
-    </div>
-
-    <!-- Última actualización -->
-    <p class="update">Última actualización: <span id="update">--</span></p>
-  </div>
+      <button onclick="exportarCSV()">📥 Exportar Histórico</button>
+    </section>
+  </main>
 
   <script src="script.js"></script>
 </body>
 </html>
+
 
 
 
