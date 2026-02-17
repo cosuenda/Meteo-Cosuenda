@@ -29,11 +29,10 @@
         <h2>Viento</h2>
         <p><span id="wind">--</span></p>
       </div>
-      <div class="card" style="position:relative;">
+      <div class="card">
         <img src="icons/rain.png" alt="Lluvia">
         <h2>Lluvia</h2>
         <p><span id="rain">--</span> mm</p>
-        <canvas id="rainCanvas" width="150" height="150"></canvas>
       </div>
       <div class="card">
         <img src="icons/pressure.png" alt="Presión">
@@ -41,48 +40,12 @@
         <p><span id="press">--</span></p>
       </div>
     </section>
-
-    <section class="historico">
-      <h2>📅 Históricos</h2>
-      <div class="hist-grid">
-        <div>
-          <h3>Diario</h3>
-          <p>Temp Máx: <span id="tempMaxDiario">--</span> °C</p>
-          <p>Temp Mín: <span id="tempMinDiario">--</span> °C</p>
-          <p>Hum Máx: <span id="humMaxDiario">--</span> %</p>
-          <p>Hum Mín: <span id="humMinDiario">--</span> %</p>
-          <p>Pres Máx: <span id="presMaxDiario">--</span> hPa</p>
-          <p>Pres Mín: <span id="presMinDiario">--</span> hPa</p>
-          <p>Lluvia: <span id="lluviaDiario">--</span> mm</p>
-        </div>
-        <div>
-          <h3>Mensual</h3>
-          <p>Temp Máx: <span id="tempMaxMensual">--</span> °C</p>
-          <p>Temp Mín: <span id="tempMinMensual">--</span> °C</p>
-          <p>Hum Máx: <span id="humMaxMensual">--</span> %</p>
-          <p>Hum Mín: <span id="humMinMensual">--</span> %</p>
-          <p>Pres Máx: <span id="presMaxMensual">--</span> hPa</p>
-          <p>Pres Mín: <span id="presMinMensual">--</span> hPa</p>
-          <p>Lluvia: <span id="lluviaMensual">--</span> mm</p>
-        </div>
-        <div>
-          <h3>Anual</h3>
-          <p>Temp Máx: <span id="tempMaxAnual">--</span> °C</p>
-          <p>Temp Mín: <span id="tempMinAnual">--</span> °C</p>
-          <p>Hum Máx: <span id="humMaxAnual">--</span> %</p>
-          <p>Hum Mín: <span id="humMinAnual">--</span> %</p>
-          <p>Pres Máx: <span id="presMaxAnual">--</span> hPa</p>
-          <p>Pres Mín: <span id="presMinAnual">--</span> hPa</p>
-          <p>Lluvia: <span id="lluviaAnual">--</span> mm</p>
-        </div>
-      </div>
-      <button onclick="exportarCSV()">📥 Exportar Histórico</button>
-    </section>
   </main>
 
   <script src="script.js"></script>
 </body>
 </html>
+
 
 
 
