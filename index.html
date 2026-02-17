@@ -4,47 +4,93 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meteo Cosuenda</title>
-<link rel="stylesheet" href="style.css">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif;}
+body { background:linear-gradient(to bottom,#87cefa,#f0f8ff); color:#333; padding:10px; }
+header { text-align:center; margin-bottom:20px; }
+header h1 { font-size:2em; }
+header p { font-size:0.9em; color:#555; }
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:15px; margin-bottom:30px; }
+.card { background:white; border-radius:10px; padding:15px; text-align:center; box-shadow:0 4px 8px rgba(0,0,0,0.1); transition:0.3s; }
+.card svg { width:48px; height:48px; margin-bottom:10px; }
+@media(max-width:600px){ .grid { grid-template-columns:1fr; } }
+</style>
 </head>
 <body>
-  <header>
-    <h1>🌦 Meteo Cosuenda</h1>
-    <p id="update">Última actualización: --</p>
-  </header>
+<header>
+<h1>🌦 Meteo Cosuenda</h1>
+<p id="update">Última actualización: --</p>
+</header>
 
-  <main>
-    <section class="grid">
-      <div class="card">
-        <img src="icons/temperature.png" alt="Temperatura">
-        <h2>Temperatura</h2>
-        <p><span id="temp">--</span></p>
-      </div>
-      <div class="card">
-        <img src="icons/humidity.png" alt="Humedad">
-        <h2>Humedad</h2>
-        <p><span id="hum">--</span></p>
-      </div>
-      <div class="card">
-        <img src="icons/wind.png" alt="Viento">
-        <h2>Viento</h2>
-        <p><span id="wind">--</span></p>
-      </div>
-      <div class="card">
-        <img src="icons/rain.png" alt="Lluvia">
-        <h2>Lluvia</h2>
-        <p><span id="rain">--</span> mm</p>
-      </div>
-      <div class="card">
-        <img src="icons/pressure.png" alt="Presión">
-        <h2>Presión</h2>
-        <p><span id="press">--</span></p>
-      </div>
-    </section>
-  </main>
+<main>
+<section class="grid">
+  <div class="card">
+    <svg viewBox="0 0 24 24" fill="#FF5722"><path d="M6 14h12v2H6z"/><path d="M12 2v12"/></svg>
+    <h2>Temperatura</h2>
+    <p><span id="temp">--</span></p>
+  </div>
+  <div class="card">
+    <svg viewBox="0 0 24 24" fill="#03A9F4"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/></svg>
+    <h2>Humedad</h2>
+    <p><span id="hum">--</span></p>
+  </div>
+  <div class="card">
+    <svg viewBox="0 0 24 24" fill="#4CAF50"><path d="M2 12h20M12 2l10 20"/></svg>
+    <h2>Viento</h2>
+    <p><span id="wind">--</span></p>
+  </div>
+  <div class="card">
+    <svg viewBox="0 0 24 24" fill="#2196F3"><path d="M4 17h16v2H4zM4 13h16v2H4zM4 9h16v2H4z"/></svg>
+    <h2>Lluvia</h2>
+    <p><span id="rain">--</span> mm</p>
+  </div>
+  <div class="card">
+    <svg viewBox="0 0 24 24" fill="#9C27B0"><path d="M4 6h16v2H4zM4 12h16v2H4zM4 18h16v2H4z"/></svg>
+    <h2>Presión</h2>
+    <p><span id="press">--</span></p>
+  </div>
+</section>
+</main>
 
-  <script src="script.js"></script>
+<script>
+const APP_KEY = "26C4D6AD21CF8F8C4F3BA85E1CAF6701";
+const API_KEY = "adf65434-1ace-43dd-b9a9-27915843d243";
+const MAC = "84:CC:A8:B4:B1:F6";
+
+const url = `https://api.allorigins.win/raw?url=` +
+  encodeURIComponent(`https://www.ecowitt.net/home/index?id=61227&application_key=${APP_KEY}&api_key=${API_KEY}&mac=${MAC}`);
+
+async function obtenerDatos(){
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    console.log("Datos recibidos:", data);
+
+    const outdoor = data.data.outdoor;
+    const temp = ((parseFloat(outdoor.temperature.value)-32)*5/9).toFixed(1);
+    const hum = parseFloat(outdoor.humidity.value);
+    const wind = (parseFloat(data.data.wind.wind_speed.value)*1.60934).toFixed(1);
+    const press = (parseFloat(data.data.pressure.relative.value)*33.8639).toFixed(1);
+    const lluvia = (parseFloat(data.data.rainfall.daily.value)*25.4).toFixed(1);
+
+    document.getElementById("temp").textContent = temp + " °C";
+    document.getElementById("hum").textContent = hum + " %";
+    document.getElementById("wind").textContent = wind + " km/h";
+    document.getElementById("press").textContent = press + " hPa";
+    document.getElementById("rain").textContent = lluvia + " mm";
+    document.getElementById("update").textContent = "Última actualización: " + new Date().toLocaleString();
+
+  } catch(err){
+    console.error("Error al cargar datos:", err);
+  }
+}
+
+obtenerDatos();
+setInterval(obtenerDatos, 600000);
+</script>
 </body>
 </html>
+
 
 
 
