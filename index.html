@@ -1,82 +1,152 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meteo-Cosuenda - Iconos Bonitos</title>
-  <style>
-    body {
-      background: #1e1e2f;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
-    .weather-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 40px;
-      margin-top: 40px;
-    }
-    .weather-box {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    canvas {
-      width: 128px;
-      height: 128px;
-    }
-    .temp {
-      margin-top: 10px;
-      font-size: 24px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meteo-Cosuenda</title>
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  transition: background 1s ease;
+  background: linear-gradient(to top, #4facfe, #00f2fe);
+  color:white;
+}
+
+.card {
+  backdrop-filter: blur(20px);
+  background: rgba(255,255,255,0.15);
+  border-radius:25px;
+  padding:40px;
+  width:340px;
+  text-align:center;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+}
+
+h1 {
+  font-size:22px;
+  margin-bottom:20px;
+}
+
+canvas {
+  width:140px;
+  height:140px;
+}
+
+.temp {
+  font-size:48px;
+  font-weight:600;
+  margin-top:10px;
+}
+
+.desc {
+  font-size:18px;
+  opacity:0.9;
+  margin-top:5px;
+}
+
+.extra {
+  margin-top:20px;
+  font-size:14px;
+  opacity:0.85;
+}
+</style>
 </head>
+
 <body>
-  <h1>Meteo-Cosuenda</h1>
-  <p>Clima en tiempo real con iconos animados</p>
 
-  <div class="weather-container">
-    <div class="weather-box">
-      <canvas id="sunny"></canvas>
-      <div class="temp">25°C</div>
-      <div>Despejado</div>
-    </div>
-    <div class="weather-box">
-      <canvas id="partlyCloudy"></canvas>
-      <div class="temp">18°C</div>
-      <div>Parcialmente nublado</div>
-    </div>
-    <div class="weather-box">
-      <canvas id="rain"></canvas>
-      <div class="temp">12°C</div>
-      <div>Lluvia</div>
-    </div>
-    <div class="weather-box">
-      <canvas id="snow"></canvas>
-      <div class="temp">0°C</div>
-      <div>Nieve</div>
-    </div>
-  </div>
+<div class="card">
+  <h1>🌤 Meteo-Cosuenda</h1>
+  <canvas id="weatherIcon" width="128" height="128"></canvas>
+  <div class="temp" id="temp">--°C</div>
+  <div class="desc" id="description">Cargando datos...</div>
+  <div class="extra" id="extraData"></div>
+</div>
 
-  <!-- Skycons -->
-  <script src="https://cdn.jsdelivr.net/npm/skycons@1.0.0/skycons.js"></script>
-  <script>
-    const skycons = new Skycons({ "color": "white" });
+<script src="https://cdn.jsdelivr.net/npm/skycons@1.0.0/skycons.js"></script>
 
-    // Asignamos iconos
-    skycons.add("sunny", Skycons.CLEAR_DAY);
-    skycons.add("partlyCloudy", Skycons.PARTLY_CLOUDY_DAY);
-    skycons.add("rain", Skycons.RAIN);
-    skycons.add("snow", Skycons.SNOW);
+<script>
+// 🔐 TUS DATOS REALES
+const APP_KEY = "26C4D6AD21CF8F8C4F3BA85E1CAF6701";
+const API_KEY = "adf65434-1ace-43dd-b9a9-27915843d243";
+const MAC = "84:CC:A8:B4:B1:F6";  
 
-    // Activamos animación
-    skycons.play();
-  </script>
+const url = `https://api.ecowitt.net/api/v3/device/real_time?application_key=${APP_KEY}&api_key=${API_KEY}&mac=${MAC}&call_back=all`;
+
+const skycons = new Skycons({ color: "white" });
+skycons.play();
+
+async function obtenerDatos() {
+  try {
+    const response = await fetch(url);
+    const json = await response.json();
+
+    const temp = json.data.outdoor.temperature.value;
+    const humedad = json.data.outdoor.humidity.value;
+    const viento = json.data.wind.speed.value;
+    const lluvia = json.data.rainfall.rate.value;
+    const radiacion = json.data.solar_and_uvi.solar.value;
+
+    document.getElementById("temp").innerText = temp + "°C";
+    document.getElementById("extraData").innerText =
+      "💧 " + humedad + "%   💨 " + viento + " km/h";
+
+    let icono;
+    let descripcion;
+    let fondo;
+
+    const hora = new Date().getHours();
+    const esNoche = hora >= 20 || hora <= 6;
+
+    if (lluvia > 0) {
+      icono = Skycons.RAIN;
+      descripcion = "Lluvia";
+      fondo = "linear-gradient(to top, #4e54c8, #8f94fb)";
+    } 
+    else if (viento > 30) {
+      icono = Skycons.WIND;
+      descripcion = "Viento fuerte";
+      fondo = "linear-gradient(to top, #757f9a, #d7dde8)";
+    } 
+    else if (esNoche) {
+      icono = Skycons.CLEAR_NIGHT;
+      descripcion = "Noche despejada";
+      fondo = "linear-gradient(to top, #141e30, #243b55)";
+    } 
+    else if (radiacion > 200) {
+      icono = Skycons.CLEAR_DAY;
+      descripcion = "Despejado";
+      fondo = "linear-gradient(to top, #4facfe, #00f2fe)";
+    } 
+    else {
+      icono = Skycons.PARTLY_CLOUDY_DAY;
+      descripcion = "Parcialmente nublado";
+      fondo = "linear-gradient(to top, #bdc3c7, #2c3e50)";
+    }
+
+    skycons.set("weatherIcon", icono);
+    document.getElementById("description").innerText = descripcion;
+    document.body.style.background = fondo;
+
+  } catch (error) {
+    console.error("Error cargando datos:", error);
+    document.getElementById("description").innerText = "Error de conexión";
+  }
+}
+
+obtenerDatos();
+setInterval(obtenerDatos, 60000);
+</script>
+
 </body>
 </html>
+
 
 
 
