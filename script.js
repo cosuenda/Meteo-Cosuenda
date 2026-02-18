@@ -44,6 +44,7 @@ async function obtenerDatos() {
     const response = await fetch(url);
     const json = await response.json();
   console.log("Respuesta API completa:", json);
+    
 console.log("Temperatura:", json.data?.outdoor?.temperature);
 console.log("Humedad:", json.data?.outdoor?.humidity);
 console.log("Viento:", json.data?.wind?.speed);
