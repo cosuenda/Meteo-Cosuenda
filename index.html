@@ -1,61 +1,57 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meteo Cosuenda</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <header>
-    <h1>Meteo Cosuenda</h1>
-    <p>Estación meteorológica en tiempo real</p>
-  </header>
+<div class="weather-panel">
+  <h2>Meteo-Cosuenda (Tiempo Real)</h2>
+  
+  <div class="weather-row">
+    <div class="weather-item">
+      <img src="https://img.icons8.com/color/48/000000/temperature.png" alt="Temperatura">
+      <p>Temperatura: <span id="temp">--</span></p>
+    </div>
+    <div class="weather-item">
+      <img src="https://img.icons8.com/color/48/000000/thermometer.png" alt="Sensación térmica">
+      <p>Sensación: <span id="feels">--</span></p>
+    </div>
+    <div class="weather-item">
+      <img src="https://img.icons8.com/color/48/000000/dew.png" alt="Punto de rocío">
+      <p>Punto de rocío: <span id="dew">--</span></p>
+    </div>
+  </div>
+  
+  <div class="weather-row">
+    <div class="weather-item">
+      <img src="https://img.icons8.com/color/48/000000/humidity.png" alt="Humedad">
+      <p>Humedad: <span id="hum">--</span></p>
+    </div>
+    <div class="weather-item">
+      <img src="https://img.icons8.com/color/48/000000/wind.png" alt="Viento">
+      <p>Viento: <span id="wind">--</span></p>
+      <p>Dirección: <span id="winddir">--</span></p>
+    </div>
+    <div class="weather-item">
+      <img src="https://img.icons8.com/color/48/000000/pressure.png" alt="Presión">
+      <p>Presión: <span id="press">--</span></p>
+    </div>
+  </div>
+  
+  <div class="weather-row">
+    <div class="weather-item">
+      <img src="https://img.icons8.com/color/48/000000/sun.png" alt="Radiación solar">
+      <p>Solar: <span id="solar">--</span></p>
+    </div>
+    <div class="weather-item">
+      <img src="https://img.icons8.com/color/48/000000/sun-uv-index.png" alt="Índice UV">
+      <p>UV: <span id="uvi">--</span></p>
+    </div>
+    <div class="weather-item">
+      <img src="https://img.icons8.com/color/48/000000/rain.png" alt="Precipitación diaria">
+      <p>Lluvia: <span id="rain">--</span></p>
+    </div>
+  </div>
 
-  <main>
-    <!-- Dashboard meteorológico -->
-    <section class="weather">
-      <h2>Datos actuales</h2>
-      <div id="weather-dashboard">
-        <div class="weather-item">
-          <img id="weather-icon" src="icons/sun.png" alt="Icono del clima">
-          <p id="temperature">-- °C</p>
-        </div>
-        <div class="weather-item">
-          <p>Humedad</p>
-          <p id="humidity">-- %</p>
-        </div>
-        <div class="weather-item">
-          <p>Viento</p>
-          <p id="wind">-- km/h</p>
-        </div>
-      </div>
-    </section>
+  <p class="update">Última actualización: <span id="update">--</span></p>
+</div>
 
-    <!-- Galería de imágenes -->
-    <section class="gallery">
-      <h2>Imágenes de Cosuenda</h2>
-      <div class="images">
-        <img src="images/cosuenda01.jpg" 
-             alt="Vista panorámica del pueblo de Cosuenda"
-             title="Cosuenda entre viñedos y su Torre de la Lisalta">
-        <img src="images/cosuenda02.jpg" 
-             alt="Calle empedrada del casco antiguo de Cosuenda"
-             title="Calle típica del centro histórico de Cosuenda">
-        <img src="images/cosuenda03.jpg" 
-             alt="Campos y viñedos alrededor de Cosuenda"
-             title="Paisaje rural y viñedos en los alrededores de Cosuenda">
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <p>© 2026 Cosuenda</p>
-  </footer>
-
-  <script src="script.js"></script>
-</body>
-</html>
+<link rel="stylesheet" href="style.css">
+<script src="script.js"></script>
 
 
 
