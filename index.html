@@ -5,10 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meteo-Cosuenda</title>
 <link rel="icon" href="data:,">
-
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-
 body {
   font-family: 'Segoe UI', sans-serif;
   height:100vh;
@@ -19,7 +17,6 @@ body {
   background: linear-gradient(to top, #4facfe, #00f2fe);
   color:white;
 }
-
 .card {
   backdrop-filter: blur(20px);
   background: rgba(255,255,255,0.15);
@@ -29,29 +26,24 @@ body {
   text-align:center;
   box-shadow: 0 15px 35px rgba(0,0,0,0.3);
 }
-
 h1 {
   font-size:22px;
   margin-bottom:20px;
 }
-
 canvas {
   width:140px;
   height:140px;
 }
-
 .temp {
   font-size:48px;
   font-weight:600;
   margin-top:10px;
 }
-
 .desc {
   font-size:18px;
   opacity:0.9;
   margin-top:5px;
 }
-
 .extra {
   margin-top:20px;
   font-size:14px;
@@ -59,7 +51,6 @@ canvas {
 }
 </style>
 </head>
-
 <body>
 
 <div class="card">
@@ -71,12 +62,10 @@ canvas {
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/skycons/1396634940/skycons.js"></script>
-
 <script>
-// 🔐 TUS DATOS REALES
 const APP_KEY = "26C4D6AD21CF8F8C4F3BA85E1CAF6701";
 const API_KEY = "adf65434-1ace-43dd-b9a9-27915843d243";
-const MAC = "84:CC:A8:B4:B1:F6";  
+const MAC = "84:CC:A8:B4:B1:F6";
 
 const url = `https://api.ecowitt.net/api/v3/device/real_time?application_key=${APP_KEY}&api_key=${API_KEY}&mac=${MAC}&call_back=all`;
 
@@ -88,22 +77,28 @@ async function obtenerDatos() {
     const response = await fetch(url);
     const json = await response.json();
 
-    const temp = json.data.outdoor.temperature.value;
-    const humedad = json.data.outdoor.humidity.value;
-    const viento = json.data.wind.speed.value;
-    const lluvia = json.data.rainfall.rate.value;
-    const radiacion = json.data.solar_and_uvi.solar.value;
+    console.log("Respuesta API:", json);
+
+    if (!json || !json.data) {
+      document.getElementById("description").innerText = "Error API (MAC o clave)";
+      return;
+    }
+
+    const temp = json.data?.outdoor?.temperature?.value ?? "--";
+    const humedad = json.data?.outdoor?.humidity?.value ?? "--";
+    const viento = json.data?.wind?.speed?.value ?? "--";
+    const lluvia = json.data?.rainfall?.rate?.value ?? 0;
+    const radiacion = json.data?.solar_and_uvi?.solar?.value ?? 0;
 
     document.getElementById("temp").innerText = temp + "°C";
     document.getElementById("extraData").innerText =
       "💧 " + humedad + "%   💨 " + viento + " km/h";
 
-    let icono;
-    let descripcion;
-    let fondo;
-
+    // Elegir icono y fondo
     const hora = new Date().getHours();
     const esNoche = hora >= 20 || hora <= 6;
+
+    let icono, descripcion, fondo;
 
     if (lluvia > 0) {
       icono = Skycons.RAIN;
@@ -137,14 +132,13 @@ async function obtenerDatos() {
 
   } catch (error) {
     console.error("Error cargando datos:", error);
-    document.getElementById("description").innerText = "Error de conexión";
+    document.getElementById("description").innerText = "Error conexión";
   }
 }
 
 obtenerDatos();
 setInterval(obtenerDatos, 60000);
 </script>
-
 </body>
 </html>
 
