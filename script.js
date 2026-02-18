@@ -50,7 +50,25 @@ console.log("Respuesta API completa:", JSON.stringify(json, null, 2));
 console.dir(json); // para expandir objetos fácilmente
 
   console.log("Respuesta API completa:", json);
-    
+    async function obtenerDatos() {
+  try {
+    const response = await fetch(url);
+    const json = await response.json();
+
+    // 🔹 Logs para ver todos los datos
+    console.log("Respuesta API completa:", JSON.stringify(json, null, 2));
+    console.dir(json); // para expandir objetos fácilmente
+    console.log("Temperatura:", json.data?.outdoor?.temperature);
+    console.log("Humedad:", json.data?.outdoor?.humidity);
+    console.log("Viento:", json.data?.wind?.speed);
+    console.log("Lluvia:", json.data?.rainfall?.rate);
+    console.log("Presión:", json.data?.barometer?.pressure);
+
+    // ...el resto de tu código
+  } catch (error) {
+    console.error("Error cargando datos:", error);
+  }
+}    
 console.log("Temperatura:", json.data?.outdoor?.temperature);
 console.log("Humedad:", json.data?.outdoor?.humidity);
 console.log("Viento:", json.data?.wind?.speed);
