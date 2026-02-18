@@ -41,9 +41,15 @@ const inHgToHpa = inHg => (parseFloat(inHg) * 33.8639).toFixed(1);
 // 🔹 Función principal
 async function obtenerDatos() {
   try {
-    const response = await fetch(url);
-    const json = await response.json();
-    const json = await response.json();
+    const response = await fetch(url); 
+   const json = await response.json();
+
+console.log("Temperatura:", json.data.outdoor.temperature);
+console.log("Humedad:", json.data.outdoor.humidity);
+console.log("Viento:", json.data.wind.speed_avg);
+console.log("Lluvia:", json.data.rainfall.rate);
+console.log("Presión:", json.data.barometer.pressure);
+
 
 // Mostrar todos los datos legibles
 console.log("Respuesta API completa:", JSON.stringify(json, null, 2));
