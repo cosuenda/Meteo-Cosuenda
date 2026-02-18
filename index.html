@@ -1,192 +1,58 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meteo Cosuenda</title>
+<div class="weather-panel">
+  <h2>Meteo-Cosuenda (Tiempo Real)</h2>
+  
+  <div class="weather-row">
+    <div class="weather-item">
+      <img src="icons/temperature.png" alt="Temperatura">
+      <p>Temperatura: <span id="temp">--</span></p>
+    </div>
+    <div class="weather-item">
+      <img src="icons/feels_like.png" alt="Sensación térmica">
+      <p>Sensación: <span id="feels">--</span></p>
+    </div>
+    <div class="weather-item">
+      <img src="icons/dew.png" alt="Punto de rocío">
+      <p>Punto de rocío: <span id="dew">--</span></p>
+    </div>
+  </div>
+  
+  <div class="weather-row">
+    <div class="weather-item">
+      <img src="icons/humidity.png" alt="Humedad">
+      <p>Humedad: <span id="hum">--</span></p>
+    </div>
+    <div class="weather-item">
+      <img src="icons/wind.png" alt="Viento">
+      <p>Viento: <span id="wind">--</span></p>
+      <p>Dirección: <span id="winddir">--</span></p>
+    </div>
+    <div class="weather-item">
+      <img src="icons/pressure.png" alt="Presión">
+      <p>Presión: <span id="press">--</span></p>
+    </div>
+  </div>
+  
+  <div class="weather-row">
+    <div class="weather-item">
+      <img src="icons/solar.png" alt="Radiación solar">
+      <p>Solar: <span id="solar">--</span></p>
+    </div>
+    <div class="weather-item">
+      <img src="icons/uv.png" alt="Índice UV">
+      <p>UV: <span id="uvi">--</span></p>
+    </div>
+    <div class="weather-item">
+      <img src="icons/rain.png" alt="Precipitación diaria">
+      <p>Lluvia: <span id="rain">--</span></p>
+    </div>
+  </div>
 
-<style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:'Segoe UI',sans-serif;
-}
-
-body{
-  background:linear-gradient(to bottom,#87cefa,#f0f8ff);
-  padding:15px;
-  color:#333;
-}
-
-header{
-  text-align:center;
-  margin-bottom:25px;
-}
-
-header h1{
-  font-size:2em;
-}
-
-header p{
-  font-size:0.9em;
-  color:#555;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:15px;
-}
-
-.card{
-  background:white;
-  border-radius:15px;
-  padding:20px;
-  text-align:center;
-  box-shadow:0 6px 15px rgba(0,0,0,0.1);
-  transition:0.3s;
-}
-
-.card:hover{
-  transform:translateY(-5px);
-}
-
-.card svg{
-  width:50px;
-  height:50px;
-  margin-bottom:10px;
-}
-
-.card h2{
-  font-size:1.1em;
-  margin-bottom:8px;
-}
-
-.card p{
-  font-size:1.3em;
-  font-weight:bold;
-}
-
-footer{
-  text-align:center;
-  margin-top:30px;
-  font-size:0.8em;
-  color:#666;
-}
-</style>
-</head>
-
-<body>
-
-<header>
-<h1>🌦 Estación Meteorológica Cosuenda</h1>
-<p id="update">Última actualización: --</p>
-</header>
-
-<main>
-<section class="grid">
-
-<div class="card">
-<svg viewBox="0 0 24 24" fill="#FF5722">
-<path d="M6 14h12v2H6z"/>
-<path d="M12 2v12"/>
-</svg>
-<h2>Temperatura</h2>
-<p><span id="temp">--</span></p>
+  <p class="update">Última actualización: <span id="update">--</span></p>
 </div>
 
-<div class="card">
-<svg viewBox="0 0 24 24" fill="#03A9F4">
-<circle cx="12" cy="12" r="10"/>
-</svg>
-<h2>Humedad</h2>
-<p><span id="hum">--</span></p>
-</div>
+<link rel="stylesheet" href="style.css">
+<script src="script.js"></script>
 
-<div class="card">
-<svg viewBox="0 0 24 24" fill="#4CAF50">
-<path d="M2 12h20M12 2l10 20"/>
-</svg>
-<h2>Viento</h2>
-<p><span id="wind">--</span></p>
-</div>
-
-<div class="card">
-<svg viewBox="0 0 24 24" fill="#2196F3">
-<path d="M4 17h16v2H4zM4 13h16v2H4zM4 9h16v2H4z"/>
-</svg>
-<h2>Lluvia</h2>
-<p><span id="rain">--</span></p>
-</div>
-
-<div class="card">
-<svg viewBox="0 0 24 24" fill="#9C27B0">
-<path d="M4 6h16v2H4zM4 12h16v2H4zM4 18h16v2H4z"/>
-</svg>
-<h2>Presión</h2>
-<p><span id="press">--</span></p>
-</div>
-
-</section>
-</main>
-
-<footer>
-Datos obtenidos desde Meteoclimatic
-</footer>
-
-<script>
-const stationCode = "ESARA5000000050409A";
-
-const rssUrl = "https://api.allorigins.win/raw?url=" +
-encodeURIComponent("https://www.meteoclimatic.net/feed/rss_es.xml");
-
-async function obtenerDatos(){
-  try{
-    const response = await fetch(rssUrl);
-    const xmlText = await response.text();
-
-    const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(xmlText,"application/xml");
-
-    const items = Array.from(xmlDoc.querySelectorAll("item"));
-
-    const miEstacion = items.find(item=>{
-      const link = item.querySelector("link")?.textContent || "";
-      return link.includes(stationCode);
-    });
-
-    if(!miEstacion){
-      console.log("Estación no encontrada");
-      return;
-    }
-
-    const description = miEstacion.querySelector("description")?.textContent || "";
-    const pubDate = miEstacion.querySelector("pubDate")?.textContent || "";
-
-    function extraer(valor){
-      const match = description.match(new RegExp(valor + ":\\s*([-\\d\\.]+)"));
-      return match ? match[1] : "--";
-    }
-
-    document.getElementById("temp").textContent  = extraer("Temperatura") + " °C";
-    document.getElementById("hum").textContent   = extraer("Humedad") + " %";
-    document.getElementById("wind").textContent  = extraer("Viento") + " km/h";
-    document.getElementById("rain").textContent  = extraer("Lluvia") + " mm";
-    document.getElementById("press").textContent = extraer("Presión") + " hPa";
-    document.getElementById("update").textContent = "Última actualización: " + pubDate;
-
-  }catch(error){
-    console.error("Error cargando datos:",error);
-  }
-}
-
-obtenerDatos();
-setInterval(obtenerDatos,600000);
-</script>
-
-</body>
-</html>
 
 
 
