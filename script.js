@@ -35,84 +35,35 @@ function animarValor(element, nuevoValor, unidad = "") {
 async function obtenerDatos() {
   try {
     const response = await fetch(url);
-    const data = await response.json();
+    const json = await response.json();
 
-    if (data.code !== 0) {
-      console.error("Error API:", data);
+    console.log("Respuesta completa:", json);
+
+    if (!json.data) {
+      document.getElementById("description").innerText = "Error API";
       return;
     }
 
-    const outdoor = data.data.outdoor;
-    const wind = data.data.wind;
-    const pressure = data.data.pressure;
-    const solar = data.data.solar_and_uvi.solar;
-    const uvi = data.data.solar_and_uvi.uvi;
-    const rainfall = data.data.rainfall.daily;
+    const outdoor = json.data.outdoor || {};
+    const wind = json.data.wind || {};
+    const rainfall = json.data.rainfall || {};
+    const solar = json.data.solar_and_uvi || {};
 
-    // ====== Convertir unidades ======
-    const rainMm = inToMm(rainfall.value);
-    const pressureHpa = inHgToHpa(pressure.relative.value);
+    const temp = outdoor.temperature?.value ?? "--";
+    const humedad = outdoor.humidity?.value ?? "--";
+    const viento = wind.speed?.value ?? "--";
+    const lluvia = rainfall.rate?.value ?? 0;
+    const radiacion = solar.solar?.value ?? 0;
 
-    // ====== Animar valores ======
-    animarValor(document.getElementById("temp"), fToC(outdoor.temperature.value), " °C");
-    animarValor(document.getElementById("feels"), fToC(outdoor.feels_like.value), " °C");
-    animarValor(document.getElementById("dew"), fToC(outdoor.dew_point.value), " °C");
-    animarValor(document.getElementById("wind"), mphToKmh(wind.wind_speed.value), " km/h");
-    animarValor(document.getElementById("hum"), outdoor.humidity.value, " %");
-    animarValor(document.getElementById("rain"), rainMm, " mm");
-
-    // ====== Valores fijos ======
-    document.getElementById("winddir").textContent = wind.wind_direction.value + " º";
-    document.getElementById("press").textContent = pressureHpa + " hPa"; // ✅ presión en hPa
-    document.getElementById("solar").textContent = solar.value + " W/m²";
-    document.getElementById("uvi").textContent = uvi.value;
-
-    // ====== Timestamp y fondo dinámico ======
-    const timestamp = new Date(data.time * 1000);
-    document.getElementById("update").textContent = timestamp.toLocaleString();
-
-    const hour = timestamp.getHours();
-    const body = document.body;
-    if (hour >= 6 && hour < 18) body.style.background = "linear-gradient(to bottom, #87CEEB, #f0f8ff)";
-    else body.style.background = "linear-gradient(to bottom, #001848, #0a1f44)";
-
-    // ====== Colores dinámicos ======
-    const tempC = parseFloat(fToC(outdoor.temperature.value));
-    const tempEl = document.getElementById("temp");
-    if (tempC <= 0) tempEl.style.color = "#00f";
-    else if (tempC <= 15) tempEl.style.color = "#0aa";
-    else if (tempC <= 25) tempEl.style.color = "#0a0";
-    else if (tempC <= 35) tempEl.style.color = "#fa0";
-    else tempEl.style.color = "#f00";
-
-    const humVal = parseInt(outdoor.humidity.value);
-    const humEl = document.getElementById("hum");
-    humEl.style.color = humVal < 50 ? "#0aa" : "#0055aa";
-
-    const windVal = parseFloat(wind.wind_speed.value) * 1.60934;
-    const windText = document.getElementById("wind");
-    if (windVal < 10) windText.style.color = "#0a0";
-    else if (windVal < 30) windText.style.color = "#fa0";
-    else windText.style.color = "#f00";
-
-    const rainText = document.getElementById("rain");
-    rainText.style.color = rainMm == 0 ? "#555" : "#00f";
-
-    // ====== Giro icono viento ======
-    const windIcon = document.querySelector('img[alt="Viento"]');
-    if (windIcon) {
-      windIcon.style.transform = `rotate(${wind.wind_direction.value}deg)`;
-      windIcon.style.transition = "transform 1s ease";
-    }
+    document.getElementById("temp").innerText = temp + "°C";
+    document.getElementById("extraData").innerText =
+      "💧 " + humedad + "%   💨 " + viento + " km/h";
 
   } catch (error) {
-    console.error("Error de conexión:", error);
+    console.error("Error cargando datos:", error);
+    document.getElementById("description").innerText = "Error conexión";
   }
 }
-
-// ====== Carga inicial y actualización cada 10 minutos ======
-obtenerDatos();
-setInterval(obtenerDatos, 600000);
 
 
 
