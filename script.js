@@ -32,7 +32,8 @@ async function obtenerDatos() {
   try {
     const response = await fetch(url);
     const json = await response.json();
-
+    
+    console.log("Temperatura cruda:", json.data.outdoor.temperature);
     console.log("Respuesta completa:", JSON.stringify(json, null, 2));
 
     if (!json || !json.data) {
