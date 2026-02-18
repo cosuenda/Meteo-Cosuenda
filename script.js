@@ -32,6 +32,13 @@ function animarValor(element, nuevoValor, unidad = "") {
 }
 
 // ====== Función principal ======
+// 🔹 Funciones de conversión
+const fToC = f => ((parseFloat(f) - 32) * 5 / 9).toFixed(1);
+const mphToKmh = mph => (parseFloat(mph) * 1.60934).toFixed(1);
+const inToMm = inches => (parseFloat(inches) * 25.4).toFixed(1);
+const inHgToHpa = inHg => (parseFloat(inHg) * 33.8639).toFixed(1);
+
+// 🔹 Función principal
 async function obtenerDatos() {
   try {
     const response = await fetch(url);
@@ -39,29 +46,45 @@ async function obtenerDatos() {
 
     console.log("Respuesta API:", json); // Para depuración
 
-    // Si no existe json.data → no rompemos la web
     if (!json || !json.data) {
       document.getElementById("description").innerText = "No hay datos disponibles";
       document.getElementById("temp").innerText = "--°C";
-      document.getElementById("extraData").innerText = "💧 --%   💨 -- km/h";
+      document.getElementById("extraData").innerText = "💧 --%   💨 -- km/h   🌦 -- mm   🌡 -- hPa";
       skycons.set("weatherIcon", Skycons.CLEAR_DAY);
       document.body.style.background = "linear-gradient(to top, #4facfe, #00f2fe)";
       return;
     }
 
-    // Extraer datos de forma segura
-    const temp = json.data?.outdoor?.temperature?.value ?? "--";
-    const humedad = json.data?.outdoor?.humidity?.value ?? "--";
-    const viento = json.data?.wind?.speed?.value ?? "--";
-    const lluvia = json.data?.rainfall?.rate?.value ?? 0;
-    const radiacion = json.data?.solar_and_uvi?.solar?.value ?? 0;
+    // 🔹 Temperatura
+    let temp = json.data?.outdoor?.temperature?.value ?? "--";
+    const tempUnit = json.data?.outdoor?.temperature?.unit ?? "C";
+    if (tempUnit === "F") temp = fToC(temp);
+    if (temp > 50 || temp < -10) temp = "--"; // Filtrar valores extremos
 
-    // Mostrar datos
+    // 🔹 Humedad
+    const humedad = json.data?.outdoor?.humidity?.value ?? "--";
+
+    // 🔹 Viento
+    let viento = json.data?.wind?.speed?.value ?? "--";
+    const vientoUnit = json.data?.wind?.speed?.unit ?? "km/h";
+    if (vientoUnit === "mph") viento = mphToKmh(viento);
+
+    // 🔹 Lluvia
+    let lluvia = json.data?.rainfall?.rate?.value ?? 0;
+    const lluviaUnit = json.data?.rainfall?.rate?.unit ?? "mm";
+    if (lluviaUnit === "in") lluvia = inToMm(lluvia);
+
+    // 🔹 Presión
+    let presion = json.data?.barometer?.pressure?.value ?? "--";
+    const presionUnit = json.data?.barometer?.pressure?.unit ?? "hPa";
+    if (presionUnit === "inHg") presion = inHgToHpa(presion);
+
+    // 🔹 Mostrar datos
     document.getElementById("temp").innerText = temp + "°C";
     document.getElementById("extraData").innerText =
-      "💧 " + humedad + "%   💨 " + viento + " km/h";
+      `💧 ${humedad}%   💨 ${viento} km/h   🌦 ${lluvia} mm   🌡 ${presion} hPa`;
 
-    // Elegir icono y fondo
+    // 🔹 Iconos y fondo dinámico
     const hora = new Date().getHours();
     const esNoche = hora >= 20 || hora <= 6;
 
@@ -82,10 +105,10 @@ async function obtenerDatos() {
       descripcion = "Noche despejada";
       fondo = "linear-gradient(to top, #141e30, #243b55)";
     } 
-    else if (radiacion > 200) {
+    else if (temp > 35) {
       icono = Skycons.CLEAR_DAY;
-      descripcion = "Despejado";
-      fondo = "linear-gradient(to top, #4facfe, #00f2fe)";
+      descripcion = "Calor intenso";
+      fondo = "linear-gradient(to top, #ff512f, #f09819)";
     } 
     else {
       icono = Skycons.PARTLY_CLOUDY_DAY;
@@ -101,11 +124,12 @@ async function obtenerDatos() {
     console.error("Error cargando datos:", error);
     document.getElementById("description").innerText = "Error de conexión";
     document.getElementById("temp").innerText = "--°C";
-    document.getElementById("extraData").innerText = "💧 --%   💨 -- km/h";
+    document.getElementById("extraData").innerText = "💧 --%   💨 -- km/h   🌦 -- mm   🌡 -- hPa";
     skycons.set("weatherIcon", Skycons.CLEAR_DAY);
     document.body.style.background = "linear-gradient(to top, #4facfe, #00f2fe)";
   }
 }
+
 
 
 
