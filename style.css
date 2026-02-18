@@ -49,6 +49,14 @@ body {
   margin-top: 10px;
   color: #555;
 }
+.weather-item p span {
+  transition: color 0.8s ease, transform 0.8s ease;
+  display: inline-block; /* necesario para animaciones de transformación */
+}
+
+#temp, #feels, #dew, #wind, #rain {
+  transition: all 1s ease; /* animación general para cambios de valor */
+}
 
 
 
