@@ -46,7 +46,7 @@ async function obtenerDatos() {
     // ----------------------------
     let temp = json.data?.outdoor?.temperature?.value ?? "--";
     const tempUnit = json.data?.outdoor?.temperature?.unit ?? "C";
-    if (tempUnit === "F") temp = fToC(temp);
+    if (tempUnit === "C") temp = fToC(temp);
     if (temp > 50 || temp < -10) temp = "--"; // Filtrar valores absurdos
 
     // ----------------------------
