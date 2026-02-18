@@ -37,33 +37,29 @@ async function obtenerDatos() {
     const response = await fetch(url);
     const json = await response.json();
 
-    console.log("Respuesta completa:", json);
+    console.log("Respuesta API:", json);
 
-    if (!json.data) {
-      document.getElementById("description").innerText = "Error API";
+    if (!json || !json.data) {
+      document.getElementById("description").innerText = "Error API o MAC incorrecto";
       return;
     }
 
-    const outdoor = json.data.outdoor || {};
-    const wind = json.data.wind || {};
-    const rainfall = json.data.rainfall || {};
-    const solar = json.data.solar_and_uvi || {};
-
-    const temp = outdoor.temperature?.value ?? "--";
-    const humedad = outdoor.humidity?.value ?? "--";
-    const viento = wind.speed?.value ?? "--";
-    const lluvia = rainfall.rate?.value ?? 0;
-    const radiacion = solar.solar?.value ?? 0;
+    const temp = json.data?.outdoor?.temperature?.value ?? "--";
+    const humedad = json.data?.outdoor?.humidity?.value ?? "--";
+    const viento = json.data?.wind?.speed?.value ?? "--";
 
     document.getElementById("temp").innerText = temp + "°C";
     document.getElementById("extraData").innerText =
       "💧 " + humedad + "%   💨 " + viento + " km/h";
+
+    document.getElementById("description").innerText = "Datos actualizados";
 
   } catch (error) {
     console.error("Error cargando datos:", error);
     document.getElementById("description").innerText = "Error conexión";
   }
 }
+
 
 
 
