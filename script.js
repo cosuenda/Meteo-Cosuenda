@@ -43,6 +43,12 @@ async function obtenerDatos() {
   try {
     const response = await fetch(url);
     const json = await response.json();
+    const json = await response.json();
+
+// Mostrar todos los datos legibles
+console.log("Respuesta API completa:", JSON.stringify(json, null, 2));
+console.dir(json); // para expandir objetos fácilmente
+
   console.log("Respuesta API completa:", json);
     
 console.log("Temperatura:", json.data?.outdoor?.temperature);
