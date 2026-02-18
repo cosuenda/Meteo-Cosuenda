@@ -9,6 +9,26 @@ const url = `https://api.ecowitt.net/api/v3/device/real_time?application_key=${a
 const fToC = f => ((parseFloat(f) - 32) * 5/9).toFixed(1);
 const mphToKmh = mph => (parseFloat(mph) * 1.60934).toFixed(1);
 
+// ====== Animación de valor ======
+function animarValor(element, nuevoValor, unidad = "") {
+  const valorActual = parseFloat(element.getAttribute("data-valor")) || 0;
+  const valorFinal = parseFloat(nuevoValor);
+  let start = valorActual;
+  const step = (valorFinal - start) / 20;
+
+  let i = 0;
+  const anim = setInterval(() => {
+    start += step;
+    element.textContent = start.toFixed(1) + unidad;
+    i++;
+    if (i >= 20) {
+      element.textContent = valorFinal.toFixed(1) + unidad;
+      element.setAttribute("data-valor", valorFinal);
+      clearInterval(anim);
+    }
+  }, 50);
+}
+
 // ====== Función principal ======
 async function obtenerDatos() {
   try {
@@ -27,30 +47,29 @@ async function obtenerDatos() {
     const uvi = data.data.solar_and_uvi.uvi;
     const rainfall = data.data.rainfall.daily;
 
-    // ====== Actualizar valores ======
-    document.getElementById("temp").textContent = fToC(outdoor.temperature.value) + " °C";
-    document.getElementById("feels").textContent = fToC(outdoor.feels_like.value) + " °C";
-    document.getElementById("dew").textContent = fToC(outdoor.dew_point.value) + " °C";
-    document.getElementById("hum").textContent = outdoor.humidity.value + " %";
-    document.getElementById("wind").textContent = mphToKmh(wind.wind_speed.value) + " km/h";
+    // ====== Animar valores ======
+    animarValor(document.getElementById("temp"), fToC(outdoor.temperature.value), " °C");
+    animarValor(document.getElementById("feels"), fToC(outdoor.feels_like.value), " °C");
+    animarValor(document.getElementById("dew"), fToC(outdoor.dew_point.value), " °C");
+    animarValor(document.getElementById("wind"), mphToKmh(wind.wind_speed.value), " km/h");
+    animarValor(document.getElementById("rain"), rainfall.value, " in");
+
+    // Actualizar valores fijos
     document.getElementById("winddir").textContent = wind.wind_direction.value + " º";
     document.getElementById("press").textContent = pressure.relative.value + " inHg";
     document.getElementById("solar").textContent = solar.value + " W/m²";
     document.getElementById("uvi").textContent = uvi.value;
-    document.getElementById("rain").textContent = rainfall.value + " in";
 
     // ====== Timestamp y fondo dinámico ======
     const timestamp = new Date(data.time * 1000);
     document.getElementById("update").textContent = timestamp.toLocaleString();
 
-    // Fondo día/noche
     const hour = timestamp.getHours();
     const body = document.body;
-    if (hour >= 6 && hour < 18) body.style.background = "linear-gradient(to bottom, #87CEEB, #f0f8ff)"; // día
-    else body.style.background = "linear-gradient(to bottom, #001848, #0a1f44)"; // noche
+    if (hour >= 6 && hour < 18) body.style.background = "linear-gradient(to bottom, #87CEEB, #f0f8ff)";
+    else body.style.background = "linear-gradient(to bottom, #001848, #0a1f44)";
 
     // ====== Colores dinámicos ======
-    // Temperatura
     const tempC = parseFloat(fToC(outdoor.temperature.value));
     const tempEl = document.getElementById("temp");
     if (tempC <= 0) tempEl.style.color = "#00f";
@@ -59,22 +78,19 @@ async function obtenerDatos() {
     else if (tempC <= 35) tempEl.style.color = "#fa0";
     else tempEl.style.color = "#f00";
 
-    // Humedad
     const humVal = parseInt(outdoor.humidity.value);
     const humEl = document.getElementById("hum");
     humEl.style.color = humVal < 50 ? "#0aa" : "#0055aa";
 
-    // Viento
     const windVal = parseFloat(wind.wind_speed.value) * 1.60934;
-    const windEl = document.getElementById("wind");
-    if (windVal < 10) windEl.style.color = "#0a0";
-    else if (windVal < 30) windEl.style.color = "#fa0";
-    else windEl.style.color = "#f00";
+    const windText = document.getElementById("wind");
+    if (windVal < 10) windText.style.color = "#0a0";
+    else if (windVal < 30) windText.style.color = "#fa0";
+    else windText.style.color = "#f00";
 
-    // Lluvia
     const rainVal = parseFloat(rainfall.value);
-    const rainEl = document.getElementById("rain");
-    rainEl.style.color = rainVal === 0 ? "#555" : "#00f";
+    const rainText = document.getElementById("rain");
+    rainText.style.color = rainVal === 0 ? "#555" : "#00f";
 
     // ====== Giro icono viento ======
     const windIcon = document.querySelector('img[alt="Viento"]');
