@@ -37,26 +37,73 @@ async function obtenerDatos() {
     const response = await fetch(url);
     const json = await response.json();
 
-    console.log("Respuesta API:", json);
+    console.log("Respuesta API:", json); // Para depuración
 
+    // Si no existe json.data → no rompemos la web
     if (!json || !json.data) {
-      document.getElementById("description").innerText = "Error API (MAC o clave)";
+      document.getElementById("description").innerText = "No hay datos disponibles";
+      document.getElementById("temp").innerText = "--°C";
+      document.getElementById("extraData").innerText = "💧 --%   💨 -- km/h";
+      skycons.set("weatherIcon", Skycons.CLEAR_DAY);
+      document.body.style.background = "linear-gradient(to top, #4facfe, #00f2fe)";
       return;
     }
 
+    // Extraer datos de forma segura
     const temp = json.data?.outdoor?.temperature?.value ?? "--";
     const humedad = json.data?.outdoor?.humidity?.value ?? "--";
     const viento = json.data?.wind?.speed?.value ?? "--";
+    const lluvia = json.data?.rainfall?.rate?.value ?? 0;
+    const radiacion = json.data?.solar_and_uvi?.solar?.value ?? 0;
 
+    // Mostrar datos
     document.getElementById("temp").innerText = temp + "°C";
     document.getElementById("extraData").innerText =
       "💧 " + humedad + "%   💨 " + viento + " km/h";
 
-    document.getElementById("description").innerText = "Datos correctos";
+    // Elegir icono y fondo
+    const hora = new Date().getHours();
+    const esNoche = hora >= 20 || hora <= 6;
+
+    let icono, descripcion, fondo;
+
+    if (lluvia > 0) {
+      icono = Skycons.RAIN;
+      descripcion = "Lluvia";
+      fondo = "linear-gradient(to top, #4e54c8, #8f94fb)";
+    } 
+    else if (viento > 30) {
+      icono = Skycons.WIND;
+      descripcion = "Viento fuerte";
+      fondo = "linear-gradient(to top, #757f9a, #d7dde8)";
+    } 
+    else if (esNoche) {
+      icono = Skycons.CLEAR_NIGHT;
+      descripcion = "Noche despejada";
+      fondo = "linear-gradient(to top, #141e30, #243b55)";
+    } 
+    else if (radiacion > 200) {
+      icono = Skycons.CLEAR_DAY;
+      descripcion = "Despejado";
+      fondo = "linear-gradient(to top, #4facfe, #00f2fe)";
+    } 
+    else {
+      icono = Skycons.PARTLY_CLOUDY_DAY;
+      descripcion = "Parcialmente nublado";
+      fondo = "linear-gradient(to top, #bdc3c7, #2c3e50)";
+    }
+
+    skycons.set("weatherIcon", icono);
+    document.getElementById("description").innerText = descripcion;
+    document.body.style.background = fondo;
 
   } catch (error) {
     console.error("Error cargando datos:", error);
-    document.getElementById("description").innerText = "Error conexión";
+    document.getElementById("description").innerText = "Error de conexión";
+    document.getElementById("temp").innerText = "--°C";
+    document.getElementById("extraData").innerText = "💧 --%   💨 -- km/h";
+    skycons.set("weatherIcon", Skycons.CLEAR_DAY);
+    document.body.style.background = "linear-gradient(to top, #4facfe, #00f2fe)";
   }
 }
 
