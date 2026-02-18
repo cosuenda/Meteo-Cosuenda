@@ -58,11 +58,12 @@ console.dir(json); // para expandir objetos fácilmente
     // 🔹 Logs para ver todos los datos
     console.log("Respuesta API completa:", JSON.stringify(json, null, 2));
     console.dir(json); // para expandir objetos fácilmente
-    console.log("Temperatura:", json.data?.outdoor?.temperature);
-    console.log("Humedad:", json.data?.outdoor?.humidity);
-    console.log("Viento:", json.data?.wind?.speed);
-    console.log("Lluvia:", json.data?.rainfall?.rate);
-    console.log("Presión:", json.data?.barometer?.pressure);
+    console.log("Temperatura:", json.data.outdoor.temperature);
+    console.log("Humedad:", json.data.outdoor.humidity);
+    console.log("Viento:", json.data.wind.speed_avg); // o speed_max según tu estación
+    console.log("Lluvia:", json.data.rainfall.rate);
+    console.log("Presión:", json.data.barometer.pressure);
+
 
     // ...el resto de tu código
   } catch (error) {
