@@ -43,7 +43,12 @@ async function obtenerDatos() {
   try {
     const response = await fetch(url);
     const json = await response.json();
-console.log(json.data);
+  console.log("Respuesta API completa:", json);
+console.log("Temperatura:", json.data?.outdoor?.temperature);
+console.log("Humedad:", json.data?.outdoor?.humidity);
+console.log("Viento:", json.data?.wind?.speed);
+console.log("Lluvia:", json.data?.rainfall?.rate);
+console.log("Presión:", json.data?.barometer?.pressure);
 
     console.log("Respuesta API:", json); // Para depuración
 
