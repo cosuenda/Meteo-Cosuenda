@@ -1,128 +1,89 @@
-// ====== Claves y URL API ======
-const appKey = "26C4D6AD21CF8F8C4F3BA85E1CAF6701";
-const apiKey = "adf65434-1ace-43dd-b9a9-27915843d243";
-const mac = "84:CC:A8:B4:B1:F6";
+// ----------------------------
+// script.js para Meteo-Cosuenda
+// ----------------------------
 
-const url = `https://api.ecowitt.net/api/v3/device/real_time?application_key=${appKey}&api_key=${apiKey}&mac=${mac}&call_back=all`;
+// ⚠️ Sustituye estos valores por los de tu estación
+const APP_KEY = "26C4D6AD21CF8F8C4F3BA85E1CAF6701";
+const API_KEY = "adf65434-1ace-43dd-b9a9-27915843d243";
+const MAC = "84:CC:A8:B4:B1:F6";
 
-// ====== Funciones de conversión ======
+// URL de la API
+const url = `https://api.ecowitt.net/api/v3/device/real_time?application_key=${APP_KEY}&api_key=${API_KEY}&mac=${MAC}&call_back=all`;
+
+// ----------------------------
+// Funciones de conversión
+// ----------------------------
 const fToC = f => ((parseFloat(f) - 32) * 5 / 9).toFixed(1);
 const mphToKmh = mph => (parseFloat(mph) * 1.60934).toFixed(1);
 const inToMm = inches => (parseFloat(inches) * 25.4).toFixed(1);
 const inHgToHpa = inHg => (parseFloat(inHg) * 33.8639).toFixed(1);
 
-// ====== Animación de valores ======
-function animarValor(element, nuevoValor, unidad = "") {
-  const valorActual = parseFloat(element.getAttribute("data-valor")) || 0;
-  const valorFinal = parseFloat(nuevoValor);
-  let start = valorActual;
-  const step = (valorFinal - start) / 20;
+// ----------------------------
+// Inicializar Skycons
+// ----------------------------
+const skycons = new Skycons({"color": "white"});
+skycons.add("weatherIcon", Skycons.CLEAR_DAY);
+skycons.play();
 
-  let i = 0;
-  const anim = setInterval(() => {
-    start += step;
-    element.textContent = start.toFixed(1) + unidad;
-    i++;
-    if (i >= 20) {
-      element.textContent = valorFinal.toFixed(1) + unidad;
-      element.setAttribute("data-valor", valorFinal);
-      clearInterval(anim);
-    }
-  }, 50);
-}
-
-// ====== Función principal ======
-// 🔹 Funciones de conversión
-const fToC = f => ((parseFloat(f) - 32) * 5 / 9).toFixed(1);
-const mphToKmh = mph => (parseFloat(mph) * 1.60934).toFixed(1);
-const inToMm = inches => (parseFloat(inches) * 25.4).toFixed(1);
-const inHgToHpa = inHg => (parseFloat(inHg) * 33.8639).toFixed(1);
-
-// 🔹 Función principal
+// ----------------------------
+// Función principal
+// ----------------------------
 async function obtenerDatos() {
-  try {
-    const response = await fetch(url); 
-   const json = await response.json();
-
-console.log("Temperatura:", json.data.outdoor.temperature);
-console.log("Humedad:", json.data.outdoor.humidity);
-console.log("Viento:", json.data.wind.speed_avg);
-console.log("Lluvia:", json.data.rainfall.rate);
-console.log("Presión:", json.data.barometer.pressure);
-
-
-// Mostrar todos los datos legibles
-console.log("Respuesta API completa:", JSON.stringify(json, null, 2));
-console.dir(json); // para expandir objetos fácilmente
-
-  console.log("Respuesta API completa:", json);
-    async function obtenerDatos() {
   try {
     const response = await fetch(url);
     const json = await response.json();
 
-    // 🔹 Logs para ver todos los datos
-    console.log("Respuesta API completa:", JSON.stringify(json, null, 2));
-    console.dir(json); // para expandir objetos fácilmente
-    console.log("Temperatura:", json.data.outdoor.temperature);
-    console.log("Humedad:", json.data.outdoor.humidity);
-    console.log("Viento:", json.data.wind.speed_avg); // o speed_max según tu estación
-    console.log("Lluvia:", json.data.rainfall.rate);
-    console.log("Presión:", json.data.barometer.pressure);
-
-
-    // ...el resto de tu código
-  } catch (error) {
-    console.error("Error cargando datos:", error);
-  }
-}    
-console.log("Temperatura:", json.data?.outdoor?.temperature);
-console.log("Humedad:", json.data?.outdoor?.humidity);
-console.log("Viento:", json.data?.wind?.speed);
-console.log("Lluvia:", json.data?.rainfall?.rate);
-console.log("Presión:", json.data?.barometer?.pressure);
-
-    console.log("Respuesta API:", json); // Para depuración
+    console.log("Respuesta completa:", JSON.stringify(json, null, 2));
 
     if (!json || !json.data) {
-      document.getElementById("description").innerText = "No hay datos disponibles";
-      document.getElementById("temp").innerText = "--°C";
-      document.getElementById("extraData").innerText = "💧 --%   💨 -- km/h   🌦 -- mm   🌡 -- hPa";
-      skycons.set("weatherIcon", Skycons.CLEAR_DAY);
-      document.body.style.background = "linear-gradient(to top, #4facfe, #00f2fe)";
+      mostrarDatosFallback();
       return;
     }
 
-    // 🔹 Temperatura
+    // ----------------------------
+    // Temperatura
+    // ----------------------------
     let temp = json.data?.outdoor?.temperature?.value ?? "--";
     const tempUnit = json.data?.outdoor?.temperature?.unit ?? "C";
     if (tempUnit === "F") temp = fToC(temp);
-    if (temp > 50 || temp < -10) temp = "--"; // Filtrar valores extremos
+    if (temp > 50 || temp < -10) temp = "--"; // Filtrar valores absurdos
 
-    // 🔹 Humedad
+    // ----------------------------
+    // Humedad
+    // ----------------------------
     const humedad = json.data?.outdoor?.humidity?.value ?? "--";
 
-    // 🔹 Viento
-    let viento = json.data?.wind?.speed?.value ?? "--";
-    const vientoUnit = json.data?.wind?.speed?.unit ?? "km/h";
+    // ----------------------------
+    // Viento
+    // ----------------------------
+    let viento = json.data?.wind?.speed_avg?.value ?? json.data?.wind?.speed_max?.value ?? "--";
+    const vientoUnit = json.data?.wind?.speed_avg?.unit ?? json.data?.wind?.speed_max?.unit ?? "km/h";
     if (vientoUnit === "mph") viento = mphToKmh(viento);
 
-    // 🔹 Lluvia
+    // ----------------------------
+    // Lluvia
+    // ----------------------------
     let lluvia = json.data?.rainfall?.rate?.value ?? 0;
     const lluviaUnit = json.data?.rainfall?.rate?.unit ?? "mm";
     if (lluviaUnit === "in") lluvia = inToMm(lluvia);
 
-    // 🔹 Presión
+    // ----------------------------
+    // Presión
+    // ----------------------------
     let presion = json.data?.barometer?.pressure?.value ?? "--";
     const presionUnit = json.data?.barometer?.pressure?.unit ?? "hPa";
     if (presionUnit === "inHg") presion = inHgToHpa(presion);
 
-    // 🔹 Mostrar datos
+    // ----------------------------
+    // Mostrar datos en HTML
+    // ----------------------------
     document.getElementById("temp").innerText = temp + "°C";
     document.getElementById("extraData").innerText =
       `💧 ${humedad}%   💨 ${viento} km/h   🌦 ${lluvia} mm   🌡 ${presion} hPa`;
 
-    // 🔹 Iconos y fondo dinámico
+    // ----------------------------
+    // Iconos y fondo dinámico
+    // ----------------------------
     const hora = new Date().getHours();
     const esNoche = hora >= 20 || hora <= 6;
 
@@ -160,13 +121,27 @@ console.log("Presión:", json.data?.barometer?.pressure);
 
   } catch (error) {
     console.error("Error cargando datos:", error);
-    document.getElementById("description").innerText = "Error de conexión";
-    document.getElementById("temp").innerText = "--°C";
-    document.getElementById("extraData").innerText = "💧 --%   💨 -- km/h   🌦 -- mm   🌡 -- hPa";
-    skycons.set("weatherIcon", Skycons.CLEAR_DAY);
-    document.body.style.background = "linear-gradient(to top, #4facfe, #00f2fe)";
+    mostrarDatosFallback();
   }
 }
+
+// ----------------------------
+// Función para mostrar fallback si hay error
+// ----------------------------
+function mostrarDatosFallback() {
+  document.getElementById("description").innerText = "Error de conexión";
+  document.getElementById("temp").innerText = "--°C";
+  document.getElementById("extraData").innerText = "💧 --%   💨 -- km/h   🌦 -- mm   🌡 -- hPa";
+  skycons.set("weatherIcon", Skycons.CLEAR_DAY);
+  document.body.style.background = "linear-gradient(to top, #4facfe, #00f2fe)";
+}
+
+// ----------------------------
+// Llamada inicial y actualización cada 60s
+// ----------------------------
+obtenerDatos();
+setInterval(obtenerDatos, 60000);
+
 
 
 
