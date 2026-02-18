@@ -40,7 +40,7 @@ async function obtenerDatos() {
     console.log("Respuesta API:", json);
 
     if (!json || !json.data) {
-      document.getElementById("description").innerText = "Error API o MAC incorrecto";
+      document.getElementById("description").innerText = "Error API (MAC o clave)";
       return;
     }
 
@@ -52,13 +52,14 @@ async function obtenerDatos() {
     document.getElementById("extraData").innerText =
       "💧 " + humedad + "%   💨 " + viento + " km/h";
 
-    document.getElementById("description").innerText = "Datos actualizados";
+    document.getElementById("description").innerText = "Datos correctos";
 
   } catch (error) {
     console.error("Error cargando datos:", error);
     document.getElementById("description").innerText = "Error conexión";
   }
 }
+
 
 
 
