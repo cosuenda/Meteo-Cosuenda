@@ -1,57 +1,83 @@
-<div class="weather-panel">
-  <h2>Meteo-Cosuenda (Tiempo Real)</h2>
-  
-  <div class="weather-row">
-    <div class="weather-item">
-      <img src="https://img.icons8.com/color/48/000000/temperature.png" alt="Temperatura">
-      <p>Temperatura: <span id="temp">--</span></p>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meteo-Cosuenda - Iconos Bonitos</title>
+  <style>
+    body {
+      background: #1e1e2f;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    .weather-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 40px;
+    }
+    .weather-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    canvas {
+      width: 128px;
+      height: 128px;
+    }
+    .temp {
+      margin-top: 10px;
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Meteo-Cosuenda</h1>
+  <p>Clima en tiempo real con iconos animados</p>
+
+  <div class="weather-container">
+    <div class="weather-box">
+      <canvas id="sunny"></canvas>
+      <div class="temp">25°C</div>
+      <div>Despejado</div>
     </div>
-    <div class="weather-item">
-      <img src="https://img.icons8.com/color/48/000000/thermometer.png" alt="Sensación térmica">
-      <p>Sensación: <span id="feels">--</span></p>
+    <div class="weather-box">
+      <canvas id="partlyCloudy"></canvas>
+      <div class="temp">18°C</div>
+      <div>Parcialmente nublado</div>
     </div>
-    <div class="weather-item">
-      <img src="https://img.icons8.com/color/48/000000/dew.png" alt="Punto de rocío">
-      <p>Punto de rocío: <span id="dew">--</span></p>
+    <div class="weather-box">
+      <canvas id="rain"></canvas>
+      <div class="temp">12°C</div>
+      <div>Lluvia</div>
     </div>
-  </div>
-  
-  <div class="weather-row">
-    <div class="weather-item">
-      <img src="https://img.icons8.com/color/48/000000/humidity.png" alt="Humedad">
-      <p>Humedad: <span id="hum">--</span></p>
-    </div>
-    <div class="weather-item">
-      <img src="https://img.icons8.com/color/48/000000/wind.png" alt="Viento">
-      <p>Viento: <span id="wind">--</span></p>
-      <p>Dirección: <span id="winddir">--</span></p>
-    </div>
-    <div class="weather-item">
-      <img src="https://img.icons8.com/color/48/000000/pressure.png" alt="Presión">
-      <p>Presión: <span id="press">--</span></p>
-    </div>
-  </div>
-  
-  <div class="weather-row">
-    <div class="weather-item">
-      <img src="https://img.icons8.com/color/48/000000/sun.png" alt="Radiación solar">
-      <p>Solar: <span id="solar">--</span></p>
-    </div>
-    <div class="weather-item">
-      <img src="https://img.icons8.com/color/48/000000/sun-uv-index.png" alt="Índice UV">
-      <p>UV: <span id="uvi">--</span></p>
-    </div>
-    <div class="weather-item">
-      <img src="https://img.icons8.com/color/48/000000/rain.png" alt="Precipitación diaria">
-      <p>Lluvia: <span id="rain">--</span></p>
+    <div class="weather-box">
+      <canvas id="snow"></canvas>
+      <div class="temp">0°C</div>
+      <div>Nieve</div>
     </div>
   </div>
 
-  <p class="update">Última actualización: <span id="update">--</span></p>
-</div>
+  <!-- Skycons -->
+  <script src="https://cdn.jsdelivr.net/npm/skycons@1.0.0/skycons.js"></script>
+  <script>
+    const skycons = new Skycons({ "color": "white" });
 
-<link rel="stylesheet" href="style.css">
-<script src="script.js"></script>
+    // Asignamos iconos
+    skycons.add("sunny", Skycons.CLEAR_DAY);
+    skycons.add("partlyCloudy", Skycons.PARTLY_CLOUDY_DAY);
+    skycons.add("rain", Skycons.RAIN);
+    skycons.add("snow", Skycons.SNOW);
+
+    // Activamos animación
+    skycons.play();
+  </script>
+</body>
+</html>
+
 
 
 
