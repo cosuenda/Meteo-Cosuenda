@@ -2,37 +2,37 @@ const APP_KEY = "26C4D6AD21CF8F8C4F3BA85E1CAF6701";
 const API_KEY = "adf65434-1ace-43dd-b9a9-27915843d243";
 const MAC = "84:CC:A8:B4:B1:F6";
 
-const rssUrl = "https://api.codetabs.com/v1/proxy?quest=" +
-encodeURIComponent("https://www.meteoclimatic.net/feed/rss_es.xml");
-
+const rssUrl = "https://api.allorigins.win/raw?url=" +
+encodeURIComponent("https://www.meteoclimatic.net/feed/rss/ESARA5000000050409A");
 
 async function obtenerDatos(){
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-    console.log("Datos recibidos:", data);
+  try{
+    const response = await fetch(rssUrl);
+    const xmlText = await response.text();
 
-    const outdoor = data.data.outdoor;
-    const temp = ((parseFloat(outdoor.temperature.value)-32)*5/9).toFixed(1);
-    const hum = parseFloat(outdoor.humidity.value);
-    const wind = (parseFloat(data.data.wind.wind_speed.value)*1.60934).toFixed(1);
-    const press = (parseFloat(data.data.pressure.relative.value)*33.8639).toFixed(1);
-    const lluvia = (parseFloat(data.data.rainfall.daily.value)*25.4).toFixed(1);
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlText,"application/xml");
 
-    document.getElementById("temp").textContent = temp + " °C";
-    document.getElementById("hum").textContent = hum + " %";
-    document.getElementById("wind").textContent = wind + " km/h";
-    document.getElementById("press").textContent = press + " hPa";
-    document.getElementById("rain").textContent = lluvia + " mm";
-    document.getElementById("update").textContent = "Última actualización: " + new Date().toLocaleString();
+    const description = xmlDoc.querySelector("description")?.textContent || "";
+    const pubDate = xmlDoc.querySelector("pubDate")?.textContent || "";
 
-  } catch (err) {
-    console.error("Error al cargar datos:", err);
+    function extraer(valor){
+      const match = description.match(new RegExp(valor + ":\\s*([-\\d\\.]+)"));
+      return match ? match[1] : "--";
+    }
+
+    document.getElementById("temp").textContent  = extraer("Temperatura") + " °C";
+    document.getElementById("hum").textContent   = extraer("Humedad") + " %";
+    document.getElementById("wind").textContent  = extraer("Viento") + " km/h";
+    document.getElementById("rain").textContent  = extraer("Lluvia") + " mm";
+    document.getElementById("press").textContent = extraer("Presión") + " hPa";
+    document.getElementById("update").textContent = "Última actualización: " + pubDate;
+
+  }catch(error){
+    console.error("Error cargando datos:",error);
   }
 }
 
-obtenerDatos();
-setInterval(obtenerDatos, 600000);
 
 
 
