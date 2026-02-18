@@ -9,6 +9,7 @@ const url = `https://api.ecowitt.net/api/v3/device/real_time?application_key=${a
 const fToC = f => ((parseFloat(f) - 32) * 5 / 9).toFixed(1);
 const mphToKmh = mph => (parseFloat(mph) * 1.60934).toFixed(1);
 const inToMm = inches => (parseFloat(inches) * 25.4).toFixed(1);
+const inHgToHpa = inHg => (parseFloat(inHg) * 33.8639).toFixed(1);
 
 // ====== Animación de valores ======
 function animarValor(element, nuevoValor, unidad = "") {
@@ -48,8 +49,9 @@ async function obtenerDatos() {
     const uvi = data.data.solar_and_uvi.uvi;
     const rainfall = data.data.rainfall.daily;
 
-    // ====== Convertir lluvia a mm ✅=====
+    // ====== Convertir unidades ======
     const rainMm = inToMm(rainfall.value);
+    const pressureHpa = inHgToHpa(pressure.relative.value);
 
     // ====== Animar valores ======
     animarValor(document.getElementById("temp"), fToC(outdoor.temperature.value), " °C");
@@ -59,9 +61,9 @@ async function obtenerDatos() {
     animarValor(document.getElementById("hum"), outdoor.humidity.value, " %");
     animarValor(document.getElementById("rain"), rainMm, " mm");
 
-    // Valores fijos
+    // ====== Valores fijos ======
     document.getElementById("winddir").textContent = wind.wind_direction.value + " º";
-    document.getElementById("press").textContent = inHgToHpa(pressure.relative.value) + " hPa";
+    document.getElementById("press").textContent = pressureHpa + " hPa"; // ✅ presión en hPa
     document.getElementById("solar").textContent = solar.value + " W/m²";
     document.getElementById("uvi").textContent = uvi.value;
 
@@ -111,6 +113,7 @@ async function obtenerDatos() {
 // ====== Carga inicial y actualización cada 10 minutos ======
 obtenerDatos();
 setInterval(obtenerDatos, 600000);
+
 
 
 
