@@ -32,6 +32,15 @@ async function obtenerDatos() {
   try {
     const response = await fetch(url);
     const json = await response.json();
+    const json = await response.json();
+
+// Mostrar los datos completos de manera legible
+console.log("Temperatura cruda:", json.data.outdoor.temperature);
+console.log("Humedad:", json.data.outdoor.humidity);
+console.log("Viento:", json.data.wind.speed_avg || json.data.wind.speed_max);
+console.log("Lluvia:", json.data.rainfall.rate);
+console.log("Presión:", json.data.barometer.pressure);
+
     
     console.log("Temperatura cruda:", json.data.outdoor.temperature);
     console.log("Respuesta completa:", JSON.stringify(json, null, 2));
