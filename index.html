@@ -4,97 +4,109 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meteo-Cosuenda</title>
-<link rel="icon" href="data:,">
+<!-- Skycons -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/skycons/1396634940/skycons.js"></script>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-body {
-  font-family: 'Segoe UI', sans-serif;
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  transition: background 1s ease;
-  background: linear-gradient(to top, #4facfe, #00f2fe);
-  color:white;
-}
-.card {
-  backdrop-filter: blur(20px);
-  background: rgba(255,255,255,0.15);
-  border-radius:25px;
-  padding:40px;
-  width:340px;
-  text-align:center;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-}
-h1 {
-  font-size:22px;
-  margin-bottom:20px;
-}
-canvas {
-  width:140px;
-  height:140px;
-}
-.temp {
-  font-size:48px;
-  font-weight:600;
-  margin-top:10px;
-}
-.desc {
-  font-size:18px;
-  opacity:0.9;
-  margin-top:5px;
-}
-.extra {
-  margin-top:20px;
-  font-size:14px;
-  opacity:0.85;
-}
+  body {
+    font-family: Arial, sans-serif;
+    color: white;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    transition: background 1s;
+  }
+  #weather {
+    margin-top: 50px;
+  }
+  #temp {
+    font-size: 4em;
+  }
+  #description {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+  }
+  #extraData {
+    font-size: 1.2em;
+  }
+  canvas {
+    width: 128px !important;
+    height: 128px !important;
+  }
 </style>
 </head>
 <body>
-
-<div class="card">
-  <h1>🌤 Meteo-Cosuenda</h1>
+<div id="weather">
   <canvas id="weatherIcon" width="128" height="128"></canvas>
-  <div class="temp" id="temp">--°C</div>
-  <div class="desc" id="description">Cargando datos...</div>
-  <div class="extra" id="extraData"></div>
+  <div id="description">Cargando...</div>
+  <div id="temp">--°C</div>
+  <div id="extraData">💧 --%   💨 -- km/h   🌦 -- mm   🌡 -- hPa</div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/skycons/1396634940/skycons.js"></script>
 <script>
+// 🔹 Configura tu API
 const APP_KEY = "26C4D6AD21CF8F8C4F3BA85E1CAF6701";
 const API_KEY = "adf65434-1ace-43dd-b9a9-27915843d243";
 const MAC = "84:CC:A8:B4:B1:F6";
 
 const url = `https://api.ecowitt.net/api/v3/device/real_time?application_key=${APP_KEY}&api_key=${API_KEY}&mac=${MAC}&call_back=all`;
 
-const skycons = new Skycons({ color: "white" });
+// 🔹 Funciones de conversión
+const fToC = f => ((parseFloat(f) - 32) * 5 / 9).toFixed(1);
+const mphToKmh = mph => (parseFloat(mph) * 1.60934).toFixed(1);
+const inToMm = inches => (parseFloat(inches) * 25.4).toFixed(1);
+const inHgToHpa = inHg => (parseFloat(inHg) * 33.8639).toFixed(1);
+
+// 🔹 Skycons
+const skycons = new Skycons({"color": "white"});
+skycons.add("weatherIcon", Skycons.CLEAR_DAY);
 skycons.play();
 
+// 🔹 Función principal
 async function obtenerDatos() {
   try {
     const response = await fetch(url);
     const json = await response.json();
-
     console.log("Respuesta API:", json);
 
     if (!json || !json.data) {
-      document.getElementById("description").innerText = "Error API (MAC o clave)";
+      document.getElementById("description").innerText = "No hay datos disponibles";
+      document.getElementById("temp").innerText = "--°C";
+      document.getElementById("extraData").innerText = "💧 --%   💨 -- km/h   🌦 -- mm   🌡 -- hPa";
+      skycons.set("weatherIcon", Skycons.CLEAR_DAY);
+      document.body.style.background = "linear-gradient(to top, #4facfe, #00f2fe)";
       return;
     }
 
-    const temp = json.data?.outdoor?.temperature?.value ?? "--";
-    const humedad = json.data?.outdoor?.humidity?.value ?? "--";
-    const viento = json.data?.wind?.speed?.value ?? "--";
-    const lluvia = json.data?.rainfall?.rate?.value ?? 0;
-    const radiacion = json.data?.solar_and_uvi?.solar?.value ?? 0;
+    // 🔹 Temperatura
+    let temp = json.data?.outdoor?.temperature?.value ?? "--";
+    const tempUnit = json.data?.outdoor?.temperature?.unit ?? "C";
+    if (tempUnit === "F") temp = fToC(temp);
+    if (temp > 50 || temp < -10) temp = "--";
 
+    // 🔹 Humedad
+    const humedad = json.data?.outdoor?.humidity?.value ?? "--";
+
+    // 🔹 Viento
+    let viento = json.data?.wind?.speed?.value ?? "--";
+    const vientoUnit = json.data?.wind?.speed?.unit ?? "km/h";
+    if (vientoUnit === "mph") viento = mphToKmh(viento);
+
+    // 🔹 Lluvia
+    let lluvia = json.data?.rainfall?.rate?.value ?? 0;
+    const lluviaUnit = json.data?.rainfall?.rate?.unit ?? "mm";
+    if (lluviaUnit === "in") lluvia = inToMm(lluvia);
+
+    // 🔹 Presión
+    let presion = json.data?.barometer?.pressure?.value ?? "--";
+    const presionUnit = json.data?.barometer?.pressure?.unit ?? "hPa";
+    if (presionUnit === "inHg") presion = inHgToHpa(presion);
+
+    // 🔹 Mostrar datos
     document.getElementById("temp").innerText = temp + "°C";
     document.getElementById("extraData").innerText =
-      "💧 " + humedad + "%   💨 " + viento + " km/h";
+      `💧 ${humedad}%   💨 ${viento} km/h   🌦 ${lluvia} mm   🌡 ${presion} hPa`;
 
-    // Elegir icono y fondo
+    // 🔹 Iconos y fondo dinámico
     const hora = new Date().getHours();
     const esNoche = hora >= 20 || hora <= 6;
 
@@ -115,10 +127,10 @@ async function obtenerDatos() {
       descripcion = "Noche despejada";
       fondo = "linear-gradient(to top, #141e30, #243b55)";
     } 
-    else if (radiacion > 200) {
+    else if (temp > 35) {
       icono = Skycons.CLEAR_DAY;
-      descripcion = "Despejado";
-      fondo = "linear-gradient(to top, #4facfe, #00f2fe)";
+      descripcion = "Calor intenso";
+      fondo = "linear-gradient(to top, #ff512f, #f09819)";
     } 
     else {
       icono = Skycons.PARTLY_CLOUDY_DAY;
@@ -132,15 +144,21 @@ async function obtenerDatos() {
 
   } catch (error) {
     console.error("Error cargando datos:", error);
-    document.getElementById("description").innerText = "Error conexión";
+    document.getElementById("description").innerText = "Error de conexión";
+    document.getElementById("temp").innerText = "--°C";
+    document.getElementById("extraData").innerText = "💧 --%   💨 -- km/h   🌦 -- mm   🌡 -- hPa";
+    skycons.set("weatherIcon", Skycons.CLEAR_DAY);
+    document.body.style.background = "linear-gradient(to top, #4facfe, #00f2fe)";
   }
 }
 
+// 🔹 Actualizar cada 60 segundos
 obtenerDatos();
 setInterval(obtenerDatos, 60000);
 </script>
 </body>
 </html>
+
 
 
 
