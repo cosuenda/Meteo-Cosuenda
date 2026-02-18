@@ -1,61 +1,70 @@
 body {
   font-family: Arial, sans-serif;
-  background: linear-gradient(to bottom, #87CEEB, #f0f8ff);
+  margin: 0;
+  padding: 0;
+  background: #f9f9f9;
   color: #333;
+}
+
+header {
+  background-color: #4CAF50;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+header h1 { margin: 0; }
+
+.weather {
+  padding: 20px;
+  text-align: center;
+}
+
+#weather-dashboard {
   display: flex;
   justify-content: center;
-  padding: 20px;
-}
-
-.weather-panel {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 15px;
-  padding: 20px;
-  max-width: 900px;
-  width: 100%;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-}
-
-.weather-panel h2 {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.weather-row {
-  display: flex;
-  justify-content: space-around;
-  margin-bottom: 15px;
+  gap: 30px;
+  margin-top: 15px;
 }
 
 .weather-item {
-  text-align: center;
-  flex: 1;
+  background: #e0f7e0;
+  border-radius: 10px;
+  padding: 15px;
+  width: 120px;
 }
 
 .weather-item img {
-  width: 50px;
-  height: 50px;
-  margin-bottom: 5px;
+  width: 60px;
+  height: 60px;
 }
 
-.weather-item p {
-  margin: 3px 0;
-  font-weight: bold;
+.gallery {
+  padding: 20px;
 }
 
-.update {
+.images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+}
+
+.images img {
+  max-width: 300px;
+  border-radius: 10px;
+  transition: transform 0.3s;
+  cursor: pointer;
+}
+
+.images img:hover {
+  transform: scale(1.05);
+}
+
+footer {
   text-align: center;
-  font-size: 0.9em;
-  margin-top: 10px;
-  color: #555;
-}
-.weather-item p span {
-  transition: color 0.8s ease, transform 0.8s ease;
-  display: inline-block; /* necesario para animaciones de transformación */
-}
-
-#temp, #feels, #dew, #wind, #rain {
-  transition: all 1s ease; /* animación general para cambios de valor */
+  padding: 10px;
+  background: #ddd;
 }
 
 
