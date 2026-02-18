@@ -2,8 +2,9 @@ const APP_KEY = "26C4D6AD21CF8F8C4F3BA85E1CAF6701";
 const API_KEY = "adf65434-1ace-43dd-b9a9-27915843d243";
 const MAC = "84:CC:A8:B4:B1:F6";
 
-const url = `https://api.allorigins.win/raw?url=` +
-            encodeURIComponent(`https://www.ecowitt.net/home/index?id=61227&application_key=${APP_KEY}&api_key=${API_KEY}&mac=${MAC}`);
+const rssUrl = "https://api.codetabs.com/v1/proxy?quest=" +
+encodeURIComponent("https://www.meteoclimatic.net/feed/rss_es.xml");
+
 
 async function obtenerDatos(){
   try {
