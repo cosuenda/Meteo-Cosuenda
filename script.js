@@ -43,6 +43,7 @@ async function obtenerDatos() {
   try {
     const response = await fetch(url);
     const json = await response.json();
+console.log(json.data);
 
     console.log("Respuesta API:", json); // Para depuración
 
