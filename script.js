@@ -6,10 +6,11 @@ const mac = "84:CC:A8:B4:B1:F6";
 const url = `https://api.ecowitt.net/api/v3/device/real_time?application_key=${appKey}&api_key=${apiKey}&mac=${mac}&call_back=all`;
 
 // ====== Funciones de conversión ======
-const fToC = f => ((parseFloat(f) - 32) * 5/9).toFixed(1);
+const fToC = f => ((parseFloat(f) - 32) * 5 / 9).toFixed(1);
 const mphToKmh = mph => (parseFloat(mph) * 1.60934).toFixed(1);
+const inToMm = inches => (parseFloat(inches) * 25.4).toFixed(1); // ✅ conversión lluvia
 
-// ====== Animación de valor ======
+// ====== Animación de valores ======
 function animarValor(element, nuevoValor, unidad = "") {
   const valorActual = parseFloat(element.getAttribute("data-valor")) || 0;
   const valorFinal = parseFloat(nuevoValor);
@@ -52,9 +53,10 @@ async function obtenerDatos() {
     animarValor(document.getElementById("feels"), fToC(outdoor.feels_like.value), " °C");
     animarValor(document.getElementById("dew"), fToC(outdoor.dew_point.value), " °C");
     animarValor(document.getElementById("wind"), mphToKmh(wind.wind_speed.value), " km/h");
-    animarValor(document.getElementById("rain"), rainfall.value, " in");
+    animarValor(document.getElementById("hum"), outdoor.humidity.value, " %"); // humedad animada
+    animarValor(document.getElementById("rain"), inToMm(rainfall.value), " mm"); // lluvia en mm
 
-    // Actualizar valores fijos
+    // Valores fijos
     document.getElementById("winddir").textContent = wind.wind_direction.value + " º";
     document.getElementById("press").textContent = pressure.relative.value + " inHg";
     document.getElementById("solar").textContent = solar.value + " W/m²";
@@ -78,19 +80,22 @@ async function obtenerDatos() {
     else if (tempC <= 35) tempEl.style.color = "#fa0";
     else tempEl.style.color = "#f00";
 
+    // Humedad
     const humVal = parseInt(outdoor.humidity.value);
     const humEl = document.getElementById("hum");
     humEl.style.color = humVal < 50 ? "#0aa" : "#0055aa";
 
+    // Viento
     const windVal = parseFloat(wind.wind_speed.value) * 1.60934;
     const windText = document.getElementById("wind");
     if (windVal < 10) windText.style.color = "#0a0";
     else if (windVal < 30) windText.style.color = "#fa0";
     else windText.style.color = "#f00";
 
-    const rainVal = parseFloat(rainfall.value);
+    // Lluvia
+    const rainVal = inToMm(rainfall.value);
     const rainText = document.getElementById("rain");
-    rainText.style.color = rainVal === 0 ? "#555" : "#00f";
+    rainText.style.color = rainVal == 0 ? "#555" : "#00f";
 
     // ====== Giro icono viento ======
     const windIcon = document.querySelector('img[alt="Viento"]');
@@ -104,9 +109,10 @@ async function obtenerDatos() {
   }
 }
 
-// Carga inicial y actualización cada 10 minutos
+// ====== Carga inicial y actualización cada 10 minutos ======
 obtenerDatos();
 setInterval(obtenerDatos, 600000);
+
 
 
 
