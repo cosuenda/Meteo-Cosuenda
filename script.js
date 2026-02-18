@@ -61,7 +61,7 @@ async function obtenerDatos() {
 
     // Valores fijos
     document.getElementById("winddir").textContent = wind.wind_direction.value + " º";
-    document.getElementById("press").textContent = pressure.relative.value + " inHg";
+    document.getElementById("press").textContent = inHgToHpa(pressure.relative.value) + " hPa";
     document.getElementById("solar").textContent = solar.value + " W/m²";
     document.getElementById("uvi").textContent = uvi.value;
 
