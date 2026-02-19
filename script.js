@@ -11,123 +11,77 @@ const mphToKmh = mph => (parseFloat(mph) * 1.60934).toFixed(1);
 const inToMm = inches => (parseFloat(inches) * 25.4).toFixed(1);
 const inHgToHpa = inHg => (parseFloat(inHg) * 33.8639).toFixed(1);
 
-// ====== Animación de valores ======
+// ====== Función para animar valores ======
 function animarValor(element, nuevoValor, unidad = "") {
-  const valorActual = parseFloat(element.getAttribute("data-valor")) || 0;
-  const valorFinal = parseFloat(nuevoValor);
-  let start = valorActual;
-  const step = (valorFinal - start) / 20;
-
-  let i = 0;
-  const anim = setInterval(() => {
-    start += step;
-    element.textContent = start.toFixed(1) + unidad;
-    i++;
-    if (i >= 20) {
-      element.textContent = valorFinal.toFixed(1) + unidad;
-      element.setAttribute("data-valor", valorFinal);
-      clearInterval(anim);
-    }
-  }, 50);
+    const valorActual = parseFloat(element.getAttribute("data-valor")) || 0;
+    const valorFinal = parseFloat(nuevoValor);
+    let start = valorActual;
+    const step = (valorFinal - start) / 20;
+    let i = 0;
+    const anim = setInterval(() => {
+        start += step;
+        element.textContent = start.toFixed(1) + unidad;
+        i++;
+        if (i >= 20) {
+            element.textContent = valorFinal.toFixed(1) + unidad;
+            element.setAttribute("data-valor", valorFinal);
+            clearInterval(anim);
+        }
+    }, 50);
 }
 
 // ====== Función principal ======
 async function obtenerDatos() {
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
 
-    if (data.code !== 0) {
-      console.error("Error API:", data);
-      return;
+        if (data.code !== 0) {
+            console.error("Error API:", data);
+            return;
+        }
+
+        const outdoor = data.data.outdoor;
+        const wind = data.data.wind;
+        const rainfall = data.data.rainfall;
+        const pressure = data.data.pressure;  // ✅ presión correcta
+
+        // ====== Temperatura gigante con icono y color ======
+        const tempF = outdoor.temperature.value;
+        const tempC = parseFloat(fToC(tempF));
+        const tempEl = document.getElementById("tempBig");
+        const iconEl = document.getElementById("tempIcon");
+        tempEl.textContent = tempC + " °C";
+
+        if(tempC <= 0){ iconEl.textContent="❄️"; tempEl.style.color="#00f"; }
+        else if(tempC <= 15){ iconEl.textContent="🌤️"; tempEl.style.color="#0aa"; }
+        else if(tempC <= 30){ iconEl.textContent="☀️"; tempEl.style.color="#fa0"; }
+        else { iconEl.textContent="🔥"; tempEl.style.color="#f00"; }
+
+        // ====== Animar otros valores ======
+        animarValor(document.getElementById("hum"), outdoor.humidity.value, " %");
+        animarValor(document.getElementById("wind"), mphToKmh(wind.wind_speed.value), " km/h");
+        animarValor(document.getElementById("rain"), inToMm(rainfall.daily.value), " mm");
+
+        // ====== Presión ======
+        const pressHpa = inHgToHpa(pressure.relative.value);
+        document.getElementById("press").textContent = pressHpa + " hPa";
+
+        // ====== Fondo dinámico día/noche ======
+        const hour = new Date().getHours();
+        if(hour >= 6 && hour < 18) document.body.style.background = "linear-gradient(to bottom, #87CEEB, #f0f8ff)";
+        else document.body.style.background = "linear-gradient(to bottom, #001848, #0a1f44)";
+
+    } catch (error) {
+        console.error("Error de conexión:", error);
     }
-
-    const outdoor = data.data.outdoor;
-    const wind = data.data.wind;
-    const pressure = data.data.pressure;
-    const solar = data.data.solar_and_uvi.solar;
-    const uvi = data.data.solar_and_uvi.uvi;
-    const rainfall = data.data.rainfall.daily;
-
-    // ====== Convertir unidades ======
-    const rainMm = inToMm(rainfall.value);
-    const pressureHpa = inHgToHpa(pressure.relative.value);
-
-    // ====== Animar valores ======
-    animarValor(document.getElementById("temp"), fToC(outdoor.temperature.value), " °C");
-    animarValor(document.getElementById("feels"), fToC(outdoor.feels_like.value), " °C");
-    animarValor(document.getElementById("dew"), fToC(outdoor.dew_point.value), " °C");
-    animarValor(document.getElementById("wind"), mphToKmh(wind.wind_speed.value), " km/h");
-    animarValor(document.getElementById("hum"), outdoor.humidity.value, " %");
-    animarValor(document.getElementById("rain"), rainMm, " mm");
-
-    // ====== Valores fijos ======
-    document.getElementById("winddir").textContent = wind.wind_direction.value + " º";
-    document.getElementById("press").textContent = pressureHpa + " hPa"; // ✅ presión en hPa
-    document.getElementById("solar").textContent = solar.value + " W/m²";
-    document.getElementById("uvi").textContent = uvi.value;
-
-    // ====== Timestamp y fondo dinámico ======
-    const timestamp = new Date(data.time * 1000);
-    document.getElementById("update").textContent = timestamp.toLocaleString();
-
-    const hour = timestamp.getHours();
-    const body = document.body;
-    if (hour >= 6 && hour < 18) body.style.background = "linear-gradient(to bottom, #87CEEB, #f0f8ff)";
-    else body.style.background = "linear-gradient(to bottom, #001848, #0a1f44)";
-
-  const tempC = parseFloat(toC(outdoor.temperature.value));
-
-document.getElementById("tempBig").textContent = tempC + " °C";
-
-// Colores dinámicos
-const tempEl = document.getElementById("tempBig");
-const icon = document.getElementById("tempIcon");
-
-if(tempC <= 0){
-  tempEl.style.color="#00f";
-  icon.textContent="❄️";
-}
-else if(tempC <= 15){
-  tempEl.style.color="#0aa";
-  icon.textContent="🌤️";
-}
-else if(tempC <= 30){
-  tempEl.style.color="#f90";
-  icon.textContent="☀️";
-}
-else{
-  tempEl.style.color="#f00";
-  icon.textContent="🔥";
-}
-    const humVal = parseInt(outdoor.humidity.value);
-    const humEl = document.getElementById("hum");
-    humEl.style.color = humVal < 50 ? "#0aa" : "#0055aa";
-
-    const windVal = parseFloat(wind.wind_speed.value) * 1.60934;
-    const windText = document.getElementById("wind");
-    if (windVal < 10) windText.style.color = "#0a0";
-    else if (windVal < 30) windText.style.color = "#fa0";
-    else windText.style.color = "#f00";
-
-    const rainText = document.getElementById("rain");
-    rainText.style.color = rainMm == 0 ? "#555" : "#00f";
-
-    // ====== Giro icono viento ======
-    const windIcon = document.querySelector('img[alt="Viento"]');
-    if (windIcon) {
-      windIcon.style.transform = `rotate(${wind.wind_direction.value}deg)`;
-      windIcon.style.transition = "transform 1s ease";
-    }
-
-  } catch (error) {
-    console.error("Error de conexión:", error);
-  }
 }
 
-// ====== Carga inicial y actualización cada 10 minutos ======
+// ====== Carga inicial + actualización cada 5 min ======
 obtenerDatos();
-setInterval(obtenerDatos, 600000);
+setInterval(obtenerDatos, 300000);
+
+
 
 
 
