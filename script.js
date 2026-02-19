@@ -76,15 +76,30 @@ async function obtenerDatos() {
     if (hour >= 6 && hour < 18) body.style.background = "linear-gradient(to bottom, #87CEEB, #f0f8ff)";
     else body.style.background = "linear-gradient(to bottom, #001848, #0a1f44)";
 
-    // ====== Colores dinámicos ======
-    const tempC = parseFloat(fToC(outdoor.temperature.value));
-    const tempEl = document.getElementById("temp");
-    if (tempC <= 0) tempEl.style.color = "#00f";
-    else if (tempC <= 15) tempEl.style.color = "#0aa";
-    else if (tempC <= 25) tempEl.style.color = "#0a0";
-    else if (tempC <= 35) tempEl.style.color = "#fa0";
-    else tempEl.style.color = "#f00";
+  const tempC = parseFloat(toC(outdoor.temperature.value));
 
+document.getElementById("tempBig").textContent = tempC + " °C";
+
+// Colores dinámicos
+const tempEl = document.getElementById("tempBig");
+const icon = document.getElementById("tempIcon");
+
+if(tempC <= 0){
+  tempEl.style.color="#00f";
+  icon.textContent="❄️";
+}
+else if(tempC <= 15){
+  tempEl.style.color="#0aa";
+  icon.textContent="🌤️";
+}
+else if(tempC <= 30){
+  tempEl.style.color="#f90";
+  icon.textContent="☀️";
+}
+else{
+  tempEl.style.color="#f00";
+  icon.textContent="🔥";
+}
     const humVal = parseInt(outdoor.humidity.value);
     const humEl = document.getElementById("hum");
     humEl.style.color = humVal < 50 ? "#0aa" : "#0055aa";
