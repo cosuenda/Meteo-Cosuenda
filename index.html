@@ -4,7 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meteo Cosuenda PRO</title>
+
+<!-- Fuentes -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body{
@@ -59,9 +67,24 @@ footer{
     font-size:14px;
     color:#444;
 }
+
+#charts{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:20px;
+    max-width:1000px;
+    margin:20px auto;
+    padding:0 10px;
+}
+
+#map{
+    height:300px;
+    margin:20px 10px;
+    border-radius:20px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.15);
+}
 </style>
 </head>
-
 <body>
 
 <header>
@@ -91,7 +114,17 @@ footer{
     </div>
 </div>
 
+<div id="charts">
+    <canvas id="tempChart"></canvas>
+    <canvas id="rainChart"></canvas>
+</div>
+
+<div id="map"></div>
+
 <footer>Actualización automática cada 5 minutos</footer>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
 // ====== Claves y URL API ======
@@ -100,50 +133,61 @@ const apiKey = "adf65434-1ace-43dd-b9a9-27915843d243";
 const mac = "84:CC:A8:B4:B1:F6";
 const url = `https://api.ecowitt.net/api/v3/device/real_time?application_key=${appKey}&api_key=${apiKey}&mac=${mac}&call_back=all`;
 
-// ====== Funciones de conversión ======
+// ====== Conversión de unidades ======
 const fToC = f => ((parseFloat(f) - 32) * 5 / 9).toFixed(1);
 const mphToKmh = mph => (parseFloat(mph) * 1.60934).toFixed(1);
 const inToMm = inches => (parseFloat(inches) * 25.4).toFixed(1);
 const inHgToHpa = inHg => (parseFloat(inHg) * 33.8639).toFixed(1);
 
-// ====== Animación de valores ======
-function animarValor(element, nuevoValor, unidad = "") {
+// ====== Animar valores ======
+function animarValor(element, nuevoValor, unidad = ""){
     const valorActual = parseFloat(element.getAttribute("data-valor")) || 0;
     const valorFinal = parseFloat(nuevoValor);
     let start = valorActual;
     const step = (valorFinal - start) / 20;
     let i = 0;
-    const anim = setInterval(() => {
+    const anim = setInterval(()=>{
         start += step;
         element.textContent = start.toFixed(1) + unidad;
         i++;
-        if (i >= 20) {
-            element.textContent = valorFinal.toFixed(1) + unidad;
-            element.setAttribute("data-valor", valorFinal);
-            clearInterval(anim);
-        }
-    }, 50);
+        if(i>=20){ element.textContent=valorFinal.toFixed(1)+unidad; element.setAttribute("data-valor", valorFinal); clearInterval(anim);}
+    },50);
 }
 
+// ====== Gráficas ======
+const tempCtx = document.getElementById('tempChart').getContext('2d');
+const tempChart = new Chart(tempCtx, {
+    type: 'line',
+    data: { labels:[], datasets:[{label:'Temperatura (°C)', data:[], borderColor:'rgba(255,99,132,1)', fill:false}]},
+    options:{ responsive:true, plugins:{legend:{display:true}} }
+});
+
+const rainCtx = document.getElementById('rainChart').getContext('2d');
+const rainChart = new Chart(rainCtx, {
+    type: 'bar',
+    data: { labels:[], datasets:[{label:'Lluvia diaria (mm)', data:[], backgroundColor:'rgba(0,123,255,0.6)'}]},
+    options:{ responsive:true, plugins:{legend:{display:true}} }
+});
+
+// ====== Mapa Leaflet ======
+const map = L.map('map').setView([41.3,-1.3],12);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
+const marker = L.marker([41.3,-1.3]).addTo(map).bindPopup('Estación Meteo Cosuenda').openPopup();
+
 // ====== Función principal ======
-async function obtenerDatos() {
-    try {
+async function obtenerDatos(){
+    try{
         const response = await fetch(url);
         const data = await response.json();
-
-        if (data.code !== 0) {
-            console.error("Error API:", data);
-            return;
-        }
+        if(data.code !== 0){ console.error("Error API:", data); return; }
 
         const outdoor = data.data.outdoor;
         const wind = data.data.wind;
         const rainfall = data.data.rainfall;
-        const pressure = data.data.pressure;  // ✅ presión correcta
+        const pressure = data.data.pressure;
 
-        // ====== Temperatura gigante con icono y color ======
-        const tempF = outdoor.temperature.value;
-        const tempC = parseFloat(fToC(tempF));
+        // Temperatura gigante con icono
+        const tempC = parseFloat(fToC(outdoor.temperature.value));
         const tempEl = document.getElementById("tempBig");
         const iconEl = document.getElementById("tempIcon");
         tempEl.textContent = tempC + " °C";
@@ -153,28 +197,42 @@ async function obtenerDatos() {
         else if(tempC <= 30){ iconEl.textContent="☀️"; tempEl.style.color="#fa0"; }
         else { iconEl.textContent="🔥"; tempEl.style.color="#f00"; }
 
-        // ====== Animar otros valores ======
+        // Animar otros valores
         animarValor(document.getElementById("hum"), outdoor.humidity.value, " %");
         animarValor(document.getElementById("wind"), mphToKmh(wind.wind_speed.value), " km/h");
         animarValor(document.getElementById("rain"), inToMm(rainfall.daily.value), " mm");
 
-        // ====== Presión ======
+        // Presión
         const pressHpa = inHgToHpa(pressure.relative.value);
         document.getElementById("press").textContent = pressHpa + " hPa";
 
-        // ====== Fondo dinámico día/noche ======
+        // Fondo día/noche
         const hour = new Date().getHours();
-        if(hour >= 6 && hour < 18) document.body.style.background = "linear-gradient(to bottom, #87CEEB, #f0f8ff)";
-        else document.body.style.background = "linear-gradient(to bottom, #001848, #0a1f44)";
+        if(hour>=6 && hour<18) document.body.style.background="linear-gradient(to bottom, #87CEEB, #f0f8ff)";
+        else document.body.style.background="linear-gradient(to bottom, #001848, #0a1f44)";
 
-    } catch (error) {
-        console.error("Error de conexión:", error);
-    }
+        // ====== Actualizar gráficas ======
+        const timestamp = new Date().toLocaleTimeString();
+        tempChart.data.labels.push(timestamp);
+        tempChart.data.datasets[0].data.push(tempC);
+        if(tempChart.data.labels.length>12){ tempChart.data.labels.shift(); tempChart.data.datasets[0].data.shift(); }
+        tempChart.update();
+
+        const rainMm = parseFloat(inToMm(rainfall.daily.value));
+        rainChart.data.labels.push(timestamp);
+        rainChart.data.datasets[0].data.push(rainMm);
+        if(rainChart.data.labels.length>12){ rainChart.data.labels.shift(); rainChart.data.datasets[0].data.shift(); }
+        rainChart.update();
+
+        // Actualizar marcador del mapa (opcional: mostrar temperatura)
+        marker.setPopupContent(`Estación Meteo Cosuenda<br>Temp: ${tempC} °C<br>Humedad: ${outdoor.humidity.value}%`).openPopup();
+
+    }catch(error){ console.error("Error de conexión:", error); }
 }
 
 // ====== Carga inicial + actualización cada 5 min ======
 obtenerDatos();
-setInterval(obtenerDatos, 300000);
+setInterval(obtenerDatos,300000);
 </script>
 
 </body>
