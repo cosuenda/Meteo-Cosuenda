@@ -1,86 +1,103 @@
-// ====== Claves y URL API ======
+// ====== CLAVES ======
 const appKey = "26C4D6AD21CF8F8C4F3BA85E1CAF6701";
 const apiKey = "adf65434-1ace-43dd-b9a9-27915843d243";
 const mac = "84:CC:A8:B4:B1:F6";
 
 const url = `https://api.ecowitt.net/api/v3/device/real_time?application_key=${appKey}&api_key=${apiKey}&mac=${mac}&call_back=all`;
 
-// ====== Funciones de conversión ======
-const fToC = f => ((parseFloat(f) - 32) * 5 / 9).toFixed(1);
-const mphToKmh = mph => (parseFloat(mph) * 1.60934).toFixed(1);
-const inToMm = inches => (parseFloat(inches) * 25.4).toFixed(1);
-const inHgToHpa = inHg => (parseFloat(inHg) * 33.8639).toFixed(1);
+// ====== CONVERSIONES ======
+const fToC = f => ((parseFloat(f) - 32) * 5 / 9);
+const mphToKmh = mph => (parseFloat(mph) * 1.60934);
+const inToMm = inches => (parseFloat(inches) * 25.4);
+const inHgToHpa = inHg => (parseFloat(inHg) * 33.8639);
 
-// ====== Función para animar valores ======
-function animarValor(element, nuevoValor, unidad = "") {
-    const valorActual = parseFloat(element.getAttribute("data-valor")) || 0;
-    const valorFinal = parseFloat(nuevoValor);
-    let start = valorActual;
-    const step = (valorFinal - start) / 20;
-    let i = 0;
-    const anim = setInterval(() => {
-        start += step;
-        element.textContent = start.toFixed(1) + unidad;
-        i++;
-        if (i >= 20) {
-            element.textContent = valorFinal.toFixed(1) + unidad;
-            element.setAttribute("data-valor", valorFinal);
-            clearInterval(anim);
-        }
-    }, 50);
+// ====== GUARDADO DIARIO ======
+function actualizarMinMaxHoy(tempActual){
+    const hoy = new Date().toDateString();
+    let datos = JSON.parse(localStorage.getItem("minmaxHoy")) || {};
+
+    if(datos.fecha !== hoy){
+        datos = {
+            fecha: hoy,
+            min: tempActual,
+            max: tempActual
+        };
+    } else {
+        if(tempActual < datos.min) datos.min = tempActual;
+        if(tempActual > datos.max) datos.max = tempActual;
+    }
+
+    localStorage.setItem("minmaxHoy", JSON.stringify(datos));
+
+    document.getElementById("tempMin").textContent = datos.min.toFixed(1) + " °C";
+    document.getElementById("tempMax").textContent = datos.max.toFixed(1) + " °C";
 }
 
-// ====== Función principal ======
-async function obtenerDatos() {
-    try {
+// ====== RECORD ABSOLUTO ======
+function actualizarRecord(tempActual){
+    let record = JSON.parse(localStorage.getItem("recordTemp")) || {
+        min: tempActual,
+        max: tempActual
+    };
+
+    if(tempActual < record.min) record.min = tempActual;
+    if(tempActual > record.max) record.max = tempActual;
+
+    localStorage.setItem("recordTemp", JSON.stringify(record));
+
+    document.getElementById("recordMin").textContent = record.min.toFixed(1) + " °C";
+    document.getElementById("recordMax").textContent = record.max.toFixed(1) + " °C";
+}
+
+// ====== DIRECCIÓN DEL VIENTO ======
+function direccionTexto(grados){
+    const dirs = ["N","NE","E","SE","S","SW","W","NW"];
+    return dirs[Math.round(grados/45)%8];
+}
+
+// ====== FUNCIÓN PRINCIPAL ======
+async function obtenerDatos(){
+    try{
         const response = await fetch(url);
         const data = await response.json();
 
-        if (data.code !== 0) {
-            console.error("Error API:", data);
-            return;
-        }
+        if(data.code !== 0) return;
 
         const outdoor = data.data.outdoor;
         const wind = data.data.wind;
         const rainfall = data.data.rainfall;
-        const pressure = data.data.pressure;  // ✅ presión correcta
+        const pressure = data.data.pressure;
 
-        // ====== Temperatura gigante con icono y color ======
-        const tempF = outdoor.temperature.value;
-        const tempC = parseFloat(fToC(tempF));
-        const tempEl = document.getElementById("tempBig");
-        const iconEl = document.getElementById("tempIcon");
-        tempEl.textContent = tempC + " °C";
-
-        if(tempC <= 0){ iconEl.textContent="❄️"; tempEl.style.color="#00f"; }
-        else if(tempC <= 15){ iconEl.textContent="🌤️"; tempEl.style.color="#0aa"; }
-        else if(tempC <= 30){ iconEl.textContent="☀️"; tempEl.style.color="#fa0"; }
-        else { iconEl.textContent="🔥"; tempEl.style.color="#f00"; }
-
-        // ====== Animar otros valores ======
-        animarValor(document.getElementById("hum"), outdoor.humidity.value, " %");
-        animarValor(document.getElementById("wind"), mphToKmh(wind.wind_speed.value), " km/h");
-        animarValor(document.getElementById("rain"), inToMm(rainfall.daily.value), " mm");
-
-        // ====== Presión ======
+        const tempC = fToC(outdoor.temperature.value);
+        const windKmh = mphToKmh(wind.wind_speed.value);
+        const rainMm = inToMm(rainfall.daily.value);
         const pressHpa = inHgToHpa(pressure.relative.value);
-        document.getElementById("press").textContent = pressHpa + " hPa";
 
-        // ====== Fondo dinámico día/noche ======
-        const hour = new Date().getHours();
-        if(hour >= 6 && hour < 18) document.body.style.background = "linear-gradient(to bottom, #87CEEB, #f0f8ff)";
-        else document.body.style.background = "linear-gradient(to bottom, #001848, #0a1f44)";
+        // TEMPERATURA GRANDE
+        document.getElementById("tempBig").textContent = tempC.toFixed(1) + " °C";
 
-    } catch (error) {
-        console.error("Error de conexión:", error);
+        // OTROS DATOS
+        document.getElementById("hum").textContent = outdoor.humidity.value + " %";
+        document.getElementById("wind").textContent = windKmh.toFixed(1) + " km/h";
+        document.getElementById("windDir").textContent =
+            direccionTexto(wind.wind_direction.value) + " (" +
+            wind.wind_direction.value + "°)";
+        document.getElementById("rain").textContent = rainMm.toFixed(1) + " mm";
+        document.getElementById("press").textContent = pressHpa.toFixed(1) + " hPa";
+
+        // MIN MAX DIARIO
+        actualizarMinMaxHoy(tempC);
+
+        // RECORD ABSOLUTO
+        actualizarRecord(tempC);
+
+    }catch(error){
+        console.error("Error conexión:", error);
     }
 }
 
-// ====== Carga inicial + actualización cada 5 min ======
 obtenerDatos();
 setInterval(obtenerDatos, 300000);
-
 
 
 
