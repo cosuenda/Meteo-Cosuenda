@@ -4,107 +4,211 @@ const apiKey = "adf65434-1ace-43dd-b9a9-27915843d243";
 const mac = "84:CC:A8:B4:B1:F6";
 const url = `https://api.ecowitt.net/api/v3/device/real_time?application_key=${appKey}&api_key=${apiKey}&mac=${mac}&call_back=all`;
 
-// ====== Conversiones ======
-const fToC = f => ((parseFloat(f)-32)*5/9).toFixed(1);
-const mphToKmh = mph => (parseFloat(mph)*1.60934).toFixed(1);
-const inToMm = inches => (parseFloat(inches)*25.4).toFixed(1);
-const inHgToHpa = inHg => (parseFloat(inHg)*33.8639).toFixed(1);
+// ====== Funciones de conversión ======
+const fToC = f => ((parseFloat(f) - 32) * 5 / 9).toFixed(1);
+const mphToKmh = mph => (parseFloat(mph) * 1.60934).toFixed(1);
+const inToMm = inches => (parseFloat(inches) * 25.4).toFixed(1);
+const inHgToHpa = inHg => (parseFloat(inHg) * 33.8639).toFixed(1);
 
-// ====== Animación ======
-function animarValor(el,nuevo,unidad=""){
-    const valAct=parseFloat(el.getAttribute("data-valor"))||0;
-    const valFin=parseFloat(nuevo);
-    let start=valAct; const step=(valFin-start)/20; let i=0;
-    const anim=setInterval(()=>{
-        start+=step;
-        el.textContent=start.toFixed(1)+unidad;
-        i++; if(i>=20){ el.textContent=valFin.toFixed(1)+unidad; el.setAttribute("data-valor",valFin); clearInterval(anim);}
-    },50);
+// ====== Animar valores ======
+function animarValor(el, nuevo, unidad = "") {
+    const valAct = parseFloat(el.getAttribute("data-valor")) || 0;
+    const valFin = parseFloat(nuevo);
+    let start = valAct;
+    const step = (valFin - start) / 20;
+    let i = 0;
+    const anim = setInterval(() => {
+        start += step;
+        el.textContent = start.toFixed(1) + unidad;
+        i++;
+        if (i >= 20) {
+            el.textContent = valFin.toFixed(1) + unidad;
+            el.setAttribute("data-valor", valFin);
+            clearInterval(anim);
+        }
+    }, 50);
 }
 
-// ====== Min/Max diario ======
-function actualizarMinMax(dato, clave){
-    const hoy = new Date().toISOString().slice(0,10);
-    let minmax = JSON.parse(localStorage.getItem('minMax'))||{};
-    if(!minmax[hoy]) minmax[hoy]={};
-    if(!minmax[hoy][clave]) minmax[hoy][clave]={min:dato,max:dato};
-    else{ if(dato<minmax[hoy][clave].min) minmax[hoy][clave].min=dato; if(dato>minmax[hoy][clave].max) minmax[hoy][clave].max=dato;}
-    localStorage.setItem('minMax',JSON.stringify(minmax));
-    return minmax[hoy][clave];
+// ====== Dirección del viento ======
+function dirViento(grados){
+    const dirs = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
+    return dirs[Math.round(grados/22.5)%16];
 }
 
-// ====== Actualizar barra ======
-function actualizarBar(id,valor,min,max){
-    let perc = (valor - min)/(max - min) * 100;
-    if(isNaN(perc)) perc=0; if(perc>100) perc=100;
-    document.getElementById(id).style.width = perc+"%";
+// ====== Histórico y min/max ======
+function guardarHistorico(ts,temp,hum,wind,rain,press,solar,uvi,windDir){
+    let hist=JSON.parse(localStorage.getItem('meteoHist'))||[];
+    hist.push({ts,temp,hum,wind,rain,press,solar,uvi,windDir});
+    const maxReg=30*24*12; // 30 días aprox.
+    if(hist.length>maxReg) hist.shift();
+    localStorage.setItem('meteoHist',JSON.stringify(hist));
+    return hist;
 }
 
-// ====== Inicializar gráficos ======
-const tempChart = new Chart(document.getElementById('tempChart').getContext('2d'),{type:'line',data:{labels:[],datasets:[{label:'Temperatura °C',data:[],borderColor:'red',fill:false}]}});
-const rainChart = new Chart(document.getElementById('rainChart').getContext('2d'),{type:'line',data:{labels:[],datasets:[{label:'Lluvia mm',data:[],borderColor:'blue',fill:false}]}});
-const humChart = new Chart(document.getElementById('humChart').getContext('2d'),{type:'line',data:{labels:[],datasets:[{label:'Humedad %',data:[],borderColor:'green',fill:false}]}});
-const windChart = new Chart(document.getElementById('windChart').getContext('2d'),{type:'line',data:{labels:[],datasets:[{label:'Viento km/h',data:[],borderColor:'orange',fill:false}]}});
+function calcularMinMax(hist){
+    if(hist.length===0) return {};
+    const campos=["temp","hum","wind","rain","press","solar","uvi"];
+    let minmax={};
+    campos.forEach(c=>{
+        const valores=hist.map(e=>e[c]);
+        minmax[c+"Min"]=Math.min(...valores);
+        minmax[c+"Max"]=Math.max(...valores);
+    });
+    return minmax;
+}
 
-// ====== Inicializar mapa ======
-const map = L.map('map').setView([41.3,-1.3],12);
+// ====== Crear gráfica ======
+function crearGrafica(ctx,label,color){
+    return new Chart(ctx,{
+        type:'line',
+        data:{labels:[],datasets:[{label:label,data:[],borderColor:color,fill:false}]},
+        options:{
+            responsive:true,
+            plugins:{
+                legend:{display:true},
+                datalabels:{
+                    display:true,
+                    align:'top',
+                    formatter:(value)=>value.toFixed(1)
+                }
+            }
+        },
+        plugins:[ChartDataLabels]
+    });
+}
+
+// ====== Inicializar gráficas ======
+const tempRainChart=new Chart(document.getElementById('tempRainChart').getContext('2d'),{
+    type:'bar',
+    data:{
+        labels:[],
+        datasets:[
+            {type:'line', label:'Temperatura (°C)', data:[], borderColor:'rgba(255,99,132,1)', yAxisID:'y1', fill:false},
+            {type:'bar', label:'Lluvia diaria (mm)', data:[], backgroundColor:'rgba(0,123,255,0.5)', yAxisID:'y2'}
+        ]
+    },
+    options:{
+        responsive:true,
+        interaction:{mode:'index',intersect:false},
+        plugins:{legend:{display:true}},
+        scales:{
+            y1:{type:'linear',position:'left',title:{display:true,text:'°C'}},
+            y2:{type:'linear',position:'right',title:{display:true,text:'mm'},grid:{drawOnChartArea:false}}
+        }
+    }
+});
+const humChart=crearGrafica(document.getElementById('humChart').getContext('2d'),'Humedad (%)','rgba(0,200,100,1)');
+const windChart=crearGrafica(document.getElementById('windChart').getContext('2d'),'Viento km/h','rgba(255,165,0,1)');
+const solarChart=crearGrafica(document.getElementById('solarChart').getContext('2d'),'Radiación (W/m²)','rgba(255,215,0,1)');
+const uviChart=crearGrafica(document.getElementById('uviChart').getContext('2d'),'UVI','rgba(255,69,0,1)');
+
+// ====== Mapa ======
+const map=L.map('map').setView([41.3,-1.3],12);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
-const marker = L.marker([41.3,-1.3]).addTo(map).bindPopup('Estación Meteo Cosuenda').openPopup();
+const marker=L.marker([41.3,-1.3]).addTo(map).bindPopup('Estación Meteo Cosuenda').openPopup();
+
+// ====== Actualizar gráficos ======
+function actualizarGraf(hist){
+    const dias=parseInt(document.getElementById('rangeSelect').value);
+    const fil=hist.slice(-dias*24*12);
+    // Temp / lluvia
+    tempRainChart.data.labels=fil.map(e=>e.ts);
+    tempRainChart.data.datasets[0].data=fil.map(e=>e.temp);
+    tempRainChart.data.datasets[1].data=fil.map(e=>e.rain);
+    tempRainChart.update();
+    // Humedad
+    humChart.data.labels=fil.map(e=>e.ts);
+    humChart.data.datasets[0].data=fil.map(e=>e.hum);
+    humChart.update();
+    // Viento
+    windChart.data.labels=fil.map(e=>e.ts);
+    windChart.data.datasets[0].data=fil.map(e=>e.wind);
+    windChart.update();
+    // Solar
+    solarChart.data.labels=fil.map(e=>e.ts);
+    solarChart.data.datasets[0].data=fil.map(e=>e.solar);
+    solarChart.update();
+    // UVI
+    uviChart.data.labels=fil.map(e=>e.ts);
+    uviChart.data.datasets[0].data=fil.map(e=>e.uvi);
+    uviChart.update();
+}
 
 // ====== Función principal ======
 async function obtenerDatos(){
     try{
-        const res = await fetch(url);
-        const data = await res.json();
-        if(data.code!==0){ console.error("Error API:",data); return;}
+        const response=await fetch(url);
+        const data=await response.json();
+        if(data.code!==0){ console.error("Error API:",data); return; }
 
-        const outdoor = data.data.outdoor;
-        const wind = data.data.wind;
-        const rainfall = data.data.rainfall;
-        const pressure = data.data.pressure;
+        const outdoor=data.data.outdoor;
+        const wind=data.data.wind;
+        const rainfall=data.data.rainfall;
+        const pressure=data.data.pressure;
+        const solarVal=data.data.solar_and_uvi.solar.value;
+        const uviVal=data.data.solar_and_uvi.uvi.value;
 
-        // --- Temperatura
-        const tempC = parseFloat(fToC(outdoor.temperature.value));
-        const tempEl = document.getElementById("tempBig");
-        const iconEl = document.getElementById("tempIcon");
-        tempEl.textContent = tempC+" °C";
-        iconEl.textContent = tempC>30?"🔥":(tempC<0?"❄️":tempC<15?"🌤️":"☀️");
+        const tempC=parseFloat(fToC(outdoor.temperature.value));
+        const windKmH=parseFloat(mphToKmh(wind.wind_speed.value));
+        const rainMm=parseFloat(inToMm(rainfall.daily.value));
+        const pressHpa=parseFloat(inHgToHpa(pressure.relative.value));
+        const hum=parseInt(outdoor.humidity.value);
+        const windDirText=dirViento(parseFloat(wind.wind_direction.value));
 
-        animarValor(document.getElementById("hum"),outdoor.humidity.value,"%");
-        animarValor(document.getElementById("wind"),mphToKmh(wind.wind_speed.value)," km/h");
-        animarValor(document.getElementById("rain"),inToMm(rainfall.daily.value)," mm");
-        const pressHpa = inHgToHpa(pressure.relative.value);
+        // Animar valores actuales
+        animarValor(document.getElementById("tempBig"),tempC," °C");
+        document.getElementById("tempIcon").textContent = (tempC<=0?"❄️":tempC<=15?"🌤️":tempC<=30?"☀️":"🔥");
+        animarValor(document.getElementById("hum"),hum,"%");
+        animarValor(document.getElementById("wind"),windKmH," km/h");
+        document.getElementById("windDir").textContent = windDirText;
+        animarValor(document.getElementById("rain"),rainMm," mm");
         animarValor(document.getElementById("press"),pressHpa," hPa");
+        animarValor(document.getElementById("solar"),solarVal," W/m²");
+        animarValor(document.getElementById("uvi"),uviVal,"");
 
-        // --- Min/Max y barras
-        const tempMM = actualizarMinMax(tempC,'temp'); document.getElementById('tempMinMax').textContent=`Min: ${tempMM.min}°C | Max: ${tempMM.max}°C`; actualizarBar('tempBar',tempC,tempMM.min,tempMM.max);
-        const humMM = actualizarMinMax(parseInt(outdoor.humidity.value),'hum'); document.getElementById('humMinMax').textContent=`Min: ${humMM.min}% | Max: ${humMM.max}%`; actualizarBar('humBar',parseInt(outdoor.humidity.value),humMM.min,humMM.max);
-        const windMM = actualizarMinMax(parseFloat(mphToKmh(wind.wind_speed.value)),'wind'); document.getElementById('windMinMax').textContent=`Min: ${windMM.min} km/h | Max: ${windMM.max} km/h`; actualizarBar('windBar',parseFloat(mphToKmh(wind.wind_speed.value)),windMM.min,windMM.max);
-        const rainMM = actualizarMinMax(parseFloat(inToMm(rainfall.daily.value)),'rain'); document.getElementById('rainMinMax').textContent=`Min: ${rainMM.min} mm | Max: ${rainMM.max} mm`; actualizarBar('rainBar',parseFloat(inToMm(rainfall.daily.value)),rainMM.min,rainMM.max);
-        const pressMM = actualizarMinMax(pressHpa,'press'); document.getElementById('pressMinMax').textContent=`Min: ${pressMM.min} hPa | Max: ${pressMM.max} hPa`; actualizarBar('pressBar',pressHpa,pressMM.min,pressMM.max);
+        // Fondo dinámico
+        const hour=new Date().getHours();
+        document.body.style.background=(hour>=6 && hour<18)?"linear-gradient(to bottom,#87CEEB,#f0f8ff)":"linear-gradient(to bottom,#001848,#0a1f44)";
 
-        // --- Actualizar gráficas
-        const now = new Date().toLocaleTimeString();
-        tempChart.data.labels.push(now); tempChart.data.datasets[0].data.push(tempC); tempChart.update();
-        rainChart.data.labels.push(now); rainChart.data.datasets[0].data.push(parseFloat(inToMm(rainfall.daily.value))); rainChart.update();
-        humChart.data.labels.push(now); humChart.data.datasets[0].data.push(parseInt(outdoor.humidity.value)); humChart.update();
-        windChart.data.labels.push(now); windChart.data.datasets[0].data.push(parseFloat(mphToKmh(wind.wind_speed.value))); windChart.update();
+        // Guardar histórico y calcular min/max
+        const ts=new Date().toLocaleTimeString();
+        const hist=guardarHistorico(ts,tempC,hum,windKmH,rainMm,pressHpa,solarVal,uviVal,windDirText);
+        const mm=calcularMinMax(hist);
 
-        // --- Fondo día/noche
-        const hour = new Date().getHours();
-        document.body.style.background = (hour>=6 && hour<18)? "linear-gradient(to bottom,#87CEEB,#f0f8ff)":"linear-gradient(to bottom,#001848,#0a1f44)";
+        // Mostrar min/max en tarjetas
+        document.getElementById("tempMin").textContent = mm.tempMin?.toFixed(1) || "--";
+        document.getElementById("tempMax").textContent = mm.tempMax?.toFixed(1) || "--";
+        document.getElementById("humMin").textContent = mm.humMin?.toFixed(0) || "--";
+        document.getElementById("humMax").textContent = mm.humMax?.toFixed(0) || "--";
+        document.getElementById("windMin").textContent = mm.windMin?.toFixed(1) || "--";
+        document.getElementById("windMax").textContent = mm.windMax?.toFixed(1) || "--";
+        document.getElementById("rainMin").textContent = mm.rainMin?.toFixed(1) || "--";
+        document.getElementById("rainMax").textContent = mm.rainMax?.toFixed(1) || "--";
+        document.getElementById("pressMin").textContent = mm.pressMin?.toFixed(1) || "--";
+        document.getElementById("pressMax").textContent = mm.pressMax?.toFixed(1) || "--";
+        document.getElementById("solarMin").textContent = mm.solarMin?.toFixed(1) || "--";
+        document.getElementById("solarMax").textContent = mm.solarMax?.toFixed(1) || "--";
+        document.getElementById("uviMin").textContent = mm.uviMin?.toFixed(0) || "--";
+        document.getElementById("uviMax").textContent = mm.uviMax?.toFixed(0) || "--";
 
-        // --- Actualizar popup del mapa
-        marker.setPopupContent(`Estación Meteo Cosuenda<br>Temp: ${tempC} °C<br>Humedad: ${outdoor.humidity.value}%`).openPopup();
+        // Actualizar gráficas
+        actualizarGraf(hist);
 
-    }catch(e){ console.error("Error de conexión:",e);}
+        // Actualizar popup del mapa
+        marker.setPopupContent(`Estación Meteo Cosuenda<br>Temp: ${tempC} °C<br>Humedad: ${hum}%<br>Viento: ${windDirText}`).openPopup();
+
+    }catch(err){console.error("Error de conexión:",err);}
 }
 
-// ====== Carga inicial + actualización cada 5 min ======
+// Selector de rango
+document.getElementById('rangeSelect').addEventListener('change',()=>{
+    const hist=JSON.parse(localStorage.getItem('meteoHist'))||[];
+    actualizarGraf(hist);
+});
+
+// Carga inicial y actualización cada 5 min
 obtenerDatos();
 setInterval(obtenerDatos,300000);
-
-
 
 
 
