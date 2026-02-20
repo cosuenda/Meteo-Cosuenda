@@ -1,133 +1,95 @@
-// 🔑 DATOS REALES ECOWITT COSUENDA
-const APP_KEY = "26C4D6AD21CF8F8C4F3BA85E1CAF6701";
-const API_KEY = "adf65434-1ace-43dd-b9a9-27915843d243";
-const MAC = "84:CC:A8:B4:B1:F6";
+// ====== CONFIGURACIÓN ======
+const appKey = "26C4D6AD21CF8F8C4F3BA85E1CAF6701";
+const apiKey = "adf65434-1ace-43dd-b9a9-27915843d243";
+const mac = "84:CC:A8:B4:B1:F6";
 
-// URL API
-const url = `https://api.ecowitt.net/api/v3/device/real_time?application_key=${APP_KEY}&api_key=${API_KEY}&mac=${MAC}&call_back=all`;
+const url = `https://api.ecowitt.net/api/v3/device/real_time?application_key=${appKey}&api_key=${apiKey}&mac=${mac}&call_back=all`;
 
-// Crear gauge
-function crearGauge(ctx, max, color){
-    return new Chart(ctx,{
-        type:'doughnut',
-        data:{
-            datasets:[{
-                data:[0,max],
-                backgroundColor:[color,'#eee'],
-                borderWidth:0
-            }]
-        },
-        options:{
-            rotation:-90*Math.PI/180,
-            circumference:180*Math.PI/180,
-            cutout:'75%',
-            plugins:{
-                legend:{display:false},
-                tooltip:{enabled:false}
-            }
-        }
-    });
+// ====== CONVERSIONES ======
+const fToC = f => ((parseFloat(f) - 32) * 5 / 9);
+const mphToKmh = mph => (parseFloat(mph) * 1.60934);
+const inToMm = inches => (parseFloat(inches) * 25.4);
+const inHgToHpa = inHg => (parseFloat(inHg) * 33.8639);
+
+// ====== MÍNIMAS Y MÁXIMAS ======
+let stats = {
+    tempMin: null, tempMax: null,
+    windMin: null, windMax: null,
+    pressMin: null, pressMax: null,
+    humMin: null, humMax: null,
+    rainMax: 0
+};
+
+function actualizarMinMax(valor, minKey, maxKey) {
+    if (stats[minKey] === null || valor < stats[minKey]) stats[minKey] = valor;
+    if (stats[maxKey] === null || valor > stats[maxKey]) stats[maxKey] = valor;
 }
 
-// Crear gauges
-const tempGauge = crearGauge(document.getElementById("tempGauge"),50,"#ff5733");
-const pressGauge = crearGauge(document.getElementById("pressGauge"),1100,"#3498db");
-const windGauge = crearGauge(document.getElementById("windGauge"),100,"#27ae60");
-
-// Actualizar gauge
-function actualizarGauge(chart, valor, max){
-    if(valor > max) valor = max;
-    chart.data.datasets[0].data = [valor, max-valor];
-    chart.update();
-}
-
-// Guardar histórico
-function guardarHistorial(datos){
-    let hist = JSON.parse(localStorage.getItem("historial")) || [];
-    hist.push(datos);
-    if(hist.length > 500) hist.shift();
-    localStorage.setItem("historial", JSON.stringify(hist));
-}
-
-// Calcular min max
-function calcularMinMax(clave){
-    let hist = JSON.parse(localStorage.getItem("historial")) || [];
-    if(hist.length === 0) return {min:"--",max:"--"};
-
-    let valores = hist.map(e => parseFloat(e[clave])).filter(v => !isNaN(v));
-
-    return {
-        min: Math.min(...valores).toFixed(1),
-        max: Math.max(...valores).toFixed(1)
-    };
-}
-
-// Mostrar min max
-function mostrarMinMax(id, datos, unidad){
-    document.getElementById(id).innerHTML =
-        `<span class="min">Min: ${datos.min} ${unidad}</span> |
-         <span class="max">Max: ${datos.max} ${unidad}</span>`;
-}
-
-// Conversión automática
-function fahrenheitACelsius(f){
-    return (f - 32) * 5 / 9;
-}
-
-function inHgAhPa(inhg){
-    return inhg * 33.8639;
-}
-
-function mphAKmh(mph){
-    return mph * 1.60934;
-}
-
-// Obtener datos API
-async function obtenerDatos(){
-    try{
+// ====== FUNCIÓN PRINCIPAL ======
+async function obtenerDatos() {
+    try {
         const response = await fetch(url);
-        const data = await response.json();
+        const json = await response.json();
 
-        if(!data.data) return;
+        if (json.code !== 0) {
+            console.error("Error API:", json);
+            return;
+        }
 
-        // 🔥 CONVERSIONES CORRECTAS
-        const tempC = fahrenheitACelsius(parseFloat(data.data.outdoor.temperature.value));
-        const pressHPa = inHgAhPa(parseFloat(data.data.pressure.relative.value));
-        const windKm = mphAKmh(parseFloat(data.data.wind.wind_speed.value));
+        const data = json.data;
 
-        const valores = {
-            temp: tempC,
-            press: pressHPa,
-            wind: windKm
-        };
+        // ====== EXTRAER DATOS ======
+        const tempC = fToC(data.outdoor.temperature.value);
+        const windKmh = mphToKmh(data.wind.wind_speed.value);
+        const pressureHpa = inHgToHpa(data.pressure.relative.value);
+        const humidity = parseFloat(data.outdoor.humidity.value);
+        const rainMm = inToMm(data.rainfall.daily.value);
+        const solar = parseFloat(data.solar_and_uvi.solar.value);
+        const uvi = parseFloat(data.solar_and_uvi.uvi.value);
 
-        // Mostrar valores actuales
-        document.getElementById("tempValor").innerHTML = tempC.toFixed(1) + " °C";
-        document.getElementById("pressValor").innerHTML = pressHPa.toFixed(1) + " hPa";
-        document.getElementById("windValor").innerHTML = windKm.toFixed(1) + " km/h";
+        // ====== ACTUALIZAR VALORES ======
+        document.getElementById("tempValor").textContent = tempC.toFixed(1) + " °C";
+        document.getElementById("windValor").textContent = windKmh.toFixed(1) + " km/h";
+        document.getElementById("pressValor").textContent = pressureHpa.toFixed(1) + " hPa";
+        document.getElementById("humValor").textContent = humidity + " %";
+        document.getElementById("rainValor").textContent = rainMm.toFixed(1) + " mm";
+        document.getElementById("solarValor").textContent = solar + " W/m²";
+        document.getElementById("uviValor").textContent = uvi;
 
-        // Actualizar gauges
-        actualizarGauge(tempGauge,tempC,50);
-        actualizarGauge(pressGauge,pressHPa,1100);
-        actualizarGauge(windGauge,windKm,100);
+        // ====== MÍNIMAS Y MÁXIMAS ======
+        actualizarMinMax(tempC, "tempMin", "tempMax");
+        actualizarMinMax(windKmh, "windMin", "windMax");
+        actualizarMinMax(pressureHpa, "pressMin", "pressMax");
+        actualizarMinMax(humidity, "humMin", "humMax");
+        if (rainMm > stats.rainMax) stats.rainMax = rainMm;
 
-        // Guardar histórico
-        guardarHistorial(valores);
+        document.getElementById("tempMinMax").innerHTML =
+            `<span class="min">Min: ${stats.tempMin.toFixed(1)}°C</span> | 
+             <span class="max">Max: ${stats.tempMax.toFixed(1)}°C</span>`;
 
-        // Calcular min max
-        mostrarMinMax("tempMinMax",calcularMinMax("temp"),"°C");
-        mostrarMinMax("pressMinMax",calcularMinMax("press"),"hPa");
-        mostrarMinMax("windMinMax",calcularMinMax("wind"),"km/h");
+        document.getElementById("windMinMax").innerHTML =
+            `<span class="min">Min: ${stats.windMin.toFixed(1)} km/h</span> | 
+             <span class="max">Max: ${stats.windMax.toFixed(1)} km/h</span>`;
 
-    }catch(error){
-        console.error("Error API:",error);
+        document.getElementById("pressMinMax").innerHTML =
+            `<span class="min">Min: ${stats.pressMin.toFixed(1)} hPa</span> | 
+             <span class="max">Max: ${stats.pressMax.toFixed(1)} hPa</span>`;
+
+        document.getElementById("humMinMax").innerHTML =
+            `<span class="min">Min: ${stats.humMin}%</span> | 
+             <span class="max">Max: ${stats.humMax}%</span>`;
+
+        document.getElementById("rainMinMax").innerHTML =
+            `<span class="max">Hoy: ${stats.rainMax.toFixed(1)} mm</span>`;
+
+    } catch (error) {
+        console.error("Error de conexión:", error);
     }
 }
 
-// Actualizar cada 2 minutos
+// ====== ACTUALIZACIÓN ======
 obtenerDatos();
-setInterval(obtenerDatos,120000);
-
+setInterval(obtenerDatos, 300000); // cada 5 minutos
 
 
 
