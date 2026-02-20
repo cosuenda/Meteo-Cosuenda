@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meteo Cosuenda - Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 body{margin:0;font-family:'Poppins',sans-serif;text-align:center;transition:background 1s;}
 header{background:linear-gradient(90deg,#004e92,#000428);color:white;padding:25px 10px;}
 header h1{margin:0;font-size:28px;} 
 header p{margin:5px 0 0;font-size:14px;opacity:0.8;}
-
 #tempBig{font-size:80px;font-weight:bold;margin:20px 0 10px;transition: color 0.5s;}
 #tempIcon{font-size:60px;margin-bottom:25px;transition: transform 0.5s ease;}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px;max-width:1000px;margin:auto;padding:0 10px 30px;}
@@ -19,6 +19,7 @@ header p{margin:5px 0 0;font-size:14px;opacity:0.8;}
 .card h2{margin:0;font-size:18px;} 
 .card p{font-size:28px;font-weight:700;margin-top:8px;}
 .minmax{font-size:14px;margin-top:5px;color:#555;}
+canvas{max-width:150px;margin-top:10px;}
 </style>
 </head>
 <body>
@@ -31,34 +32,38 @@ header p{margin:5px 0 0;font-size:14px;opacity:0.8;}
 <div id="tempBig">-- °C</div>
 <div id="tempIcon">🌤️</div>
 <p class="minmax" id="tempMinMax"></p>
+<canvas id="tempChart"></canvas>
 
 <div class="cards">
   <div class="card">
     <h2>Humedad</h2>
     <p id="hum">-- %</p>
     <p class="minmax" id="humMinMax"></p>
+    <canvas id="humChart"></canvas>
   </div>
   <div class="card">
     <h2>Viento</h2>
     <p id="wind">-- km/h</p>
     <p class="minmax" id="windMinMax"></p>
+    <canvas id="windChart"></canvas>
   </div>
   <div class="card">
     <h2>Lluvia</h2>
     <p id="rain">-- mm</p>
     <p class="minmax" id="rainMinMax"></p>
+    <canvas id="rainChart"></canvas>
   </div>
   <div class="card">
     <h2>Presión</h2>
     <p id="press">-- hPa</p>
     <p class="minmax" id="pressMinMax"></p>
+    <canvas id="pressChart"></canvas>
   </div>
 </div>
 
 <script src="script.js"></script>
 </body>
 </html>
-
 
 
 
