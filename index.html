@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meteo Cosuenda - Dashboard</title>
+<title>Meteo Cosuenda - Dashboard Visual</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -13,7 +13,7 @@ body{margin:0;font-family:'Poppins',sans-serif;text-align:center;transition:back
 header{background:linear-gradient(90deg,#004e92,#000428);color:white;padding:25px 10px;}
 header h1{margin:0;font-size:28px;} 
 header p{margin:5px 0 0;font-size:14px;opacity:0.8;}
-#tempBig{font-size:80px;font-weight:bold;margin:20px 0 10px;transition: background 0.5s;color:#000;}
+#tempBig{font-size:80px;font-weight:bold;margin:20px 0 10px;transition: all 0.5s;}
 #tempIcon{font-size:60px;margin-bottom:25px;transition: transform 0.5s ease;}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px;max-width:1000px;margin:auto;padding:0 10px 30px;}
 .card{background:white;border-radius:20px;padding:20px;box-shadow:0 10px 25px rgba(0,0,0,0.15);transition: transform 0.3s, background 0.5s;}
@@ -21,7 +21,9 @@ header p{margin:5px 0 0;font-size:14px;opacity:0.8;}
 .card h2{margin:0;font-size:18px;} 
 .card p{font-size:28px;font-weight:700;margin-top:8px;}
 .card .icon{font-size:50px;margin-bottom:10px;transition: transform 0.5s ease;}
-.minmax{font-size:14px;margin-top:5px;color:#555;}
+.minmax{font-size:14px;margin-top:5px;}
+.min{color:green; font-weight:bold;}
+.max{color:red; font-weight:bold;}
 #charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;max-width:1000px;margin:20px auto;padding:0 10px;}
 #map{height:300px;margin:20px 10px;border-radius:20px;box-shadow:0 10px 25px rgba(0,0,0,0.15);}
 footer{padding:20px;font-size:14px;color:#444;}
@@ -41,14 +43,14 @@ footer{padding:20px;font-size:14px;color:#444;}
     <div class="icon">🌡️</div>
     <h2>Temperatura</h2>
     <p id="tempBigVal">-- °C</p>
-    <p class="minmax">Min: <span id="tempMin">--</span> °C / Max: <span id="tempMax">--</span> °C</p>
+    <p class="minmax">Min: <span id="tempMin" class="min">--</span> °C / Max: <span id="tempMax" class="max">--</span> °C</p>
   </div>
 
   <div class="card">
     <div class="icon">💧</div>
     <h2>Humedad</h2>
     <p id="hum">-- %</p>
-    <p class="minmax">Min: <span id="humMin">--</span> % / Max: <span id="humMax">--</span> %</p>
+    <p class="minmax">Min: <span id="humMin" class="min">--</span> % / Max: <span id="humMax" class="max">--</span> %</p>
   </div>
 
   <div class="card">
@@ -56,35 +58,35 @@ footer{padding:20px;font-size:14px;color:#444;}
     <h2>Viento</h2>
     <p id="wind">-- km/h</p>
     <p id="windDir">--</p>
-    <p class="minmax">Min: <span id="windMin">--</span> km/h / Max: <span id="windMax">--</span> km/h</p>
+    <p class="minmax">Min: <span id="windMin" class="min">--</span> km/h / Max: <span id="windMax" class="max">--</span> km/h</p>
   </div>
 
   <div class="card">
     <div class="icon">🌧️</div>
     <h2>Lluvia</h2>
     <p id="rain">-- mm</p>
-    <p class="minmax">Min: <span id="rainMin">--</span> mm / Max: <span id="rainMax">--</span> mm</p>
+    <p class="minmax">Min: <span id="rainMin" class="min">--</span> mm / Max: <span id="rainMax" class="max">--</span> mm</p>
   </div>
 
   <div class="card">
     <div class="icon">📈</div>
     <h2>Presión</h2>
     <p id="press">-- hPa</p>
-    <p class="minmax">Min: <span id="pressMin">--</span> hPa / Max: <span id="pressMax">--</span> hPa</p>
+    <p class="minmax">Min: <span id="pressMin" class="min">--</span> hPa / Max: <span id="pressMax" class="max">--</span> hPa</p>
   </div>
 
   <div class="card">
     <div class="icon">☀️</div>
     <h2>Radiación</h2>
     <p id="solar">-- W/m²</p>
-    <p class="minmax">Min: <span id="solarMin">--</span> / Max: <span id="solarMax">--</span></p>
+    <p class="minmax">Min: <span id="solarMin" class="min">--</span> / Max: <span id="solarMax" class="max">--</span></p>
   </div>
 
   <div class="card">
     <div class="icon">🟠</div>
     <h2>UVI</h2>
     <p id="uvi">--</p>
-    <p class="minmax">Min: <span id="uviMin">--</span> / Max: <span id="uviMax">--</span></p>
+    <p class="minmax">Min: <span id="uviMin" class="min">--</span> / Max: <span id="uviMax" class="max">--</span></p>
   </div>
 </div>
 
@@ -97,144 +99,6 @@ footer{padding:20px;font-size:14px;color:#444;}
 <div id="map"></div>
 
 <footer>Actualización automática cada 5 minutos · Histórico local</footer>
-
-<script>
-// ====== Claves y URL API ======
-const appKey = "26C4D6AD21CF8F8C4F3BA85E1CAF6701";
-const apiKey = "adf65434-1ace-43dd-b9a9-27915843d243";
-const mac = "84:CC:A8:B4:B1:F6";
-const url = `https://api.ecowitt.net/api/v3/device/real_time?application_key=${appKey}&api_key=${apiKey}&mac=${mac}&call_back=all`;
-
-// ====== Conversiones ======
-const fToC = f => ((parseFloat(f)-32)*5/9).toFixed(1);
-const mphToKmh = mph => (parseFloat(mph)*1.60934).toFixed(1);
-const inToMm = inches => (parseFloat(inches)*25.4).toFixed(1);
-const inHgToHpa = inHg => (parseFloat(inHg)*33.8639).toFixed(1);
-
-// ====== Animación valores ======
-function animarValor(el,nuevo,unidad=""){
-  const valAct = parseFloat(el.getAttribute("data-valor"))||0;
-  const valFin = parseFloat(nuevo);
-  let start = valAct;
-  const step = (valFin-start)/20;
-  let i=0;
-  const anim = setInterval(()=>{
-    start+=step;
-    el.textContent = start.toFixed(1)+unidad;
-    i++;
-    if(i>=20){ el.textContent=valFin.toFixed(1)+unidad; el.setAttribute("data-valor",valFin); clearInterval(anim);}
-  },50);
-}
-
-// ====== Mapa ======
-const map = L.map('map').setView([41.3,-1.3],12);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
-const marker = L.marker([41.3,-1.3]).addTo(map).bindPopup('Estación Meteo Cosuenda').openPopup();
-
-// ====== Histórico y min/max ======
-function guardarHistorico(ts,temp,hum,wind,rain,press,solar,uvi,windDir){
-  let hist = JSON.parse(localStorage.getItem('meteoHist'))||[];
-  hist.push({ts,temp,hum,wind,rain,press,solar,uvi,windDir});
-  if(hist.length>24*12) hist.shift(); // guarda 24h aprox
-  localStorage.setItem('meteoHist',JSON.stringify(hist));
-  return hist;
-}
-
-function calcularMinMax(hist){
-  if(!hist.length) return {};
-  return {
-    tempMin: Math.min(...hist.map(e=>e.temp)),
-    tempMax: Math.max(...hist.map(e=>e.temp)),
-    humMin: Math.min(...hist.map(e=>e.hum)),
-    humMax: Math.max(...hist.map(e=>e.hum)),
-    windMin: Math.min(...hist.map(e=>e.wind)),
-    windMax: Math.max(...hist.map(e=>e.wind)),
-    rainMin: Math.min(...hist.map(e=>e.rain)),
-    rainMax: Math.max(...hist.map(e=>e.rain)),
-    pressMin: Math.min(...hist.map(e=>e.press)),
-    pressMax: Math.max(...hist.map(e=>e.press)),
-    solarMin: Math.min(...hist.map(e=>e.solar)),
-    solarMax: Math.max(...hist.map(e=>e.solar)),
-    uviMin: Math.min(...hist.map(e=>e.uvi)),
-    uviMax: Math.max(...hist.map(e=>e.uvi))
-  };
-}
-
-// ====== Dirección viento ======
-function gradosADireccion(grados){
-  const dirs = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSO","SO","OSO","O","ONO","NO","NNO"];
-  const ix = Math.round(grados/22.5)%16;
-  return dirs[ix];
-}
-
-// ====== Función principal ======
-async function obtenerDatos(){
-  try{
-    const resp = await fetch(url);
-    const json = await resp.json();
-    if(json.code!==0){ console.error("Error API",json); return;}
-
-    const outdoor = json.data.outdoor;
-    const wind = json.data.wind;
-    const rainfall = json.data.rainfall;
-    const pressure = json.data.pressure;
-    const solarVal = json.data.solar_and_uvi.solar.value;
-    const uviVal = json.data.solar_and_uvi.uvi.value;
-
-    const tempC = parseFloat(fToC(outdoor.temperature.value));
-    const humVal = parseInt(outdoor.humidity.value);
-    const windKmH = parseFloat(mphToKmh(wind.wind_speed.value));
-    const rainMm = parseFloat(inToMm(rainfall.daily.value));
-    const pressHpa = parseFloat(inHgToHpa(pressure.relative.value));
-    const windDirText = gradosADireccion(parseFloat(wind.wind_direction.value));
-
-    // Valores animados
-    animarValor(document.getElementById("tempBigVal"), tempC, " °C");
-    animarValor(document.getElementById("hum"), humVal, "%");
-    animarValor(document.getElementById("wind"), windKmH, " km/h");
-    animarValor(document.getElementById("rain"), rainMm, " mm");
-    animarValor(document.getElementById("press"), pressHpa, " hPa");
-    animarValor(document.getElementById("solar"), solarVal, " W/m²");
-    animarValor(document.getElementById("uvi"), uviVal, "");
-
-    document.getElementById("windDir").textContent = windDirText;
-
-    const ts = new Date().toLocaleTimeString();
-    const hist = guardarHistorico(ts,tempC,humVal,windKmH,rainMm,pressHpa,solarVal,uviVal,windDirText);
-    const mm = calcularMinMax(hist);
-
-    // Mostrar min/max
-    document.getElementById("tempMin").textContent = mm.tempMin?.toFixed(1);
-    document.getElementById("tempMax").textContent = mm.tempMax?.toFixed(1);
-    document.getElementById("humMin").textContent = mm.humMin?.toFixed(0);
-    document.getElementById("humMax").textContent = mm.humMax?.toFixed(0);
-    document.getElementById("windMin").textContent = mm.windMin?.toFixed(1);
-    document.getElementById("windMax").textContent = mm.windMax?.toFixed(1);
-    document.getElementById("rainMin").textContent = mm.rainMin?.toFixed(1);
-    document.getElementById("rainMax").textContent = mm.rainMax?.toFixed(1);
-    document.getElementById("pressMin").textContent = mm.pressMin?.toFixed(1);
-    document.getElementById("pressMax").textContent = mm.pressMax?.toFixed(1);
-    document.getElementById("solarMin").textContent = mm.solarMin?.toFixed(1);
-    document.getElementById("solarMax").textContent = mm.solarMax?.toFixed(1);
-    document.getElementById("uviMin").textContent = mm.uviMin?.toFixed(0);
-    document.getElementById("uviMax").textContent = mm.uviMax?.toFixed(0);
-
-    // Fondo día/noche
-    const hour = new Date().getHours();
-    document.body.style.background = (hour>=6 && hour<18)? "linear-gradient(to bottom,#87CEEB,#f0f8ff)":"linear-gradient(to bottom,#001848,#0a1f44)";
-
-    // Actualizar popup mapa
-    marker.setPopupContent(`Estación Meteo Cosuenda<br>Temp: ${tempC} °C<br>Humedad: ${humVal}%<br>Viento: ${windKmH} km/h ${windDirText}`).openPopup();
-
-  }catch(err){ console.error("Error conexión",err);}
-}
-
-// ====== Inicialización + actualización cada 5 min ======
-obtenerDatos();
-setInterval(obtenerDatos,300000);
-</script>
-</body>
-</html>
 
 
 
