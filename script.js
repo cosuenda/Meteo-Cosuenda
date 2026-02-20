@@ -51,6 +51,14 @@ async function obtenerDatos(){
 
         // ====== TEMPERATURA GRANDE ======
         document.getElementById("tempBig").textContent=tempC+" °C";
+        // ====== MINIMAS Y MAXIMAS DIARIAS ======
+if(outdoor.temperature.min && outdoor.temperature.max){
+    const tempMin = fToC(outdoor.temperature.min);
+    const tempMax = fToC(outdoor.temperature.max);
+
+    document.getElementById("tempMin").textContent = tempMin + " °C";
+    document.getElementById("tempMax").textContent = tempMax + " °C";
+}
 
         // ====== MINIMA Y MAXIMA DIARIA ======
         let hoy=new Date().toDateString();
