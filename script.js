@@ -11,14 +11,27 @@ const mphToKmh = mph => (parseFloat(mph) * 1.60934);
 const inToMm = inches => (parseFloat(inches) * 25.4);
 const inHgToHpa = inHg => (parseFloat(inHg) * 33.8639);
 
-// ====== MÍNIMAS Y MÁXIMAS ======
-let stats = {
-    tempMin: null, tempMax: null,
-    windMin: null, windMax: null,
-    pressMin: null, pressMax: null,
-    humMin: null, humMax: null,
-    rainMax: 0
-};
+// ====== FECHA ACTUAL ======
+const hoy = new Date().toISOString().split("T")[0];
+
+// ====== CARGAR STATS DEL LOCALSTORAGE ======
+let stats = JSON.parse(localStorage.getItem("meteoStats")) || {};
+
+if (!stats.fecha || stats.fecha !== hoy) {
+    stats = {
+        fecha: hoy,
+        tempMin: null, tempMax: null,
+        windMin: null, windMax: null,
+        pressMin: null, pressMax: null,
+        humMin: null, humMax: null,
+        rainMax: 0
+    };
+}
+
+// ====== GUARDAR STATS ======
+function guardarStats() {
+    localStorage.setItem("meteoStats", JSON.stringify(stats));
+}
 
 function actualizarMinMax(valor, minKey, maxKey) {
     if (stats[minKey] === null || valor < stats[minKey]) stats[minKey] = valor;
@@ -38,7 +51,6 @@ async function obtenerDatos() {
 
         const data = json.data;
 
-        // ====== EXTRAER DATOS ======
         const tempC = fToC(data.outdoor.temperature.value);
         const windKmh = mphToKmh(data.wind.wind_speed.value);
         const pressureHpa = inHgToHpa(data.pressure.relative.value);
@@ -47,7 +59,7 @@ async function obtenerDatos() {
         const solar = parseFloat(data.solar_and_uvi.solar.value);
         const uvi = parseFloat(data.solar_and_uvi.uvi.value);
 
-        // ====== ACTUALIZAR VALORES ======
+        // ====== MOSTRAR VALORES ======
         document.getElementById("tempValor").textContent = tempC.toFixed(1) + " °C";
         document.getElementById("windValor").textContent = windKmh.toFixed(1) + " km/h";
         document.getElementById("pressValor").textContent = pressureHpa.toFixed(1) + " hPa";
@@ -56,13 +68,16 @@ async function obtenerDatos() {
         document.getElementById("solarValor").textContent = solar + " W/m²";
         document.getElementById("uviValor").textContent = uvi;
 
-        // ====== MÍNIMAS Y MÁXIMAS ======
+        // ====== ACTUALIZAR MÍN / MÁX ======
         actualizarMinMax(tempC, "tempMin", "tempMax");
         actualizarMinMax(windKmh, "windMin", "windMax");
         actualizarMinMax(pressureHpa, "pressMin", "pressMax");
         actualizarMinMax(humidity, "humMin", "humMax");
         if (rainMm > stats.rainMax) stats.rainMax = rainMm;
 
+        guardarStats();
+
+        // ====== MOSTRAR MÍN / MÁX ======
         document.getElementById("tempMinMax").innerHTML =
             `<span class="min">Min: ${stats.tempMin.toFixed(1)}°C</span> | 
              <span class="max">Max: ${stats.tempMax.toFixed(1)}°C</span>`;
@@ -83,13 +98,13 @@ async function obtenerDatos() {
             `<span class="max">Hoy: ${stats.rainMax.toFixed(1)} mm</span>`;
 
     } catch (error) {
-        console.error("Error de conexión:", error);
+        console.error("Error conexión:", error);
     }
 }
 
 // ====== ACTUALIZACIÓN ======
 obtenerDatos();
-setInterval(obtenerDatos, 300000); // cada 5 minutos
+setInterval(obtenerDatos, 300000);
 
 
 
