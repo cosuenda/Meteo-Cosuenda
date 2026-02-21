@@ -13,13 +13,13 @@ body{margin:0;font-family:'Poppins',sans-serif;text-align:center;transition:back
 header{background:linear-gradient(90deg,#004e92,#000428);color:white;padding:25px 10px;}
 header h1{margin:0;font-size:28px;} header p{margin:5px 0 0;font-size:14px;opacity:0.8;}
 #tempBig{font-size:80px;font-weight:bold;margin:20px 0 10px;transition: background 0.5s;color:#000;}
-#tempIcon{font-size:60px;margin-bottom:25px;transition: transform 0.5s ease;}
+#tempIcon{font-size:60px;margin-bottom:15px;transition: transform 0.5s ease;}
+#minMax{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:15px;margin:10px auto;font-size:16px;max-width:900px;}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px;max-width:1000px;margin:auto;padding:0 10px 30px;}
 .card{background:white;border-radius:20px;padding:20px;box-shadow:0 10px 25px rgba(0,0,0,0.15);transition: transform 0.3s, background 0.5s;}
 .card:hover{transform:translateY(-5px);}
-.card h2{margin:0;font-size:18px;} .card p{font-size:28px;font-weight:700;margin-top:8px;}
-.card .icon{font-size:50px;margin-bottom:10px;transition: transform 0.5s ease;}
-#minMax{display:flex;justify-content:center;gap:20px;margin:10px 0;}
+.card h2{margin:0;font-size:16px;} .card p{font-size:24px;font-weight:700;margin-top:5px;}
+.card .icon{font-size:40px;margin-bottom:5px;transition: transform 0.5s ease;}
 #selectorRange{margin:20px;}
 #charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;max-width:1000px;margin:20px auto;padding:0 10px;}
 #map{height:300px;margin:20px 10px;border-radius:20px;box-shadow:0 10px 25px rgba(0,0,0,0.15);}
@@ -35,10 +35,16 @@ footer{padding:20px;font-size:14px;color:#444;}
 <div id="tempBig">-- °C</div>
 <div id="tempIcon">🌤️</div>
 
-<!-- Min y Max -->
+<!-- Min / Max de temperatura, humedad, viento y lluvia -->
 <div id="minMax">
-  <div class="card"><div class="icon">🥶</div><h2>Mínima</h2><p id="tempMin">-- °C</p></div>
-  <div class="card"><div class="icon">🥵</div><h2>Máxima</h2><p id="tempMax">-- °C</p></div>
+  <div class="card"><div class="icon">🥶</div><h2>Temp Mín</h2><p id="tempMin">-- °C</p></div>
+  <div class="card"><div class="icon">🥵</div><h2>Temp Máx</h2><p id="tempMax">-- °C</p></div>
+  <div class="card"><div class="icon">💧</div><h2>Humedad Mín</h2><p id="humMin">-- %</p></div>
+  <div class="card"><div class="icon">💧</div><h2>Humedad Máx</h2><p id="humMax">-- %</p></div>
+  <div class="card"><div class="icon">💨</div><h2>Viento Mín</h2><p id="windMin">-- km/h</p></div>
+  <div class="card"><div class="icon">💨</div><h2>Viento Máx</h2><p id="windMax">-- km/h</p></div>
+  <div class="card"><div class="icon">🌧️</div><h2>Lluvia Mín</h2><p id="rainMin">-- mm</p></div>
+  <div class="card"><div class="icon">🌧️</div><h2>Lluvia Máx</h2><p id="rainMax">-- mm</p></div>
 </div>
 
 <div class="cards">
@@ -69,6 +75,7 @@ Mostrar datos de:
 
 <div id="map"></div>
 <footer>Actualización automática cada 5 minutos · Histórico local</footer>
+
 
 
 
