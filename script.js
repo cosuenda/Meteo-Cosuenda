@@ -11,12 +11,6 @@ const mphToKmh = mph => (parseFloat(mph) * 1.60934);
 const inToMm = inches => (parseFloat(inches) * 25.4);
 const inHgToHpa = inHg => (parseFloat(inHg) * 33.8639);
 
-// ====== VARIABLES PARA MÍNIMAS Y MÁXIMAS ======
-let tempMin = null;
-let tempMax = null;
-let humMax = 0;
-let windMax = 0;
-
 async function obtenerDatos(){
   try{
     const response = await fetch(url);
@@ -31,45 +25,34 @@ async function obtenerDatos(){
     const wind = data.data.wind;
     const rainfall = data.data.rainfall;
     const pressure = data.data.pressure;
+    const today = data.data.today;
 
+    // ====== ACTUALES ======
     const tempC = fToC(outdoor.temperature.value);
     const hum = parseInt(outdoor.humidity.value);
     const windKmH = mphToKmh(wind.wind_speed.value);
     const rainMm = inToMm(rainfall.daily.value);
     const press = inHgToHpa(pressure.relative.value);
 
-    // ====== ACTUALIZAR VALORES ACTUALES ======
     document.getElementById("tempBig").textContent = tempC.toFixed(1) + " °C";
     document.getElementById("hum").textContent = hum + " %";
     document.getElementById("wind").textContent = windKmH.toFixed(1) + " km/h";
     document.getElementById("rain").textContent = rainMm.toFixed(1) + " mm";
     document.getElementById("press").textContent = press.toFixed(1) + " hPa";
 
-    // ====== CALCULAR MÍNIMAS Y MÁXIMAS DIARIAS ======
-    const hoy = new Date().toDateString();
-    const diaGuardado = localStorage.getItem("dia");
+    // ====== MÍNIMA Y MÁXIMA OFICIALES ======
+    const tempMin = fToC(today.outdoor.temperature.min);
+    const tempMax = fToC(today.outdoor.temperature.max);
+    const humMax = today.outdoor.humidity.max;
+    const windMax = mphToKmh(today.wind.wind_gust.max);
 
-    if(diaGuardado !== hoy){
-      tempMin = tempC;
-      tempMax = tempC;
-      humMax = hum;
-      windMax = windKmH;
-      localStorage.setItem("dia", hoy);
-    }
-
-    if(tempMin === null || tempC < tempMin) tempMin = tempC;
-    if(tempMax === null || tempC > tempMax) tempMax = tempC;
-    if(hum > humMax) humMax = hum;
-    if(windKmH > windMax) windMax = windKmH;
-
-    // ====== MOSTRAR MÍNIMAS Y MÁXIMAS ======
     document.getElementById("tempMin").textContent = tempMin.toFixed(1) + " °C";
     document.getElementById("tempMax").textContent = tempMax.toFixed(1) + " °C";
     document.getElementById("humMax").textContent = humMax + " %";
     document.getElementById("windMax").textContent = windMax.toFixed(1) + " km/h";
 
   }catch(error){
-    console.log("Error conexión");
+    console.log("Error conexión", error);
   }
 }
 
