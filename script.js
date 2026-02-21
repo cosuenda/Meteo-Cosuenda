@@ -18,9 +18,11 @@ function gradosADireccion(grados){
   return dirs[Math.round(grados/22.5)%16];
 }
 
-// ====== MÍNIMA Y MÁXIMA DIARIA LOCAL ======
+// ====== VARIABLES DIARIAS ======
 let tempMin = null;
 let tempMax = null;
+let windMax = null;
+let humMax = null;
 let diaActual = new Date().getDate();
 
 // ====== MAPA ======
@@ -50,28 +52,42 @@ async function obtenerDatos(){
     const pressure = data.data.pressure;
 
     const tempC = fToC(outdoor.temperature.value);
+    const windKmH = mphToKmh(wind.wind_speed.value);
+    const humVal = parseFloat(outdoor.humidity.value);
 
-    // Reset diario automático
+    // RESET DIARIO AUTOMÁTICO
     const hoy = new Date().getDate();
     if(hoy !== diaActual){
       tempMin = null;
       tempMax = null;
+      windMax = null;
+      humMax = null;
       diaActual = hoy;
     }
 
+    // TEMPERATURA
     if(tempMin === null || tempC < tempMin) tempMin = tempC;
     if(tempMax === null || tempC > tempMax) tempMax = tempC;
 
-    // Mostrar datos
+    // VIENTO MÁXIMO
+    if(windMax === null || windKmH > windMax) windMax = windKmH;
+
+    // HUMEDAD MÁXIMA
+    if(humMax === null || humVal > humMax) humMax = humVal;
+
+    // MOSTRAR DATOS
     document.getElementById("tempBig").textContent = tempC.toFixed(1) + " °C";
     document.getElementById("tempMin").textContent = tempMin.toFixed(1);
     document.getElementById("tempMax").textContent = tempMax.toFixed(1);
 
-    document.getElementById("hum").textContent =
-      outdoor.humidity.value + " %";
+    document.getElementById("hum").textContent = humVal + " %";
+    document.getElementById("humMax").textContent = humMax.toFixed(0) + " %";
 
     document.getElementById("wind").textContent =
-      mphToKmh(wind.wind_speed.value).toFixed(1) + " km/h";
+      windKmH.toFixed(1) + " km/h";
+
+    document.getElementById("windMax").textContent =
+      windMax.toFixed(1) + " km/h";
 
     document.getElementById("windDir").textContent =
       gradosADireccion(wind.wind_direction.value);
@@ -89,7 +105,6 @@ async function obtenerDatos(){
 
 obtenerDatos();
 setInterval(obtenerDatos, 300000);
-
 
 
 
