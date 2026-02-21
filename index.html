@@ -13,13 +13,12 @@ body{margin:0;font-family:'Poppins',sans-serif;text-align:center;transition:back
 header{background:linear-gradient(90deg,#004e92,#000428);color:white;padding:25px 10px;}
 header h1{margin:0;font-size:28px;} header p{margin:5px 0 0;font-size:14px;opacity:0.8;}
 #tempBig{font-size:80px;font-weight:bold;margin:20px 0 10px;transition: background 0.5s;color:#000;}
-#tempIcon{font-size:60px;margin-bottom:15px;transition: transform 0.5s ease;}
-#minMax{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:15px;margin:10px auto;font-size:16px;max-width:900px;}
+#tempIcon{font-size:60px;margin-bottom:25px;transition: transform 0.5s ease;}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px;max-width:1000px;margin:auto;padding:0 10px 30px;}
 .card{background:white;border-radius:20px;padding:20px;box-shadow:0 10px 25px rgba(0,0,0,0.15);transition: transform 0.3s, background 0.5s;}
 .card:hover{transform:translateY(-5px);}
-.card h2{margin:0;font-size:16px;} .card p{font-size:24px;font-weight:700;margin-top:5px;}
-.card .icon{font-size:40px;margin-bottom:5px;transition: transform 0.5s ease;}
+.card h2{margin:0;font-size:18px;} .card p{font-size:28px;font-weight:700;margin-top:8px;}
+.card .icon{font-size:50px;margin-bottom:10px;transition: transform 0.5s ease;}
 #selectorRange{margin:20px;}
 #charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;max-width:1000px;margin:20px auto;padding:0 10px;}
 #map{height:300px;margin:20px 10px;border-radius:20px;box-shadow:0 10px 25px rgba(0,0,0,0.15);}
@@ -34,18 +33,6 @@ footer{padding:20px;font-size:14px;color:#444;}
 
 <div id="tempBig">-- °C</div>
 <div id="tempIcon">🌤️</div>
-
-<!-- Min / Max de temperatura, humedad, viento y lluvia -->
-<div id="minMax">
-  <div class="card"><div class="icon">🥶</div><h2>Temp Mín</h2><p id="tempMin">-- °C</p></div>
-  <div class="card"><div class="icon">🥵</div><h2>Temp Máx</h2><p id="tempMax">-- °C</p></div>
-  <div class="card"><div class="icon">💧</div><h2>Humedad Mín</h2><p id="humMin">-- %</p></div>
-  <div class="card"><div class="icon">💧</div><h2>Humedad Máx</h2><p id="humMax">-- %</p></div>
-  <div class="card"><div class="icon">💨</div><h2>Viento Mín</h2><p id="windMin">-- km/h</p></div>
-  <div class="card"><div class="icon">💨</div><h2>Viento Máx</h2><p id="windMax">-- km/h</p></div>
-  <div class="card"><div class="icon">🌧️</div><h2>Lluvia Mín</h2><p id="rainMin">-- mm</p></div>
-  <div class="card"><div class="icon">🌧️</div><h2>Lluvia Máx</h2><p id="rainMax">-- mm</p></div>
-</div>
 
 <div class="cards">
   <div class="card"><div class="icon">💧</div><h2>Humedad</h2><p id="hum">-- %</p></div>
@@ -75,6 +62,180 @@ Mostrar datos de:
 
 <div id="map"></div>
 <footer>Actualización automática cada 5 minutos · Histórico local</footer>
+
+<script>
+// ====== Claves y URL API ======
+const appKey = "26C4D6AD21CF8F8C4F3BA85E1CAF6701";
+const apiKey = "adf65434-1ace-43dd-b9a9-27915843d243";
+const mac = "84:CC:A8:B4:B1:F6";
+const url = `https://api.ecowitt.net/api/v3/device/real_time?application_key=${appKey}&api_key=${apiKey}&mac=${mac}&call_back=all`;
+
+// ====== Conversión ======
+const fToC = f => ((parseFloat(f) - 32) * 5 / 9).toFixed(1);
+const mphToKmh = mph => (parseFloat(mph) * 1.60934).toFixed(1);
+const inToMm = inches => (parseFloat(inches) * 25.4).toFixed(1);
+const inHgToHpa = inHg => (parseFloat(inHg) * 33.8639).toFixed(1);
+
+// ====== Animar ======
+function animarValor(el,nuevo,unidad=""){
+    const valAct=parseFloat(el.getAttribute("data-valor"))||0;
+    const valFin=parseFloat(nuevo);
+    let start=valAct;
+    const step=(valFin-start)/20;
+    let i=0;
+    const anim=setInterval(()=>{
+        start+=step;
+        el.textContent=start.toFixed(1)+unidad;
+        i++;
+        if(i>=20){ el.textContent=valFin.toFixed(1)+unidad; el.setAttribute("data-valor",valFin); clearInterval(anim);}
+    },50);
+}
+
+// ====== Gráficas ======
+function crearGrafica(ctx,label,color){
+    return new Chart(ctx,{
+        type:'line',
+        data:{labels:[],datasets:[{label:label,data:[],borderColor:color,fill:false}]},
+        options:{responsive:true,plugins:{legend:{display:true}}}
+    });
+}
+
+const tempRainChart = new Chart(document.getElementById('tempRainChart').getContext('2d'),{
+    type:'bar',
+    data:{
+        labels:[],
+        datasets:[
+            {type:'line', label:'Temperatura (°C)', data:[], borderColor:'rgba(255,99,132,1)', yAxisID:'y1', fill:false},
+            {type:'bar', label:'Lluvia diaria (mm)', data:[], backgroundColor:'rgba(0,123,255,0.5)', yAxisID:'y2'}
+        ]
+    },
+    options:{
+        responsive:true,
+        interaction:{mode:'index',intersect:false},
+        plugins:{legend:{display:true}},
+        scales:{
+            y1:{type:'linear',position:'left',title:{display:true,text:'°C'}},
+            y2:{type:'linear',position:'right',title:{display:true,text:'mm'},grid:{drawOnChartArea:false}}
+        }
+    }
+});
+
+const humChart = crearGrafica(document.getElementById('humChart').getContext('2d'),'Humedad (%)','rgba(0,200,100,1)');
+const windChart = crearGrafica(document.getElementById('windChart').getContext('2d'),'Viento km/h','rgba(255,165,0,1)');
+const solarChart = crearGrafica(document.getElementById('solarChart').getContext('2d'),'Radiación Solar (W/m²)','rgba(255,215,0,1)');
+const uviChart = crearGrafica(document.getElementById('uviChart').getContext('2d'),'UVI','rgba(255,69,0,1)');
+
+// ====== Mapa ======
+const map = L.map('map').setView([41.3,-1.3],12);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
+const marker = L.marker([41.3,-1.3]).addTo(map).bindPopup('Estación Meteo Cosuenda').openPopup();
+
+// ====== Histórico ======
+function guardarHistorico(ts,temp,hum,wind,rain,solar,uvi){
+    let hist=JSON.parse(localStorage.getItem('meteoHist'))||[];
+    hist.push({ts,temp,hum,wind,rain,solar,uvi});
+    const maxRegistros=30*24*12;
+    if(hist.length>maxRegistros) hist.shift();
+    localStorage.setItem('meteoHist',JSON.stringify(hist));
+    return hist;
+}
+
+// ====== Actualizar gráficas ======
+function actualizarGraf(hist){
+    const dias=parseInt(document.getElementById('rangeSelect').value);
+    const fil=hist.slice(-dias*24*12);
+    tempRainChart.data.labels=fil.map(e=>e.ts);
+    tempRainChart.data.datasets[0].data=fil.map(e=>e.temp);
+    tempRainChart.data.datasets[1].data=fil.map(e=>e.rain);
+    tempRainChart.update();
+
+    humChart.data.labels=fil.map(e=>e.ts);
+    humChart.data.datasets[0].data=fil.map(e=>e.hum);
+    humChart.update();
+
+    windChart.data.labels=fil.map(e=>e.ts);
+    windChart.data.datasets[0].data=fil.map(e=>e.wind);
+    windChart.update();
+
+    solarChart.data.labels=fil.map(e=>e.ts);
+    solarChart.data.datasets[0].data=fil.map(e=>e.solar);
+    solarChart.update();
+
+    uviChart.data.labels=fil.map(e=>e.ts);
+    uviChart.data.datasets[0].data=fil.map(e=>e.uvi);
+    uviChart.update();
+}
+
+// ====== Alertas visuales ======
+function alertasVisuales(tempC, rainMm, windKmH, uviVal){
+    const tempCard = document.getElementById("tempBig");
+    const iconEl = document.getElementById("tempIcon");
+    if(tempC > 35){ tempCard.style.background="#ffcccc"; tempCard.textContent=`🔥 ${tempC} °C`; iconEl.textContent="🔥"; }
+    else if(tempC < 0){ tempCard.style.background="#cce5ff"; tempCard.textContent=`❄️ ${tempC} °C`; iconEl.textContent="❄️"; }
+    else{ tempCard.style.background="transparent"; tempCard.textContent=`${tempC} °C`; iconEl.textContent="🌤️"; }
+
+    const rainCard = document.getElementById("rain");
+    if(rainMm > 10){ rainCard.parentElement.style.background="#cce5ff"; rainCard.textContent=`🌧️ ${rainMm} mm`; }
+    else{ rainCard.parentElement.style.background="white"; }
+
+    const windCard = document.getElementById("wind");
+    if(windKmH > 50){ windCard.parentElement.style.background="#ffe5cc"; windCard.textContent=`💨 ${windKmH} km/h`; }
+    else{ windCard.parentElement.style.background="white"; }
+
+    const uviCard = document.getElementById("uvi");
+    if(uviVal > 8){ uviCard.parentElement.style.background="#ffd699"; uviCard.textContent=`🟠 ${uviVal}`; }
+    else{ uviCard.parentElement.style.background="white"; }
+}
+
+// ====== Función principal ======
+async function obtenerDatos(){
+    try{
+        const response=await fetch(url);
+        const data=await response.json();
+        if(data.code!==0){ console.error("Error API:",data); return; }
+
+        const outdoor=data.data.outdoor;
+        const wind=data.data.wind;
+        const rainfall=data.data.rainfall;
+        const pressure=data.data.pressure;
+        const solarVal=data.data.solar_and_uvi.solar.value;
+        const uviVal=data.data.solar_and_uvi.uvi.value;
+
+        const tempC=parseFloat(fToC(outdoor.temperature.value));
+
+        animarValor(document.getElementById("hum"),outdoor.humidity.value,"%");
+        animarValor(document.getElementById("wind"),mphToKmh(wind.wind_speed.value)," km/h");
+        animarValor(document.getElementById("rain"),inToMm(rainfall.daily.value)," mm");
+        animarValor(document.getElementById("press"),inHgToHpa(pressure.relative.value)," hPa");
+        animarValor(document.getElementById("solar"),solarVal," W/m²");
+        animarValor(document.getElementById("uvi"),uviVal,"");
+
+        alertasVisuales(tempC, parseFloat(inToMm(rainfall.daily.value)), parseFloat(mphToKmh(wind.wind_speed.value)), uviVal);
+
+        const hour=new Date().getHours();
+        document.body.style.background = (hour>=6 && hour<18)? "linear-gradient(to bottom,#87CEEB,#f0f8ff)":"linear-gradient(to bottom,#001848,#0a1f44)";
+
+        const ts=new Date().toLocaleTimeString();
+        const hist=guardarHistorico(ts,tempC,parseInt(outdoor.humidity.value),parseFloat(mphToKmh(wind.wind_speed.value)),parseFloat(inToMm(rainfall.daily.value)),solarVal,uviVal);
+        actualizarGraf(hist);
+
+        marker.setPopupContent(`Estación Meteo Cosuenda<br>Temp: ${tempC} °C<br>Humedad: ${outdoor.humidity.value}%`).openPopup();
+
+    }catch(error){ console.error("Error de conexión:",error);}
+}
+
+// Selector de rango
+document.getElementById('rangeSelect').addEventListener('change',()=>{
+    const hist=JSON.parse(localStorage.getItem('meteoHist'))||[];
+    actualizarGraf(hist);
+});
+
+// Carga inicial + actualización cada 5 min
+obtenerDatos();
+setInterval(obtenerDatos,300000);
+</script>
+</body>
+</html>
 
 
 
