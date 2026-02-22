@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meteo Cosuenda - Rosa 3D</title>
+<title>Meteo Cosuenda</title>
 
 <style>
 body{
     margin:0;
-    font-family: 'Arial', sans-serif;
+    font-family: Arial, sans-serif;
     text-align:center;
     transition: background 1s;
     background: linear-gradient(to bottom,#87CEEB,#f0f8ff);
@@ -35,11 +35,6 @@ header{
     padding:20px;
     border-radius:20px;
     box-shadow:0 8px 20px rgba(0,0,0,0.25);
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-.card:hover{
-    transform: translateY(-5px);
-    box-shadow:0 12px 30px rgba(0,0,0,0.35);
 }
 
 .valor{
@@ -52,13 +47,13 @@ header{
     color:#555;
 }
 
-/* Rosa premium 3D */
+/* Rosa centrada */
 .rosa-moderna {
-    width: 240px;
+    width: 100%;
+    max-width: 240px;
     height: 240px;
-    margin: 20px auto;
+    margin: 0 auto;
     position: relative;
-    perspective: 400px;
 }
 
 .rosa-moderna .circle {
@@ -68,10 +63,9 @@ header{
     background: radial-gradient(circle at center, #f9f9f9 60%, #d9d9d9 100%);
     border: 3px solid #555;
     position: absolute;
-    top: 0;
-    left: 0;
+    top:0;
+    left:0;
     box-shadow: inset 0 0 30px rgba(0,0,0,0.08);
-    transform: rotateX(10deg);
 }
 
 .flecha-moderna {
@@ -85,10 +79,8 @@ header{
     transform: translateX(-50%) rotate(0deg);
     transition: transform 1s ease-in-out;
     border-radius: 2px;
-    box-shadow: 0 0 15px rgba(255,0,0,0.7);
 }
 
-/* Puntos y cardinales relativos */
 .rosa-moderna .labels .punto,
 .rosa-moderna .labels .cardinal {
     position: absolute;
@@ -101,7 +93,6 @@ header{
     background: #555;
     border-radius: 50%;
     box-shadow: 0 0 4px rgba(0,0,0,0.3);
-    animation: pulse 3s infinite alternate;
 }
 
 .rosa-moderna .labels .cardinal {
@@ -111,22 +102,12 @@ header{
     text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
 }
 
-@keyframes pulse{
-    0%{ transform: translate(-50%,-50%) scale(1); opacity:0.7; }
-    100%{ transform: translate(-50%,-50%) scale(1.3); opacity:1; }
-}
-
 .oculto{ display:none; }
 
 footer{
     padding:20px;
     font-size:14px;
     color:#333;
-}
-
-@media(max-width:500px){
-    .rosa-moderna{ width:180px; height:180px; }
-    .flecha-moderna{ height:80px; transform-origin:50% 60px; }
 }
 </style>
 </head>
