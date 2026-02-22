@@ -5,7 +5,7 @@ const mac = "84:CC:A8:B4:B1:F6";
 
 const url = `https://api.ecowitt.net/api/v3/device/real_time?application_key=${appKey}&api_key=${apiKey}&mac=${mac}&call_back=all`;
 
-let angAnteriorModerna = 0; // inercia flecha
+let angAnteriorModerna = 0;
 
 // ====== CONVERSIONES ======
 const fToC = f => ((parseFloat(f) - 32) * 5 / 9);
@@ -65,7 +65,7 @@ function actualizarLluvia(rainActual){
     return datos;
 }
 
-// Crear rosa moderna
+// Crear rosa 3D
 function crearRosaModerna(){
     const rosa = document.getElementById("rosaVientoModerna");
     const labelsDiv = rosa.querySelector(".labels");
@@ -73,9 +73,9 @@ function crearRosaModerna(){
         const punto = document.createElement("div");
         punto.className = "punto";
         const rad = deg*Math.PI/180;
-        const r = 95;
-        const x = 110 + r*Math.sin(rad);
-        const y = 110 - r*Math.cos(rad);
+        const r = 100;
+        const x = 120 + r*Math.sin(rad);
+        const y = 120 - r*Math.cos(rad);
         punto.style.left = x+"px";
         punto.style.top = y+"px";
         labelsDiv.appendChild(punto);
@@ -84,8 +84,8 @@ function crearRosaModerna(){
             const cardinal = document.createElement("div");
             cardinal.className = "cardinal";
             cardinal.textContent = ["N","NE","E","SE","S","SW","W","NW"][deg/45];
-            const lx = 110 + (r+20)*Math.sin(rad);
-            const ly = 110 - (r+20)*Math.cos(rad);
+            const lx = 120 + (r+25)*Math.sin(rad);
+            const ly = 120 - (r+25)*Math.cos(rad);
             cardinal.style.left = lx+"px";
             cardinal.style.top = ly+"px";
             labelsDiv.appendChild(cardinal);
@@ -94,7 +94,7 @@ function crearRosaModerna(){
 }
 crearRosaModerna();
 
-// Animación flecha
+// Animar flecha 3D
 function actualizarFlechaModerna(grados){
     const flecha = document.getElementById("flechaModerna");
     let diff = grados - angAnteriorModerna;
@@ -170,7 +170,6 @@ async function obtenerDatos(){
 
 obtenerDatos();
 setInterval(obtenerDatos,300000);
-
 
 
 
