@@ -5,6 +5,9 @@ const mac = "84:CC:A8:B4:B1:F6";
 
 const url = `https://api.ecowitt.net/api/v3/device/real_time?application_key=${appKey}&api_key=${apiKey}&mac=${mac}&call_back=all`;
 
+// ====== VARIABLES ======
+let angAnterior = 0; // Para la flecha con inercia
+
 // ====== CONVERSIONES ======
 const fToC = f => ((parseFloat(f) - 32) * 5 / 9);
 const mphToKmh = mph => (parseFloat(mph) * 1.60934);
@@ -87,6 +90,7 @@ function crearRosa(){
             const ly = 100 - (r+15)*Math.cos(rad);
             label.style.left = lx+"px";
             label.style.top = ly+"px";
+            rosa.appendChild(label);
         }
     }
 }
@@ -124,8 +128,14 @@ async function obtenerDatos(){
         // Dirección viento
         document.getElementById("windDirText").textContent = "Dirección: "+gradosADireccion(windDeg);
 
-        // Flecha animada
-        document.getElementById("flecha").style.transform = `rotate(${windDeg}deg)`;
+        // Flecha animada con inercia
+        const flecha = document.getElementById("flecha");
+        let angActual = windDeg;
+        let diff = angActual - angAnterior;
+        if(diff > 180) diff -= 360;
+        if(diff < -180) diff += 360;
+        angAnterior += diff;
+        flecha.style.transform = `rotate(${angAnterior}deg)`;
 
         // Extremos diarios
         const extremos = actualizarExtremos(tempC, hum, windKm);
@@ -159,7 +169,6 @@ async function obtenerDatos(){
 
 obtenerDatos();
 setInterval(obtenerDatos,300000);
-
 
 
 
