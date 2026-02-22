@@ -73,9 +73,9 @@ function crearRosaModerna(){
         const punto = document.createElement("div");
         punto.className = "punto";
         const rad = deg*Math.PI/180;
-        const r = 85;
-        const x = 100 + r*Math.sin(rad);
-        const y = 100 - r*Math.cos(rad);
+        const r = 95;
+        const x = 110 + r*Math.sin(rad);
+        const y = 110 - r*Math.cos(rad);
         punto.style.left = x+"px";
         punto.style.top = y+"px";
         labelsDiv.appendChild(punto);
@@ -84,8 +84,8 @@ function crearRosaModerna(){
             const cardinal = document.createElement("div");
             cardinal.className = "cardinal";
             cardinal.textContent = ["N","NE","E","SE","S","SW","W","NW"][deg/45];
-            const lx = 100 + (r+15)*Math.sin(rad);
-            const ly = 100 - (r+15)*Math.cos(rad);
+            const lx = 110 + (r+20)*Math.sin(rad);
+            const ly = 110 - (r+20)*Math.cos(rad);
             cardinal.style.left = lx+"px";
             cardinal.style.top = ly+"px";
             labelsDiv.appendChild(cardinal);
@@ -116,7 +116,6 @@ async function obtenerDatos(){
         const rainfall = data.data.rainfall;
         const pressure = data.data.pressure;
 
-        // UV y Solar
         const uvIndex = data.data.uv?.value ?? null;
         const solarRadiation = data.data.solar_radiation?.value ?? null;
 
@@ -133,7 +132,6 @@ async function obtenerDatos(){
         document.getElementById("rain").textContent = rainMm.toFixed(1)+" mm";
         document.getElementById("press").textContent = pressHpa.toFixed(1)+" hPa";
 
-        // UV y Solar
         const uvCard = document.getElementById("uvCard");
         const solarCard = document.getElementById("solarCard");
         if(uvIndex !== null){ uvCard.classList.remove("oculto"); document.getElementById("uv").textContent = uvIndex.toFixed(1); }
@@ -158,7 +156,6 @@ async function obtenerDatos(){
         document.getElementById("rainMonth").textContent = "Mes: "+lluvia.totalMes.toFixed(1)+" mm";
         document.getElementById("rainYear").textContent = "Año: "+lluvia.totalAño.toFixed(1)+" mm";
 
-        // Fondo día/noche
         const hora = new Date().getHours();
         if(hora >= 6 && hora < 18){
             document.body.style.background = "linear-gradient(to bottom,#87CEEB,#f0f8ff)";
