@@ -11,30 +11,26 @@ body{
     font-family: Arial, sans-serif;
     text-align:center;
     transition: background 1s;
-    background: linear-gradient(to bottom,#87CEEB,#f0f8ff);
 }
 
 header{
     background:#003366;
     color:white;
     padding:20px;
-    box-shadow:0 2px 10px rgba(0,0,0,0.3);
 }
 
 .container{
     max-width:1000px;
     margin:auto;
     padding:20px;
-    display:grid;
-    grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
-    gap:15px;
 }
 
 .card{
     background:white;
     padding:20px;
-    border-radius:20px;
-    box-shadow:0 8px 20px rgba(0,0,0,0.25);
+    margin:15px;
+    border-radius:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.2);
 }
 
 .valor{
@@ -47,12 +43,11 @@ header{
     color:#555;
 }
 
-/* Rosa centrada */
+/* Rosa moderna */
 .rosa-moderna {
-    width: 100%;
-    max-width: 240px;
-    height: 240px;
-    margin: 0 auto;
+    width: 200px;
+    height: 200px;
+    margin: 20px auto;
     position: relative;
 }
 
@@ -60,57 +55,58 @@ header{
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    background: radial-gradient(circle at center, #f9f9f9 60%, #d9d9d9 100%);
-    border: 3px solid #555;
+    border: 2px solid #555;
+    background: radial-gradient(circle at center, #f0f0f0 70%, transparent 100%);
     position: absolute;
-    top:0;
-    left:0;
-    box-shadow: inset 0 0 30px rgba(0,0,0,0.08);
+    top: 0;
+    left: 0;
 }
 
 .flecha-moderna {
     width: 4px;
-    height: 110px;
-    background: linear-gradient(to top,#ff4d4d,transparent);
+    height: 90px;
+    background: linear-gradient(to top, red, transparent);
     position: absolute;
     top: 10%;
     left: 50%;
-    transform-origin: 50% 90px;
+    transform-origin: 50% 80px;
     transform: translateX(-50%) rotate(0deg);
     transition: transform 1s ease-in-out;
     border-radius: 2px;
 }
 
-.rosa-moderna .labels .punto,
-.rosa-moderna .labels .cardinal {
+.rosa-moderna .labels .punto {
+    width: 4px;
+    height: 4px;
+    background: #555;
+    border-radius: 50%;
     position: absolute;
     transform: translate(-50%, -50%);
 }
 
-.rosa-moderna .labels .punto {
-    width: 5px;
-    height: 5px;
-    background: #555;
-    border-radius: 50%;
-    box-shadow: 0 0 4px rgba(0,0,0,0.3);
-}
-
 .rosa-moderna .labels .cardinal {
-    font-size: 14px;
+    position: absolute;
+    font-size: 12px;
     font-weight: bold;
-    color: #222;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    transform: translate(-50%, -50%);
 }
 
+/* Oculto si no hay datos */
 .oculto{ display:none; }
 
 footer{
     padding:20px;
     font-size:14px;
-    color:#333;
+}
+
+/* Responsive */
+@media(max-width:500px){
+    .rosa-moderna{ width:150px; height:150px; }
+    .flecha-moderna{ height:70px; transform-origin:50% 60px; }
 }
 </style>
 </head>
+
 <body>
 
 <header>
@@ -141,6 +137,7 @@ footer{
 <div id="windDirText" class="minmax">Dirección: --</div>
 <div id="windMax" class="minmax">Racha máxima diaria: -- km/h</div>
 
+<!-- Rosa moderna -->
 <div class="rosa-moderna" id="rosaVientoModerna">
     <div class="circle"></div>
     <div class="flecha-moderna" id="flechaModerna"></div>
@@ -177,6 +174,7 @@ Actualización automática cada 5 minutos · Meteo Cosuenda
 </footer>
 
 <script src="script.js"></script>
+
 </body>
 </html>
 
