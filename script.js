@@ -81,7 +81,6 @@ function crearRosa(){
         punto.style.top = y+"px";
         rosa.appendChild(punto);
 
-        // Letras cardinales cada 45°
         if(deg%45===0){
             const label = document.createElement("div");
             label.className = "label";
@@ -108,7 +107,7 @@ async function obtenerDatos(){
         const rainfall = data.data.rainfall;
         const pressure = data.data.pressure;
 
-        // ===== UV y Solar: varios nombres posibles =====
+        // UV y Solar: varios nombres posibles
         const uvIndex = (
             data.data.uv?.value ??
             data.data.uv_index?.value ??
@@ -136,8 +135,15 @@ async function obtenerDatos(){
         document.getElementById("wind").textContent = windKm.toFixed(1)+" km/h";
         document.getElementById("rain").textContent = rainMm.toFixed(1)+" mm";
         document.getElementById("press").textContent = pressHpa.toFixed(1)+" hPa";
-        document.getElementById("uv").textContent = uvIndex !== null ? uvIndex.toFixed(1) : "--";
-        document.getElementById("solar").textContent = solarRadiation !== null ? solarRadiation.toFixed(0)+" W/m²" : "--";
+
+        // Mostrar u ocultar UV y Solar
+        const uvCard = document.getElementById("uvCard");
+        const solarCard = document.getElementById("solarCard");
+        if(uvIndex !== null){ uvCard.classList.remove("oculto"); document.getElementById("uv").textContent = uvIndex.toFixed(1); }
+        else{ uvCard.classList.add("oculto"); }
+
+        if(solarRadiation !== null){ solarCard.classList.remove("oculto"); document.getElementById("solar").textContent = solarRadiation.toFixed(0)+" W/m²"; }
+        else{ solarCard.classList.add("oculto"); }
 
         // Dirección viento
         document.getElementById("windDirText").textContent = "Dirección: "+gradosADireccion(windDeg);
@@ -183,7 +189,6 @@ async function obtenerDatos(){
 
 obtenerDatos();
 setInterval(obtenerDatos,300000);
-
 
 
 
