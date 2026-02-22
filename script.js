@@ -65,7 +65,7 @@ function actualizarLluvia(rainActual){
     return datos;
 }
 
-// Crear rosa 3D
+// Crear rosa 3D centrada
 function crearRosaModerna(){
     const rosa = document.getElementById("rosaVientoModerna");
     const labelsDiv = rosa.querySelector(".labels");
@@ -73,21 +73,21 @@ function crearRosaModerna(){
         const punto = document.createElement("div");
         punto.className = "punto";
         const rad = deg*Math.PI/180;
-        const r = 100;
-        const x = 120 + r*Math.sin(rad);
-        const y = 120 - r*Math.cos(rad);
-        punto.style.left = x+"px";
-        punto.style.top = y+"px";
+        const r = 45; // radio %
+        const x = 50 + r*Math.sin(rad);
+        const y = 50 - r*Math.cos(rad);
+        punto.style.left = x+"%";
+        punto.style.top = y+"%";
         labelsDiv.appendChild(punto);
 
         if(deg % 45 === 0){
             const cardinal = document.createElement("div");
             cardinal.className = "cardinal";
             cardinal.textContent = ["N","NE","E","SE","S","SW","W","NW"][deg/45];
-            const lx = 120 + (r+25)*Math.sin(rad);
-            const ly = 120 - (r+25)*Math.cos(rad);
-            cardinal.style.left = lx+"px";
-            cardinal.style.top = ly+"px";
+            const lx = 50 + (r+12)*Math.sin(rad);
+            const ly = 50 - (r+12)*Math.cos(rad);
+            cardinal.style.left = lx+"%";
+            cardinal.style.top = ly+"%";
             labelsDiv.appendChild(cardinal);
         }
     }
