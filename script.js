@@ -5,7 +5,7 @@ const mac = "84:CC:A8:B4:B1:F6";
 
 const url = `https://api.ecowitt.net/api/v3/device/real_time?application_key=${appKey}&api_key=${apiKey}&mac=${mac}&call_back=all`;
 
-let angAnterior = 0; // Para flecha con inercia
+let angAnteriorModerna = 0; // inercia flecha
 
 // ====== CONVERSIONES ======
 const fToC = f => ((parseFloat(f) - 32) * 5 / 9);
@@ -65,34 +65,46 @@ function actualizarLluvia(rainActual){
     return datos;
 }
 
-// Crear puntos y etiquetas de la rosa
-function crearRosa(){
-    const rosa = document.getElementById("rosaViento");
+// Crear rosa moderna
+function crearRosaModerna(){
+    const rosa = document.getElementById("rosaVientoModerna");
+    const labelsDiv = rosa.querySelector(".labels");
     for(let deg=0; deg<360; deg+=10){
         const punto = document.createElement("div");
         punto.className = "punto";
         const rad = deg*Math.PI/180;
-        const r = 90;
+        const r = 85;
         const x = 100 + r*Math.sin(rad);
         const y = 100 - r*Math.cos(rad);
         punto.style.left = x+"px";
         punto.style.top = y+"px";
-        rosa.appendChild(punto);
+        labelsDiv.appendChild(punto);
 
-        if(deg%45===0){
-            const label = document.createElement("div");
-            label.className = "label";
-            label.textContent = ["N","NE","E","SE","S","SW","W","NW"][deg/45];
+        if(deg % 45 === 0){
+            const cardinal = document.createElement("div");
+            cardinal.className = "cardinal";
+            cardinal.textContent = ["N","NE","E","SE","S","SW","W","NW"][deg/45];
             const lx = 100 + (r+15)*Math.sin(rad);
             const ly = 100 - (r+15)*Math.cos(rad);
-            label.style.left = lx+"px";
-            label.style.top = ly+"px";
-            rosa.appendChild(label);
+            cardinal.style.left = lx+"px";
+            cardinal.style.top = ly+"px";
+            labelsDiv.appendChild(cardinal);
         }
     }
 }
-crearRosa();
+crearRosaModerna();
 
+// Animación flecha
+function actualizarFlechaModerna(grados){
+    const flecha = document.getElementById("flechaModerna");
+    let diff = grados - angAnteriorModerna;
+    if(diff > 180) diff -= 360;
+    if(diff < -180) diff += 360;
+    angAnteriorModerna += diff;
+    flecha.style.transform = `translateX(-50%) rotate(${angAnteriorModerna}deg)`;
+}
+
+// ====== PRINCIPAL ======
 async function obtenerDatos(){
     try{
         const response = await fetch(url);
@@ -105,19 +117,8 @@ async function obtenerDatos(){
         const pressure = data.data.pressure;
 
         // UV y Solar
-        const uvIndex = (
-            data.data.uv?.value ??
-            data.data.uv_index?.value ??
-            data.data.uv_light?.value ??
-            null
-        );
-
-        const solarRadiation = (
-            data.data.solar_radiation?.value ??
-            data.data.solar_irradiance?.value ??
-            data.data.solar_irradiance_1?.value ??
-            null
-        );
+        const uvIndex = data.data.uv?.value ?? null;
+        const solarRadiation = data.data.solar_radiation?.value ?? null;
 
         const tempC = fToC(outdoor.temperature.value);
         const hum = parseFloat(outdoor.humidity.value);
@@ -126,14 +127,13 @@ async function obtenerDatos(){
         const pressHpa = inHgToHpa(pressure.relative.value);
         const windDeg = parseFloat(wind.wind_direction.value);
 
-        // Actualizar HTML
         document.getElementById("tempBig").textContent = tempC.toFixed(1)+" °C";
         document.getElementById("hum").textContent = hum+" %";
         document.getElementById("wind").textContent = windKm.toFixed(1)+" km/h";
         document.getElementById("rain").textContent = rainMm.toFixed(1)+" mm";
         document.getElementById("press").textContent = pressHpa.toFixed(1)+" hPa";
 
-        // Mostrar/ocultar UV y Solar
+        // UV y Solar
         const uvCard = document.getElementById("uvCard");
         const solarCard = document.getElementById("solarCard");
         if(uvIndex !== null){ uvCard.classList.remove("oculto"); document.getElementById("uv").textContent = uvIndex.toFixed(1); }
@@ -141,31 +141,19 @@ async function obtenerDatos(){
         if(solarRadiation !== null){ solarCard.classList.remove("oculto"); document.getElementById("solar").textContent = solarRadiation.toFixed(0)+" W/m²"; }
         else{ solarCard.classList.add("oculto"); }
 
-        // Dirección viento
         document.getElementById("windDirText").textContent = "Dirección: "+gradosADireccion(windDeg);
+        actualizarFlechaModerna(windDeg);
 
-        // Flecha animada con inercia
-        const flecha = document.getElementById("flecha");
-        let angActual = windDeg;
-        let diff = angActual - angAnterior;
-        if(diff > 180) diff -= 360;
-        if(diff < -180) diff += 360;
-        angAnterior += diff;
-        flecha.style.transform = `translateX(-50%) rotate(${angAnterior}deg)`;
-
-        // Extremos diarios
         const extremos = actualizarExtremos(tempC, hum, windKm);
         document.getElementById("tempMin").textContent = "Min diaria: "+extremos.tempMin.toFixed(1)+" °C";
         document.getElementById("tempMax").textContent = "Max diaria: "+extremos.tempMax.toFixed(1)+" °C";
         document.getElementById("humMax").textContent = "Max diaria: "+extremos.humMax+" %";
         document.getElementById("windMax").textContent = "Racha máxima diaria: "+extremos.windMax.toFixed(1)+" km/h";
 
-        // Récord absoluto
         const record = actualizarRecord(tempC);
         document.getElementById("tempRecordMax").textContent = "🏆 Récord Máx: "+record.max.toFixed(1)+" °C";
         document.getElementById("tempRecordMin").textContent = "🏆 Récord Mín: "+record.min.toFixed(1)+" °C";
 
-        // Lluvia
         const lluvia = actualizarLluvia(rainMm);
         document.getElementById("rainMonth").textContent = "Mes: "+lluvia.totalMes.toFixed(1)+" mm";
         document.getElementById("rainYear").textContent = "Año: "+lluvia.totalAño.toFixed(1)+" mm";
@@ -185,7 +173,6 @@ async function obtenerDatos(){
 
 obtenerDatos();
 setInterval(obtenerDatos,300000);
-
 
 
 
