@@ -11,7 +11,14 @@ const mphToKmh = mph => (parseFloat(mph) * 1.60934);
 const inToMm = inches => (parseFloat(inches) * 25.4);
 const inHgToHpa = inHg => (parseFloat(inHg) * 33.8639);
 
-// ====== EXTREMOS DIARIOS ======
+// ====== DIRECCIÓN VIENTO ======
+function gradosADireccion(grados){
+    const direcciones = ["N","NE","E","SE","S","SW","W","NW"];
+    const index = Math.round(grados / 45) % 8;
+    return direcciones[index];
+}
+
+// ====== EXTREMOS + RÉCORDS ======
 function actualizarExtremos(temp, hum, wind){
 
     const hoy = new Date().toDateString();
@@ -36,7 +43,23 @@ function actualizarExtremos(temp, hum, wind){
     return datos;
 }
 
-// ====== LLUVIA MENSUAL Y ANUAL ======
+// ====== RÉCORD HISTÓRICO ======
+function actualizarRecord(temp){
+
+    let record = JSON.parse(localStorage.getItem("recordTemp"));
+
+    if(!record){
+        record = { max: temp, min: temp };
+    }else{
+        if(temp > record.max) record.max = temp;
+        if(temp < record.min) record.min = temp;
+    }
+
+    localStorage.setItem("recordTemp", JSON.stringify(record));
+    return record;
+}
+
+// ====== LLUVIA ======
 function actualizarLluvia(rainActual){
 
     const hoy = new Date();
@@ -46,30 +69,21 @@ function actualizarLluvia(rainActual){
     let datos = JSON.parse(localStorage.getItem("lluviaTotal"));
 
     if(!datos){
-        datos = {
-            mes: mesActual,
-            año: añoActual,
-            totalMes: rainActual,
-            totalAño: rainActual
-        };
+        datos = { mes: mesActual, año: añoActual, totalMes: rainActual, totalAño: rainActual };
     }else{
 
         if(datos.mes !== mesActual){
             datos.mes = mesActual;
             datos.totalMes = rainActual;
-        }else{
-            if(rainActual > datos.totalMes){
-                datos.totalMes = rainActual;
-            }
+        }else if(rainActual > datos.totalMes){
+            datos.totalMes = rainActual;
         }
 
         if(datos.año !== añoActual){
             datos.año = añoActual;
             datos.totalAño = rainActual;
-        }else{
-            if(rainActual > datos.totalAño){
-                datos.totalAño = rainActual;
-            }
+        }else if(rainActual > datos.totalAño){
+            datos.totalAño = rainActual;
         }
     }
 
@@ -77,14 +91,13 @@ function actualizarLluvia(rainActual){
     return datos;
 }
 
-// ====== FUNCIÓN PRINCIPAL ======
+// ====== PRINCIPAL ======
 async function obtenerDatos(){
 
     try{
 
         const response = await fetch(url);
         const data = await response.json();
-
         if(data.code !== 0) return;
 
         const outdoor = data.data.outdoor;
@@ -97,6 +110,7 @@ async function obtenerDatos(){
         const windKm = mphToKmh(wind.wind_speed.value);
         const rainMm = inToMm(rainfall.daily.value);
         const pressHpa = inHgToHpa(pressure.relative.value);
+        const windDeg = parseFloat(wind.wind_direction.value);
 
         document.getElementById("tempBig").textContent = tempC.toFixed(1)+" °C";
         document.getElementById("hum").textContent = hum+" %";
@@ -104,20 +118,38 @@ async function obtenerDatos(){
         document.getElementById("rain").textContent = rainMm.toFixed(1)+" mm";
         document.getElementById("press").textContent = pressHpa.toFixed(1)+" hPa";
 
+        // Dirección viento
+        document.getElementById("windDirText").textContent =
+            "Dirección: "+gradosADireccion(windDeg);
+
+        document.getElementById("flecha").style.transform =
+            `rotate(${windDeg}deg)`;
+
+        // Extremos diarios
         const extremos = actualizarExtremos(tempC, hum, windKm);
 
         document.getElementById("tempMin").textContent =
-            "Min: "+extremos.tempMin.toFixed(1)+" °C";
+            "Min diaria: "+extremos.tempMin.toFixed(1)+" °C";
 
         document.getElementById("tempMax").textContent =
-            "Max: "+extremos.tempMax.toFixed(1)+" °C";
+            "Max diaria: "+extremos.tempMax.toFixed(1)+" °C";
 
         document.getElementById("humMax").textContent =
-            "Max: "+extremos.humMax+" %";
+            "Max diaria: "+extremos.humMax+" %";
 
         document.getElementById("windMax").textContent =
-            "Max: "+extremos.windMax.toFixed(1)+" km/h";
+            "Racha máxima diaria: "+extremos.windMax.toFixed(1)+" km/h";
 
+        // Récord absoluto
+        const record = actualizarRecord(tempC);
+
+        document.getElementById("tempRecordMax").textContent =
+            "🏆 Récord Máx: "+record.max.toFixed(1)+" °C";
+
+        document.getElementById("tempRecordMin").textContent =
+            "🏆 Récord Mín: "+record.min.toFixed(1)+" °C";
+
+        // Lluvia
         const lluvia = actualizarLluvia(rainMm);
 
         document.getElementById("rainMonth").textContent =
@@ -126,7 +158,7 @@ async function obtenerDatos(){
         document.getElementById("rainYear").textContent =
             "Año: "+lluvia.totalAño.toFixed(1)+" mm";
 
-        // Fondo día/noche real
+        // Fondo día/noche
         const hora = new Date().getHours();
         if(hora >= 6 && hora < 18){
             document.body.style.background =
@@ -143,7 +175,6 @@ async function obtenerDatos(){
 
 obtenerDatos();
 setInterval(obtenerDatos,300000);
-
 
 
 
