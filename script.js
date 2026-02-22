@@ -5,6 +5,7 @@ const mac = "84:CC:A8:B4:B1:F6";
 
 const url = `https://api.ecowitt.net/api/v3/device/real_time?application_key=${appKey}&api_key=${apiKey}&mac=${mac}&call_back=all`;
 
+// Inercia flecha
 let angAnteriorModerna = 0;
 
 // ====== CONVERSIONES ======
@@ -19,88 +20,47 @@ function gradosADireccion(grados){
     return direcciones[index];
 }
 
-// Extremos diarios
-function actualizarExtremos(temp, hum, wind){
-    const hoy = new Date().toDateString();
-    let datos = JSON.parse(localStorage.getItem("extremos"));
-    if(!datos || datos.fecha !== hoy){
-        datos = { fecha:hoy, tempMin:temp, tempMax:temp, humMax:hum, windMax:wind };
-    }else{
-        if(temp < datos.tempMin) datos.tempMin = temp;
-        if(temp > datos.tempMax) datos.tempMax = temp;
-        if(hum > datos.humMax) datos.humMax = hum;
-        if(wind > datos.windMax) datos.windMax = wind;
-    }
-    localStorage.setItem("extremos", JSON.stringify(datos));
-    return datos;
-}
-
-// Récord absoluto
-function actualizarRecord(temp){
-    let record = JSON.parse(localStorage.getItem("recordTemp"));
-    if(!record){ record = { max: temp, min: temp }; }
-    else{
-        if(temp > record.max) record.max = temp;
-        if(temp < record.min) record.min = temp;
-    }
-    localStorage.setItem("recordTemp", JSON.stringify(record));
-    return record;
-}
-
-// Lluvia total
-function actualizarLluvia(rainActual){
-    const hoy = new Date();
-    const mesActual = hoy.getMonth();
-    const añoActual = hoy.getFullYear();
-    let datos = JSON.parse(localStorage.getItem("lluviaTotal"));
-    if(!datos){ datos = { mes: mesActual, año: añoActual, totalMes: rainActual, totalAño: rainActual }; }
-    else{
-        if(datos.mes !== mesActual){ datos.mes = mesActual; datos.totalMes = rainActual; }
-        else if(rainActual > datos.totalMes){ datos.totalMes = rainActual; }
-
-        if(datos.año !== añoActual){ datos.año = añoActual; datos.totalAño = rainActual; }
-        else if(rainActual > datos.totalAño){ datos.totalAño = rainActual; }
-    }
-    localStorage.setItem("lluviaTotal", JSON.stringify(datos));
-    return datos;
-}
-
-// Crear rosa 3D centrada
+// Crea la rosa **después del layout**
 function crearRosaModerna() {
     const rosa = document.getElementById("rosaVientoModerna");
     const labelsDiv = rosa.querySelector(".labels");
     labelsDiv.innerHTML = "";
 
     const rect = rosa.getBoundingClientRect();
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    const radius = rect.width * 0.45;
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+    const r = rect.width * 0.45;
 
     for (let deg = 0; deg < 360; deg += 10) {
         const punto = document.createElement("div");
         punto.className = "punto";
         const rad = deg * Math.PI / 180;
-        const x = centerX + radius * Math.sin(rad);
-        const y = centerY - radius * Math.cos(rad);
-        punto.style.left = x + "px";
-        punto.style.top = y + "px";
+        punto.style.left = (cx + r * Math.sin(rad)) + "px";
+        punto.style.top = (cy - r * Math.cos(rad)) + "px";
         labelsDiv.appendChild(punto);
 
         if (deg % 45 === 0) {
-            const cardinal = document.createElement("div");
-            cardinal.className = "cardinal";
-            cardinal.textContent = ["N","NE","E","SE","S","SW","W","NW"][deg / 45];
-            const lx = centerX + (radius + 20) * Math.sin(rad);
-            const ly = centerY - (radius + 20) * Math.cos(rad);
-            cardinal.style.left = lx + "px";
-            cardinal.style.top = ly + "px";
-            labelsDiv.appendChild(cardinal);
+            const card = document.createElement("div");
+            card.className = "cardinal";
+            card.textContent = ["N","NE","E","SE","S","SW","W","NW"][deg/45];
+            card.style.left = (cx + (r+18)*Math.sin(rad)) + "px";
+            card.style.top = (cy - (r+18)*Math.cos(rad)) + "px";
+            labelsDiv.appendChild(card);
         }
     }
 }
-crearRosaModerna();
 
-// Animar flecha 3D
+// Llamamos después de que cargue todo
+window.addEventListener('load', () => {
+    crearRosaModerna();
+});
+    
+// Recalculamos si se redimensiona
+window.addEventListener('resize', () => {
+    crearRosaModerna();
+});
+
+// Flecha con inercia
 function actualizarFlechaModerna(grados){
     const flecha = document.getElementById("flechaModerna");
     let diff = grados - angAnteriorModerna;
@@ -110,9 +70,9 @@ function actualizarFlechaModerna(grados){
     flecha.style.transform = `translateX(-50%) rotate(${angAnteriorModerna}deg)`;
 }
 
-// ====== PRINCIPAL ======
+// Datos y actualización
 async function obtenerDatos(){
-    try{
+    try {
         const response = await fetch(url);
         const data = await response.json();
         if(data.code !== 0) return;
@@ -122,8 +82,8 @@ async function obtenerDatos(){
         const rainfall = data.data.rainfall;
         const pressure = data.data.pressure;
 
-        const uvIndex = data.data.uv?.value ?? null;
-        const solarRadiation = data.data.solar_radiation?.value ?? null;
+        const uvVal = data.data.uv?.value ?? null;
+        const solarVal = data.data.solar_radiation?.value ?? null;
 
         const tempC = fToC(outdoor.temperature.value);
         const hum = parseFloat(outdoor.humidity.value);
@@ -140,43 +100,21 @@ async function obtenerDatos(){
 
         const uvCard = document.getElementById("uvCard");
         const solarCard = document.getElementById("solarCard");
-        if(uvIndex !== null){ uvCard.classList.remove("oculto"); document.getElementById("uv").textContent = uvIndex.toFixed(1); }
+        if(uvVal !== null){ uvCard.classList.remove("oculto"); document.getElementById("uv").textContent = uvVal.toFixed(1); }
         else{ uvCard.classList.add("oculto"); }
-        if(solarRadiation !== null){ solarCard.classList.remove("oculto"); document.getElementById("solar").textContent = solarRadiation.toFixed(0)+" W/m²"; }
+        if(solarVal !== null){ solarCard.classList.remove("oculto"); document.getElementById("solar").textContent = solarVal.toFixed(1)+" W/m²"; }
         else{ solarCard.classList.add("oculto"); }
 
         document.getElementById("windDirText").textContent = "Dirección: "+gradosADireccion(windDeg);
         actualizarFlechaModerna(windDeg);
 
-        const extremos = actualizarExtremos(tempC, hum, windKm);
-        document.getElementById("tempMin").textContent = "Min diaria: "+extremos.tempMin.toFixed(1)+" °C";
-        document.getElementById("tempMax").textContent = "Max diaria: "+extremos.tempMax.toFixed(1)+" °C";
-        document.getElementById("humMax").textContent = "Max diaria: "+extremos.humMax+" %";
-        document.getElementById("windMax").textContent = "Racha máxima diaria: "+extremos.windMax.toFixed(1)+" km/h";
-
-        const record = actualizarRecord(tempC);
-        document.getElementById("tempRecordMax").textContent = "🏆 Récord Máx: "+record.max.toFixed(1)+" °C";
-        document.getElementById("tempRecordMin").textContent = "🏆 Récord Mín: "+record.min.toFixed(1)+" °C";
-
-        const lluvia = actualizarLluvia(rainMm);
-        document.getElementById("rainMonth").textContent = "Mes: "+lluvia.totalMes.toFixed(1)+" mm";
-        document.getElementById("rainYear").textContent = "Año: "+lluvia.totalAño.toFixed(1)+" mm";
-
-        const hora = new Date().getHours();
-        if(hora >= 6 && hora < 18){
-            document.body.style.background = "linear-gradient(to bottom,#87CEEB,#f0f8ff)";
-        }else{
-            document.body.style.background = "linear-gradient(to bottom,#001848,#0a1f44)";
-        }
-
-    }catch(error){
-        console.log("Error conexión", error);
+    } catch(error) {
+        console.log("Error conexión:", error);
     }
 }
 
 obtenerDatos();
-setInterval(obtenerDatos,300000);
-
+setInterval(obtenerDatos, 300000);
 
 
 
