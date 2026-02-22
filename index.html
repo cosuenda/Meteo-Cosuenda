@@ -88,15 +88,27 @@ header{
     box-shadow: 0 0 15px rgba(255,0,0,0.7);
 }
 
+/* Puntos y cardinales relativos */
+.rosa-moderna .labels .punto,
+.rosa-moderna .labels .cardinal {
+    position: absolute;
+    transform: translate(-50%, -50%);
+}
+
 .rosa-moderna .labels .punto {
     width: 5px;
     height: 5px;
     background: #555;
     border-radius: 50%;
-    position: absolute;
-    transform: translate(-50%, -50%);
     box-shadow: 0 0 4px rgba(0,0,0,0.3);
     animation: pulse 3s infinite alternate;
+}
+
+.rosa-moderna .labels .cardinal {
+    font-size: 14px;
+    font-weight: bold;
+    color: #222;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
 }
 
 @keyframes pulse{
@@ -104,16 +116,6 @@ header{
     100%{ transform: translate(-50%,-50%) scale(1.3); opacity:1; }
 }
 
-.rosa-moderna .labels .cardinal {
-    position: absolute;
-    font-size: 14px;
-    font-weight: bold;
-    color: #222;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-    transform: translate(-50%, -50%) rotateX(10deg);
-}
-
-/* Oculto si no hay datos */
 .oculto{ display:none; }
 
 footer{
@@ -196,7 +198,6 @@ Actualización automática cada 5 minutos · Meteo Cosuenda
 <script src="script.js"></script>
 </body>
 </html>
-
 
 
 
