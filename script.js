@@ -78,7 +78,7 @@ function crearRosa(){
         punto.style.top = y+"px";
         rosa.appendChild(punto);
 
-        // Letras para cardinales cada 45°
+        // Letras cardinales cada 45°
         if(deg%45===0){
             const label = document.createElement("div");
             label.className = "label";
@@ -87,7 +87,6 @@ function crearRosa(){
             const ly = 100 - (r+15)*Math.cos(rad);
             label.style.left = lx+"px";
             label.style.top = ly+"px";
-            rosa.appendChild(label);
         }
     }
 }
@@ -104,6 +103,8 @@ async function obtenerDatos(){
         const wind = data.data.wind;
         const rainfall = data.data.rainfall;
         const pressure = data.data.pressure;
+        const uvIndex = data.data.uv ? parseFloat(data.data.uv.value) : null;
+        const solarRadiation = data.data.solar_radiation ? parseFloat(data.data.solar_radiation.value) : null;
 
         const tempC = fToC(outdoor.temperature.value);
         const hum = parseFloat(outdoor.humidity.value);
@@ -117,6 +118,8 @@ async function obtenerDatos(){
         document.getElementById("wind").textContent = windKm.toFixed(1)+" km/h";
         document.getElementById("rain").textContent = rainMm.toFixed(1)+" mm";
         document.getElementById("press").textContent = pressHpa.toFixed(1)+" hPa";
+        document.getElementById("uv").textContent = uvIndex !== null ? uvIndex.toFixed(1) : "--";
+        document.getElementById("solar").textContent = solarRadiation !== null ? solarRadiation.toFixed(0)+" W/m²" : "--";
 
         // Dirección viento
         document.getElementById("windDirText").textContent = "Dirección: "+gradosADireccion(windDeg);
