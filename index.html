@@ -43,38 +43,42 @@ header{
     color:#555;
 }
 
-.rosa{
-    width:150px;
-    height:150px;
-    border:3px solid #333;
-    border-radius:50%;
-    margin:20px auto;
-    position:relative;
+/* Contenedor rosa centrado */
+.rosa-container {
+    width: 200px;
+    height: 200px;
+    margin: 20px auto;
+    position: relative;
 }
 
+/* Círculo de la rosa */
+.rosa {
+    width: 100%;
+    height: 100%;
+    border: 3px solid #333;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(circle at center, #f9f9f9 95%, transparent 100%);
+}
+
+/* Flecha centrada */
 .flecha{
-    width:4px;
-    height:60px;
-    background:red;
-    position:absolute;
-    top:15px;
-    left:50%;
-    transform-origin:50% 60px;
+    width: 4px;
+    height: 80px;
+    background: red;
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform-origin: 50% 70px;
+    transform: translateX(-50%) rotate(0deg);
     transition: transform 1s ease-in-out;
 }
 
-.punto{
-    width:4px;
-    height:4px;
-    background:#333;
-    border-radius:50%;
-    position:absolute;
-}
-
-.label{
-    position:absolute;
-    font-size:12px;
-    font-weight:bold;
+/* Puntos y etiquetas de la rosa */
+.punto, .label {
+    position: absolute;
+    transform: translate(-50%, -50%);
 }
 
 footer{
@@ -119,10 +123,11 @@ footer{
 <div id="windDirText" class="minmax">Dirección: --</div>
 <div id="windMax" class="minmax">Racha máxima diaria: -- km/h</div>
 
-<div class="rosa" id="rosaViento">
-<div id="flecha" class="flecha"></div>
+<div class="rosa-container">
+    <div class="rosa" id="rosaViento">
+        <div id="flecha" class="flecha"></div>
+    </div>
 </div>
-
 </div>
 
 <div class="card">
@@ -157,7 +162,6 @@ Actualización automática cada 5 minutos · Meteo Cosuenda
 
 </body>
 </html>
-
 
 
 
