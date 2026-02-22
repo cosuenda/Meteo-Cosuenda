@@ -11,15 +11,15 @@ const mphToKmh = mph => (parseFloat(mph) * 1.60934);
 const inToMm = inches => (parseFloat(inches) * 25.4);
 const inHgToHpa = inHg => (parseFloat(inHg) * 33.8639);
 
-// ====== CONTROL DÍA ACTUAL ======
-function obtenerFechaHoy() {
+// ====== FECHA ACTUAL ======
+function fechaHoy() {
     return new Date().toISOString().split("T")[0];
 }
 
-// ====== GUARDAR EXTREMOS ======
+// ====== EXTREMOS DIARIOS ======
 function actualizarExtremos(temp, hum, wind) {
 
-    const hoy = obtenerFechaHoy();
+    const hoy = fechaHoy();
     let datos = JSON.parse(localStorage.getItem("extremosDia"));
 
     if (!datos || datos.fecha !== hoy) {
@@ -39,6 +39,18 @@ function actualizarExtremos(temp, hum, wind) {
 
     localStorage.setItem("extremosDia", JSON.stringify(datos));
     return datos;
+}
+
+// ====== FONDO DÍA / NOCHE ======
+function fondoAutomatico() {
+    const hora = new Date().getHours();
+    if (hora >= 6 && hora < 18) {
+        document.body.style.background =
+            "linear-gradient(to bottom,#87CEEB,#f0f8ff)";
+    } else {
+        document.body.style.background =
+            "linear-gradient(to bottom,#001848,#0a1f44)";
+    }
 }
 
 // ====== FUNCIÓN PRINCIPAL ======
@@ -64,20 +76,34 @@ async function obtenerDatos() {
         const rainMm = inToMm(rainfall.daily.value);
         const pressHpa = inHgToHpa(pressure.relative.value);
 
-        // ====== ACTUALIZAR VALORES ======
-        document.getElementById("tempBig").textContent = tempC.toFixed(1) + " °C";
-        document.getElementById("hum").textContent = hum + " %";
-        document.getElementById("wind").textContent = windKmh.toFixed(1) + " km/h";
-        document.getElementById("rain").textContent = rainMm.toFixed(1) + " mm";
-        document.getElementById("press").textContent = pressHpa.toFixed(1) + " hPa";
+        // Mostrar valores actuales
+        document.getElementById("tempBig").textContent =
+            tempC.toFixed(1) + " °C";
+        document.getElementById("hum").textContent =
+            hum + " %";
+        document.getElementById("wind").textContent =
+            windKmh.toFixed(1) + " km/h";
+        document.getElementById("rain").textContent =
+            rainMm.toFixed(1) + " mm";
+        document.getElementById("press").textContent =
+            pressHpa.toFixed(1) + " hPa";
 
-        // ====== EXTREMOS ======
+        // Actualizar extremos
         const extremos = actualizarExtremos(tempC, hum, windKmh);
 
-        document.getElementById("tempMin").textContent = "Min: " + extremos.tempMin.toFixed(1) + " °C";
-        document.getElementById("tempMax").textContent = "Max: " + extremos.tempMax.toFixed(1) + " °C";
-        document.getElementById("humMax").textContent = "Max: " + extremos.humMax + " %";
-        document.getElementById("windMax").textContent = "Max: " + extremos.windMax.toFixed(1) + " km/h";
+        document.getElementById("tempMin").textContent =
+            "Min: " + extremos.tempMin.toFixed(1) + " °C";
+
+        document.getElementById("tempMax").textContent =
+            "Max: " + extremos.tempMax.toFixed(1) + " °C";
+
+        document.getElementById("humMax").textContent =
+            "Max: " + extremos.humMax + " %";
+
+        document.getElementById("windMax").textContent =
+            "Max: " + extremos.windMax.toFixed(1) + " km/h";
+
+        fondoAutomatico();
 
     } catch (error) {
         console.log("Error conexión", error);
@@ -86,8 +112,7 @@ async function obtenerDatos() {
 
 // ====== INICIO ======
 obtenerDatos();
-setInterval(obtenerDatos, 300000); // cada 5 min
-
+setInterval(obtenerDatos, 300000);
 
 
 
