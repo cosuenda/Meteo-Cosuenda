@@ -107,8 +107,21 @@ async function obtenerDatos(){
         const wind = data.data.wind;
         const rainfall = data.data.rainfall;
         const pressure = data.data.pressure;
-        const uvIndex = data.data.uv ? parseFloat(data.data.uv.value) : null;
-        const solarRadiation = data.data.solar_radiation ? parseFloat(data.data.solar_radiation.value) : null;
+
+        // ===== UV y Solar: varios nombres posibles =====
+        const uvIndex = (
+            data.data.uv?.value ??
+            data.data.uv_index?.value ??
+            data.data.uv_light?.value ??
+            null
+        );
+
+        const solarRadiation = (
+            data.data.solar_radiation?.value ??
+            data.data.solar_irradiance?.value ??
+            data.data.solar_irradiance_1?.value ??
+            null
+        );
 
         const tempC = fToC(outdoor.temperature.value);
         const hum = parseFloat(outdoor.humidity.value);
@@ -117,6 +130,7 @@ async function obtenerDatos(){
         const pressHpa = inHgToHpa(pressure.relative.value);
         const windDeg = parseFloat(wind.wind_direction.value);
 
+        // ===== ACTUALIZAR HTML =====
         document.getElementById("tempBig").textContent = tempC.toFixed(1)+" °C";
         document.getElementById("hum").textContent = hum+" %";
         document.getElementById("wind").textContent = windKm.toFixed(1)+" km/h";
