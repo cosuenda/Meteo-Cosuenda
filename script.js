@@ -20,82 +20,82 @@ function gradosADireccion(grados){
 
 // ====== EXTREMOS + RÉCORDS ======
 function actualizarExtremos(temp, hum, wind){
-
     const hoy = new Date().toDateString();
     let datos = JSON.parse(localStorage.getItem("extremos"));
-
     if(!datos || datos.fecha !== hoy){
-        datos = {
-            fecha: hoy,
-            tempMin: temp,
-            tempMax: temp,
-            humMax: hum,
-            windMax: wind
-        };
+        datos = { fecha:hoy, tempMin:temp, tempMax:temp, humMax:hum, windMax:wind };
     }else{
         if(temp < datos.tempMin) datos.tempMin = temp;
         if(temp > datos.tempMax) datos.tempMax = temp;
         if(hum > datos.humMax) datos.humMax = hum;
         if(wind > datos.windMax) datos.windMax = wind;
     }
-
     localStorage.setItem("extremos", JSON.stringify(datos));
     return datos;
 }
 
 // ====== RÉCORD HISTÓRICO ======
 function actualizarRecord(temp){
-
     let record = JSON.parse(localStorage.getItem("recordTemp"));
-
-    if(!record){
-        record = { max: temp, min: temp };
-    }else{
+    if(!record){ record = { max: temp, min: temp }; }
+    else{
         if(temp > record.max) record.max = temp;
         if(temp < record.min) record.min = temp;
     }
-
     localStorage.setItem("recordTemp", JSON.stringify(record));
     return record;
 }
 
 // ====== LLUVIA ======
 function actualizarLluvia(rainActual){
-
     const hoy = new Date();
     const mesActual = hoy.getMonth();
     const añoActual = hoy.getFullYear();
-
     let datos = JSON.parse(localStorage.getItem("lluviaTotal"));
+    if(!datos){ datos = { mes: mesActual, año: añoActual, totalMes: rainActual, totalAño: rainActual }; }
+    else{
+        if(datos.mes !== mesActual){ datos.mes = mesActual; datos.totalMes = rainActual; }
+        else if(rainActual > datos.totalMes){ datos.totalMes = rainActual; }
 
-    if(!datos){
-        datos = { mes: mesActual, año: añoActual, totalMes: rainActual, totalAño: rainActual };
-    }else{
-
-        if(datos.mes !== mesActual){
-            datos.mes = mesActual;
-            datos.totalMes = rainActual;
-        }else if(rainActual > datos.totalMes){
-            datos.totalMes = rainActual;
-        }
-
-        if(datos.año !== añoActual){
-            datos.año = añoActual;
-            datos.totalAño = rainActual;
-        }else if(rainActual > datos.totalAño){
-            datos.totalAño = rainActual;
-        }
+        if(datos.año !== añoActual){ datos.año = añoActual; datos.totalAño = rainActual; }
+        else if(rainActual > datos.totalAño){ datos.totalAño = rainActual; }
     }
-
     localStorage.setItem("lluviaTotal", JSON.stringify(datos));
     return datos;
 }
 
+// ====== CREAR PUNTOS DE LA ROSA ======
+function crearRosa(){
+    const rosa = document.getElementById("rosaViento");
+    for(let deg=0; deg<360; deg+=10){
+        const punto = document.createElement("div");
+        punto.className = "punto";
+        const rad = deg*Math.PI/180;
+        const r = 90;
+        const x = 100 + r*Math.sin(rad);
+        const y = 100 - r*Math.cos(rad);
+        punto.style.left = x+"px";
+        punto.style.top = y+"px";
+        rosa.appendChild(punto);
+
+        // Letras para cardinales cada 45°
+        if(deg%45===0){
+            const label = document.createElement("div");
+            label.className = "label";
+            label.textContent = ["N","NE","E","SE","S","SW","W","NW"][deg/45];
+            const lx = 100 + (r+15)*Math.sin(rad);
+            const ly = 100 - (r+15)*Math.cos(rad);
+            label.style.left = lx+"px";
+            label.style.top = ly+"px";
+            rosa.appendChild(label);
+        }
+    }
+}
+crearRosa();
+
 // ====== PRINCIPAL ======
 async function obtenerDatos(){
-
     try{
-
         const response = await fetch(url);
         const data = await response.json();
         if(data.code !== 0) return;
@@ -119,53 +119,34 @@ async function obtenerDatos(){
         document.getElementById("press").textContent = pressHpa.toFixed(1)+" hPa";
 
         // Dirección viento
-        document.getElementById("windDirText").textContent =
-            "Dirección: "+gradosADireccion(windDeg);
+        document.getElementById("windDirText").textContent = "Dirección: "+gradosADireccion(windDeg);
 
-        document.getElementById("flecha").style.transform =
-            `rotate(${windDeg}deg)`;
+        // Flecha animada
+        document.getElementById("flecha").style.transform = `rotate(${windDeg}deg)`;
 
         // Extremos diarios
         const extremos = actualizarExtremos(tempC, hum, windKm);
-
-        document.getElementById("tempMin").textContent =
-            "Min diaria: "+extremos.tempMin.toFixed(1)+" °C";
-
-        document.getElementById("tempMax").textContent =
-            "Max diaria: "+extremos.tempMax.toFixed(1)+" °C";
-
-        document.getElementById("humMax").textContent =
-            "Max diaria: "+extremos.humMax+" %";
-
-        document.getElementById("windMax").textContent =
-            "Racha máxima diaria: "+extremos.windMax.toFixed(1)+" km/h";
+        document.getElementById("tempMin").textContent = "Min diaria: "+extremos.tempMin.toFixed(1)+" °C";
+        document.getElementById("tempMax").textContent = "Max diaria: "+extremos.tempMax.toFixed(1)+" °C";
+        document.getElementById("humMax").textContent = "Max diaria: "+extremos.humMax+" %";
+        document.getElementById("windMax").textContent = "Racha máxima diaria: "+extremos.windMax.toFixed(1)+" km/h";
 
         // Récord absoluto
         const record = actualizarRecord(tempC);
-
-        document.getElementById("tempRecordMax").textContent =
-            "🏆 Récord Máx: "+record.max.toFixed(1)+" °C";
-
-        document.getElementById("tempRecordMin").textContent =
-            "🏆 Récord Mín: "+record.min.toFixed(1)+" °C";
+        document.getElementById("tempRecordMax").textContent = "🏆 Récord Máx: "+record.max.toFixed(1)+" °C";
+        document.getElementById("tempRecordMin").textContent = "🏆 Récord Mín: "+record.min.toFixed(1)+" °C";
 
         // Lluvia
         const lluvia = actualizarLluvia(rainMm);
-
-        document.getElementById("rainMonth").textContent =
-            "Mes: "+lluvia.totalMes.toFixed(1)+" mm";
-
-        document.getElementById("rainYear").textContent =
-            "Año: "+lluvia.totalAño.toFixed(1)+" mm";
+        document.getElementById("rainMonth").textContent = "Mes: "+lluvia.totalMes.toFixed(1)+" mm";
+        document.getElementById("rainYear").textContent = "Año: "+lluvia.totalAño.toFixed(1)+" mm";
 
         // Fondo día/noche
         const hora = new Date().getHours();
         if(hora >= 6 && hora < 18){
-            document.body.style.background =
-            "linear-gradient(to bottom,#87CEEB,#f0f8ff)";
+            document.body.style.background = "linear-gradient(to bottom,#87CEEB,#f0f8ff)";
         }else{
-            document.body.style.background =
-            "linear-gradient(to bottom,#001848,#0a1f44)";
+            document.body.style.background = "linear-gradient(to bottom,#001848,#0a1f44)";
         }
 
     }catch(error){
