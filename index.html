@@ -43,28 +43,48 @@ header{
     color:#555;
 }
 
+/* Rosa de los vientos */
 .rosa{
-    width:150px;
-    height:150px;
+    width:200px;
+    height:200px;
     border:3px solid #333;
     border-radius:50%;
     margin:20px auto;
     position:relative;
+    background: radial-gradient(circle at center, #f9f9f9 95%, transparent 100%);
 }
 
 .flecha{
     width:4px;
-    height:60px;
+    height:80px;
     background:red;
     position:absolute;
-    top:15px;
+    top:20px;
     left:50%;
-    transform-origin:50% 60px;
+    transform-origin:50% 70px;
+    transform:rotate(0deg);
+    transition: transform 1s ease-out; /* animación suave */
 }
 
-footer{
-    padding:20px;
-    font-size:14px;
+/* Puntos y etiquetas de rosa */
+.punto{
+    width:4px;
+    height:4px;
+    background:#333;
+    border-radius:50%;
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform-origin: -50% -50%;
+}
+
+.label{
+    position:absolute;
+    font-size:12px;
+    font-weight:bold;
+    top:50%;
+    left:50%;
+    transform-origin: -50% -50%;
 }
 </style>
 </head>
@@ -99,8 +119,8 @@ footer{
 <div id="windDirText" class="minmax">Dirección: --</div>
 <div id="windMax" class="minmax">Racha máxima diaria: -- km/h</div>
 
-<div class="rosa">
-<div id="flecha" class="flecha"></div>
+<div class="rosa" id="rosaViento">
+    <div id="flecha" class="flecha"></div>
 </div>
 
 </div>
@@ -124,7 +144,6 @@ Actualización automática cada 5 minutos · Meteo Cosuenda
 </footer>
 
 <script src="script.js"></script>
-
 </body>
 </html>
 
