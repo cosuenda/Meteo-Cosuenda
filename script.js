@@ -11,18 +11,23 @@ const mphToKmh = mph => (parseFloat(mph) * 1.60934);
 const inToMm = inches => (parseFloat(inches) * 25.4);
 const inHgToHpa = inHg => (parseFloat(inHg) * 33.8639);
 
+// ====== DIRECCIÓN DEL VIENTO ======
+function direccionViento(grados){
+    const dirs = ["N","NE","E","SE","S","SW","W","NW"];
+    return dirs[Math.round(grados / 45) % 8];
+}
+
 // ====== FECHA ACTUAL ======
-function fechaHoy() {
+function fechaHoy(){
     return new Date().toISOString().split("T")[0];
 }
 
 // ====== EXTREMOS DIARIOS ======
-function actualizarExtremos(temp, hum, wind) {
-
+function actualizarExtremos(temp, hum, wind){
     const hoy = fechaHoy();
     let datos = JSON.parse(localStorage.getItem("extremosDia"));
 
-    if (!datos || datos.fecha !== hoy) {
+    if(!datos || datos.fecha !== hoy){
         datos = {
             fecha: hoy,
             tempMin: temp,
@@ -30,37 +35,36 @@ function actualizarExtremos(temp, hum, wind) {
             humMax: hum,
             windMax: wind
         };
-    } else {
-        if (temp < datos.tempMin) datos.tempMin = temp;
-        if (temp > datos.tempMax) datos.tempMax = temp;
-        if (hum > datos.humMax) datos.humMax = hum;
-        if (wind > datos.windMax) datos.windMax = wind;
+    }else{
+        if(temp < datos.tempMin) datos.tempMin = temp;
+        if(temp > datos.tempMax) datos.tempMax = temp;
+        if(hum > datos.humMax) datos.humMax = hum;
+        if(wind > datos.windMax) datos.windMax = wind;
     }
 
     localStorage.setItem("extremosDia", JSON.stringify(datos));
     return datos;
 }
 
-// ====== FONDO DÍA / NOCHE ======
-function fondoAutomatico() {
+// ====== FONDO AUTOMÁTICO ======
+function fondoAutomatico(){
     const hora = new Date().getHours();
-    if (hora >= 6 && hora < 18) {
+    if(hora >= 6 && hora < 18){
         document.body.style.background =
             "linear-gradient(to bottom,#87CEEB,#f0f8ff)";
-    } else {
+    }else{
         document.body.style.background =
             "linear-gradient(to bottom,#001848,#0a1f44)";
     }
 }
 
 // ====== FUNCIÓN PRINCIPAL ======
-async function obtenerDatos() {
-
-    try {
+async function obtenerDatos(){
+    try{
         const response = await fetch(url);
         const json = await response.json();
 
-        if (json.code !== 0) {
+        if(json.code !== 0){
             console.log("Error API");
             return;
         }
@@ -73,22 +77,30 @@ async function obtenerDatos() {
         const tempC = fToC(outdoor.temperature.value);
         const hum = parseFloat(outdoor.humidity.value);
         const windKmh = mphToKmh(wind.wind_speed.value);
+        const windDeg = parseFloat(wind.wind_direction.value);
         const rainMm = inToMm(rainfall.daily.value);
         const pressHpa = inHgToHpa(pressure.relative.value);
 
-        // Mostrar valores actuales
+        // MOSTRAR ACTUALES
         document.getElementById("tempBig").textContent =
             tempC.toFixed(1) + " °C";
+
         document.getElementById("hum").textContent =
             hum + " %";
+
         document.getElementById("wind").textContent =
             windKmh.toFixed(1) + " km/h";
+
+        document.getElementById("windDir").textContent =
+            "Dirección: " + direccionViento(windDeg);
+
         document.getElementById("rain").textContent =
             rainMm.toFixed(1) + " mm";
+
         document.getElementById("press").textContent =
             pressHpa.toFixed(1) + " hPa";
 
-        // Actualizar extremos
+        // EXTREMOS
         const extremos = actualizarExtremos(tempC, hum, windKmh);
 
         document.getElementById("tempMin").textContent =
@@ -105,12 +117,12 @@ async function obtenerDatos() {
 
         fondoAutomatico();
 
-    } catch (error) {
+    }catch(error){
         console.log("Error conexión", error);
     }
 }
 
-// ====== INICIO ======
+// INICIO
 obtenerDatos();
 setInterval(obtenerDatos, 300000);
 
