@@ -66,28 +66,34 @@ function actualizarLluvia(rainActual){
 }
 
 // Crear rosa 3D centrada
-function crearRosaModerna(){
+function crearRosaModerna() {
     const rosa = document.getElementById("rosaVientoModerna");
     const labelsDiv = rosa.querySelector(".labels");
-    for(let deg=0; deg<360; deg+=10){
+    labelsDiv.innerHTML = "";
+
+    const rect = rosa.getBoundingClientRect();
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const radius = rect.width * 0.45;
+
+    for (let deg = 0; deg < 360; deg += 10) {
         const punto = document.createElement("div");
         punto.className = "punto";
-        const rad = deg*Math.PI/180;
-        const r = 45; // radio %
-        const x = 50 + r*Math.sin(rad);
-        const y = 50 - r*Math.cos(rad);
-        punto.style.left = x+"%";
-        punto.style.top = y+"%";
+        const rad = deg * Math.PI / 180;
+        const x = centerX + radius * Math.sin(rad);
+        const y = centerY - radius * Math.cos(rad);
+        punto.style.left = x + "px";
+        punto.style.top = y + "px";
         labelsDiv.appendChild(punto);
 
-        if(deg % 45 === 0){
+        if (deg % 45 === 0) {
             const cardinal = document.createElement("div");
             cardinal.className = "cardinal";
-            cardinal.textContent = ["N","NE","E","SE","S","SW","W","NW"][deg/45];
-            const lx = 50 + (r+12)*Math.sin(rad);
-            const ly = 50 - (r+12)*Math.cos(rad);
-            cardinal.style.left = lx+"%";
-            cardinal.style.top = ly+"%";
+            cardinal.textContent = ["N","NE","E","SE","S","SW","W","NW"][deg / 45];
+            const lx = centerX + (radius + 20) * Math.sin(rad);
+            const ly = centerY - (radius + 20) * Math.cos(rad);
+            cardinal.style.left = lx + "px";
+            cardinal.style.top = ly + "px";
             labelsDiv.appendChild(cardinal);
         }
     }
