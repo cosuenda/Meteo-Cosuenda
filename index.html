@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meteo Cosuenda - Widget Moderno</title>
+<title>Meteo Cosuenda - Widget Premium 3D</title>
 
 <style>
 body{
@@ -11,6 +11,7 @@ body{
     font-family: 'Arial', sans-serif;
     text-align:center;
     transition: background 1s;
+    background: linear-gradient(to bottom,#87CEEB,#f0f8ff);
 }
 
 header{
@@ -32,11 +33,14 @@ header{
 .card{
     background:white;
     padding:20px;
-    border-radius:15px;
-    box-shadow:0 5px 15px rgba(0,0,0,0.2);
-    transition: transform 0.3s;
+    border-radius:20px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.25);
+    transition: transform 0.3s, box-shadow 0.3s;
 }
-.card:hover{ transform: translateY(-5px); }
+.card:hover{
+    transform: translateY(-5px);
+    box-shadow:0 12px 30px rgba(0,0,0,0.35);
+}
 
 .valor{
     font-size:40px;
@@ -48,56 +52,65 @@ header{
     color:#555;
 }
 
-/* Rosa moderna widget */
+/* Rosa premium 3D */
 .rosa-moderna {
-    width: 220px;
-    height: 220px;
+    width: 240px;
+    height: 240px;
     margin: 20px auto;
     position: relative;
+    perspective: 400px;
 }
 
 .rosa-moderna .circle {
     width: 100%;
     height: 100%;
     border-radius: 50%;
+    background: radial-gradient(circle at center, #f9f9f9 60%, #d9d9d9 100%);
     border: 3px solid #555;
-    background: radial-gradient(circle at center, #f9f9f9 60%, #e0e0e0 100%);
     position: absolute;
     top: 0;
     left: 0;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.08);
+    transform: rotateX(10deg);
 }
 
 .flecha-moderna {
     width: 4px;
-    height: 100px;
-    background: linear-gradient(to top, #ff4d4d, transparent);
+    height: 110px;
+    background: linear-gradient(to top,#ff4d4d,transparent);
     position: absolute;
     top: 10%;
     left: 50%;
-    transform-origin: 50% 80px;
+    transform-origin: 50% 90px;
     transform: translateX(-50%) rotate(0deg);
     transition: transform 1s ease-in-out;
     border-radius: 2px;
-    box-shadow: 0 0 8px rgba(255,0,0,0.6);
+    box-shadow: 0 0 15px rgba(255,0,0,0.7);
 }
 
 .rosa-moderna .labels .punto {
-    width: 4px;
-    height: 4px;
+    width: 5px;
+    height: 5px;
     background: #555;
     border-radius: 50%;
     position: absolute;
     transform: translate(-50%, -50%);
+    box-shadow: 0 0 4px rgba(0,0,0,0.3);
+    animation: pulse 3s infinite alternate;
+}
+
+@keyframes pulse{
+    0%{ transform: translate(-50%,-50%) scale(1); opacity:0.7; }
+    100%{ transform: translate(-50%,-50%) scale(1.3); opacity:1; }
 }
 
 .rosa-moderna .labels .cardinal {
     position: absolute;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: bold;
-    color: #333;
-    transform: translate(-50%, -50%);
+    color: #222;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    transform: translate(-50%, -50%) rotateX(10deg);
 }
 
 /* Oculto si no hay datos */
@@ -109,14 +122,12 @@ footer{
     color:#333;
 }
 
-/* Responsive */
 @media(max-width:500px){
-    .rosa-moderna{ width:160px; height:160px; }
-    .flecha-moderna{ height:70px; transform-origin:50% 60px; }
+    .rosa-moderna{ width:180px; height:180px; }
+    .flecha-moderna{ height:80px; transform-origin:50% 60px; }
 }
 </style>
 </head>
-
 <body>
 
 <header>
@@ -147,7 +158,6 @@ footer{
 <div id="windDirText" class="minmax">Dirección: --</div>
 <div id="windMax" class="minmax">Racha máxima diaria: -- km/h</div>
 
-<!-- Rosa moderna -->
 <div class="rosa-moderna" id="rosaVientoModerna">
     <div class="circle"></div>
     <div class="flecha-moderna" id="flechaModerna"></div>
@@ -184,7 +194,6 @@ Actualización automática cada 5 minutos · Meteo Cosuenda
 </footer>
 
 <script src="script.js"></script>
-
 </body>
 </html>
 
