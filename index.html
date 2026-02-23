@@ -8,42 +8,67 @@
 <style>
 body{
     margin:0;
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Arial, sans-serif;
     text-align:center;
     transition: background 1s;
 }
 
 header{
-    background:#003366;
+    background: linear-gradient(135deg,#003366,#005599);
     color:white;
-    padding:20px;
+    padding:25px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.3);
+}
+
+header h1{
+    margin:0;
+    font-size:28px;
+    letter-spacing:1px;
 }
 
 .container{
-    max-width:1000px;
+    max-width:1200px;
     margin:auto;
-    padding:20px;
+    padding:25px;
+    display:grid;
+    grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
+    gap:25px;
 }
 
 .card{
-    background:white;
-    padding:20px;
-    margin:15px;
-    border-radius:15px;
-    box-shadow:0 5px 15px rgba(0,0,0,0.2);
+    background:rgba(255,255,255,0.95);
+    padding:25px;
+    border-radius:20px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.15);
+    backdrop-filter: blur(6px);
+    transition: all 0.3s ease;
+}
+
+.card:hover{
+    transform: translateY(-6px);
+    box-shadow:0 15px 35px rgba(0,0,0,0.25);
+}
+
+.card h2{
+    margin-top:0;
+    font-size:20px;
+    letter-spacing:0.5px;
 }
 
 .valor{
-    font-size:40px;
-    font-weight:bold;
+    font-size:52px;
+    font-weight:700;
+    margin:15px 0;
+    color:#003366;
 }
 
 .minmax{
-    font-size:16px;
+    font-size:14px;
     color:#555;
+    margin:4px 0;
 }
 
-/* Rosa moderna */
+/* Rosa moderna mejorada */
 .rosa-moderna {
     width: 200px;
     height: 200px;
@@ -55,30 +80,28 @@ header{
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    border: 2px solid #555;
-    background: radial-gradient(circle at center, #f0f0f0 70%, transparent 100%);
+    border: 2px solid #ccc;
+    background: radial-gradient(circle at center, #ffffff 60%, #e6f2ff 100%);
     position: absolute;
-    top: 0;
-    left: 0;
 }
 
 .flecha-moderna {
-    width: 4px;
+    width: 6px;
     height: 90px;
-    background: linear-gradient(to top, red, transparent);
+    background: linear-gradient(to top, #ff3b3b, transparent);
     position: absolute;
     top: 10%;
     left: 50%;
     transform-origin: 50% 80px;
     transform: translateX(-50%) rotate(0deg);
-    transition: transform 1s ease-in-out;
-    border-radius: 2px;
+    transition: transform 0.8s ease-in-out;
+    border-radius: 3px;
 }
 
 .rosa-moderna .labels .punto {
     width: 4px;
     height: 4px;
-    background: #555;
+    background: #888;
     border-radius: 50%;
     position: absolute;
     transform: translate(-50%, -50%);
@@ -86,23 +109,33 @@ header{
 
 .rosa-moderna .labels .cardinal {
     position: absolute;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: bold;
+    color:#003366;
     transform: translate(-50%, -50%);
 }
 
-/* Oculto si no hay datos */
 .oculto{ display:none; }
 
 footer{
-    padding:20px;
+    padding:25px;
     font-size:14px;
+    color:#444;
 }
 
 /* Responsive */
-@media(max-width:500px){
-    .rosa-moderna{ width:150px; height:150px; }
-    .flecha-moderna{ height:70px; transform-origin:50% 60px; }
+@media(max-width:600px){
+    .valor{
+        font-size:42px;
+    }
+    .rosa-moderna{
+        width:150px;
+        height:150px;
+    }
+    .flecha-moderna{
+        height:70px;
+        transform-origin:50% 60px;
+    }
 }
 </style>
 </head>
