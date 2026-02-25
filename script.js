@@ -61,7 +61,7 @@ function actualizarLluvia(rainActual){
 let angAnterior=0;
 function actualizarFlecha(grados, velocidad){
     const flecha=document.getElementById("flechaViento");
-    if(!flecha) return; // seguridad
+    if(!flecha) return;
     let diff=grados-angAnterior;
     if(diff>180) diff-=360;
     if(diff<-180) diff+=360;
@@ -72,12 +72,40 @@ function actualizarFlecha(grados, velocidad){
     else flecha.style.background="red";
 }
 
-// Gauges
-function actualizarGauge(id, valor, max){
-    const fill=document.getElementById(id+"Gauge");
-    if(!fill) return;
-    const grados=(valor/max)*180;
-    fill.style.transform=`rotate(${grados}deg)`;
+// Gauges circulares
+let humGaugeChart=null, uvGaugeChart=null;
+function actualizarGauges(hum, uv){
+    const ctxHum=document.getElementById("humGauge").getContext("2d");
+    const ctxUV=document.getElementById("uvGauge").getContext("2d");
+
+    const colorHum = hum<50 ? '#3498db' : (hum<75 ? '#f1c40f' : '#e74c3c');
+    const colorUV = uv<3 ? '#2ecc71' : (uv<7 ? '#f39c12' : '#e74c3c');
+
+    if(!humGaugeChart){
+        humGaugeChart = new Chart(ctxHum,{
+            type:'doughnut',
+            data:{datasets:[{data:[hum,100-hum],backgroundColor:[colorHum,'#eee'],borderWidth:0}]},
+            options:{rotation: -90*(Math.PI/180), circumference: 180, cutout:'70%', responsive:true, plugins:{legend:{display:false}}}
+        });
+    }else{
+        humGaugeChart.data.datasets[0].data=[hum,100-hum];
+        humGaugeChart.data.datasets[0].backgroundColor=[colorHum,'#eee'];
+        humGaugeChart.update();
+    }
+
+    if(uv!==null){
+        if(!uvGaugeChart){
+            uvGaugeChart = new Chart(ctxUV,{
+                type:'doughnut',
+                data:{datasets:[{data:[uv,11-uv],backgroundColor:[colorUV,'#eee'],borderWidth:0}]},
+                options:{rotation: -90*(Math.PI/180), circumference: 180, cutout:'70%', responsive:true, plugins:{legend:{display:false}}}
+            });
+        }else{
+            uvGaugeChart.data.datasets[0].data=[uv,11-uv];
+            uvGaugeChart.data.datasets[0].backgroundColor=[colorUV,'#eee'];
+            uvGaugeChart.update();
+        }
+    }
 }
 
 // Gráfico temperatura
@@ -114,7 +142,6 @@ async function obtenerDatos(){
         const rainfall=data.data.rainfall;
         const pressure=data.data.pressure;
 
-        // UV y Solar
         const uvIndex = outdoor.uv?.value ?? null;
         const solarRadiation = outdoor.solar_radiation?.value ?? null;
 
@@ -125,7 +152,6 @@ async function obtenerDatos(){
         const pressHpa=inHgToHpa(pressure.relative.value);
         const windDeg=parseFloat(wind.wind_direction.value);
 
-        // DOM
         document.getElementById("tempBig").textContent=tempC.toFixed(1)+" °C";
         document.getElementById("hum").textContent=hum+" %";
         document.getElementById("wind").textContent=windKm.toFixed(1)+" km/h";
@@ -134,8 +160,7 @@ async function obtenerDatos(){
         document.getElementById("windDirText").textContent="Dirección: "+gradosADireccion(windDeg);
 
         actualizarFlecha(windDeg, windKm);
-        actualizarGauge("hum", hum, 100);
-        if(uvIndex!==null) actualizarGauge("uv", uvIndex, 11);
+        actualizarGauges(hum, uvIndex);
 
         const extremos=actualizarExtremos(tempC, hum, windKm);
         document.getElementById("tempMin").textContent=`Min diaria: ${extremos.tempMin.toFixed(1)} °C | Max diaria: ${extremos.tempMax.toFixed(1)} °C`;
@@ -152,7 +177,6 @@ async function obtenerDatos(){
 
         actualizarGraficoTemp(tempC);
 
-        // UV y Solar
         const uvCard=document.getElementById("uvCard");
         const solarCard=document.getElementById("solarCard");
         if(uvIndex!==null){ uvCard.classList.remove("oculto"); document.getElementById("uv").textContent=uvIndex.toFixed(1); }
@@ -160,7 +184,6 @@ async function obtenerDatos(){
         if(solarRadiation!==null){ solarCard.classList.remove("oculto"); document.getElementById("solar").textContent=solarRadiation.toFixed(0)+" W/m²"; }
         else solarCard.classList.add("oculto");
 
-        // Fondo día/noche
         const hora=new Date().getHours();
         if(hora>=6 && hora<18) document.body.style.background="linear-gradient(to bottom,#87CEEB,#f0f8ff)";
         else document.body.style.background="linear-gradient(to bottom,#001848,#0a1f44)";
