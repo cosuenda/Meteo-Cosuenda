@@ -1,20 +1,19 @@
 // ====== CLAVES API ======
-const appKey = "26C4D6AD21CF8F8C4F3BA85E1CAF6701";
-const apiKey = "adf65434-1ace-43dd-b9a9-27915843d243";
-const mac = "84:CC:A8:B4:B1:F6";
-const url = `https://api.ecowitt.net/api/v3/device/real_time?application_key=${appKey}&api_key=${apiKey}&mac=${mac}&call_back=all`;
+const appKey="26C4D6AD21CF8F8C4F3BA85E1CAF6701";
+const apiKey="adf65434-1ace-43dd-b9a9-27915843d243";
+const mac="84:CC:A8:B4:B1:F6";
+const url=`https://api.ecowitt.net/api/v3/device/real_time?application_key=${appKey}&api_key=${apiKey}&mac=${mac}&call_back=all`;
 
 // Conversiones
-const fToC = f => ((parseFloat(f)-32)*5/9);
-const mphToKmh = mph => parseFloat(mph)*1.60934;
-const inToMm = inches => parseFloat(inches)*25.4;
-const inHgToHpa = inHg => parseFloat(inHg)*33.8639;
-const gradosADireccion = grados => ["N","NE","E","SE","S","SW","W","NW"][Math.round(grados/45)%8];
+const fToC=f=>((parseFloat(f)-32)*5/9);
+const mphToKmh=mph=>parseFloat(mph)*1.60934;
+const inToMm=inches=>parseFloat(inches)*25.4;
+const inHgToHpa=inHg=>parseFloat(inHg)*33.8639;
 
-// Flecha de viento con color según intensidad
+// Flecha rosa viento
 let angAnterior=0;
-function actualizarFlecha(grados, vel){
-    const flecha=document.getElementById("flechaViento");
+function actualizarFlechaModerna(grados,vel){
+    const flecha=document.getElementById("flechaModerna");
     if(!flecha) return;
     let diff=grados-angAnterior;
     if(diff>180) diff-=360;
@@ -24,7 +23,29 @@ function actualizarFlecha(grados, vel){
     flecha.style.background=vel<15?'#3498db':(vel<30?'#f1c40f':'#e74c3c');
 }
 
-// Gauges circulares (humedad y UV)
+// Crear rosa moderna
+function crearRosaModerna(){
+    const rosa=document.getElementById("rosaVientoModerna");
+    const labelsDiv=rosa.querySelector(".labels");
+    for(let deg=0;deg<360;deg+=10){
+        const punto=document.createElement("div"); punto.className="punto";
+        const rad=deg*Math.PI/180; const r=85;
+        punto.style.left=100+r*Math.sin(rad)+"px";
+        punto.style.top=100-r*Math.cos(rad)+"px";
+        labelsDiv.appendChild(punto);
+
+        if(deg%45===0){
+            const cardinal=document.createElement("div"); cardinal.className="cardinal";
+            cardinal.textContent=["N","NE","E","SE","S","SW","W","NW"][deg/45];
+            cardinal.style.left=100+(r+15)*Math.sin(rad)+"px";
+            cardinal.style.top=100-(r+15)*Math.cos(rad)+"px";
+            labelsDiv.appendChild(cardinal);
+        }
+    }
+}
+crearRosaModerna();
+
+// Gauges
 let humGauge=null, uvGauge=null;
 function actualizarGauges(hum, uv){
     const ctxHum=document.getElementById("humGauge").getContext("2d");
@@ -32,17 +53,30 @@ function actualizarGauges(hum, uv){
     const colorHum=hum<50?'#3498db':(hum<75?'#f1c40f':'#e74c3c');
     const colorUV=uv<3?'#2ecc71':(uv<7?'#f39c12':'#e74c3c');
     if(!humGauge){
-        humGauge=new Chart(ctxHum,{type:'doughnut',data:{datasets:[{data:[hum,100-hum],backgroundColor:[colorHum,'#eee'],borderWidth:0}]},options:{rotation:-90*(Math.PI/180),circumference:180,cutout:'70%',plugins:{legend:{display:false}}}});
-    }else{ humGauge.data.datasets[0].data=[hum,100-hum]; humGauge.data.datasets[0].backgroundColor=[colorHum,'#eee']; humGauge.update(); }
+        humGauge=new Chart(ctxHum,{type:'doughnut',data:{datasets:[{data:[hum,100-hum],backgroundColor:[colorHum,'#eee'],borderWidth:0}]},options:{rotation:-90*Math.PI/180,circumference:180,cutout:'70%',plugins:{legend:{display:false}}}});
+    }else{ humGauge.data.datasets[0].data=[hum,100-hum]; humGauge.data.datasets[0].backgroundColor=[colorHum,'#eee']; humGauge.update();}
     if(uv!==null && ctxUV){
         if(!uvGauge){
-            uvGauge=new Chart(ctxUV,{type:'doughnut',data:{datasets:[{data:[uv,11-uv],backgroundColor:[colorUV,'#eee'],borderWidth:0}]},options:{rotation:-90*(Math.PI/180),circumference:180,cutout:'70%',plugins:{legend:{display:false}}}});
+            uvGauge=new Chart(ctxUV,{type:'doughnut',data:{datasets:[{data:[uv,11-uv],backgroundColor:[colorUV,'#eee'],borderWidth:0}]},options:{rotation:-90*Math.PI/180,circumference:180,cutout:'70%',plugins:{legend:{display:false}}}});
         }else{ uvGauge.data.datasets[0].data=[uv,11-uv]; uvGauge.data.datasets[0].backgroundColor=[colorUV,'#eee']; uvGauge.update(); }
     }
 }
 
+// Gráfico temperatura 24h
+let tempChart=null, tiempos=[], temps=[];
+function actualizarGraficoTemp(temp){
+    const ahora=new Date();
+    tiempos.push(ahora.getHours()+":"+ahora.getMinutes());
+    temps.push(temp);
+    if(tiempos.length>24){ tiempos.shift(); temps.shift(); }
+    if(!tempChart){
+        const ctx=document.getElementById("tempChart").getContext("2d");
+        tempChart=new Chart(ctx,{type:'line',data:{labels:tiempos,datasets:[{label:"°C",data:temps,borderColor:"#FF5733",fill:false,tension:0.3}]},options:{responsive:true,plugins:{legend:{display:false}}}});
+    }else{ tempChart.data.labels=tiempos; tempChart.data.datasets[0].data=temps; tempChart.update();}
+}
+
 // Extremos y récords
-function actualizarExtremos(temp, hum, wind){
+function actualizarExtremos(temp,hum,wind){
     const hoy=new Date().toDateString();
     let datos=JSON.parse(localStorage.getItem("extremos"));
     if(!datos || datos.fecha!==hoy){ datos={fecha:hoy,tempMin:temp,tempMax:temp,humMax:hum,windMax:wind}; }
@@ -58,26 +92,13 @@ function actualizarRecord(temp){
     return record;
 }
 function actualizarLluvia(rain){
-    const hoy=new Date(); const mes=hoy.getMonth(); const año=hoy.getFullYear();
+    const hoy=new Date(), mes=hoy.getMonth(), año=hoy.getFullYear();
     let datos=JSON.parse(localStorage.getItem("lluviaTotal"));
     if(!datos) datos={mes,año,totalMes:rain,totalAño:rain};
     else{ if(datos.mes!==mes) datos.totalMes=rain, datos.mes=mes; else if(rain>datos.totalMes) datos.totalMes=rain;
            if(datos.año!==año) datos.totalAño=rain, datos.año=año; else if(rain>datos.totalAño) datos.totalAño=rain; }
     localStorage.setItem("lluviaTotal",JSON.stringify(datos));
     return datos;
-}
-
-// Gráfico temperatura últimas 24h
-let tempChart=null, tiempos=[], temps=[];
-function actualizarGraficoTemp(temp){
-    const ahora=new Date();
-    tiempos.push(ahora.getHours()+":"+ahora.getMinutes());
-    temps.push(temp);
-    if(tiempos.length>24){ tiempos.shift(); temps.shift(); }
-    if(!tempChart){
-        const ctx=document.getElementById("tempChart").getContext("2d");
-        tempChart=new Chart(ctx,{type:'line',data:{labels:tiempos,datasets:[{label:"°C",data:temps,borderColor:"#FF5733",fill:false,tension:0.3}]},options:{responsive:true,plugins:{legend:{display:false}}}});
-    }else{ tempChart.data.labels=tiempos; tempChart.data.datasets[0].data=temps; tempChart.update(); }
 }
 
 // ====== OBTENER DATOS ======
@@ -106,9 +127,9 @@ async function obtenerDatos(){
         document.getElementById("wind").textContent=windKm.toFixed(1)+" km/h";
         document.getElementById("rain").textContent=rainMm.toFixed(1)+" mm";
         document.getElementById("press").textContent=pressHpa.toFixed(1)+" hPa";
-        document.getElementById("windDirText").textContent="Dirección: "+gradosADireccion(windDeg);
+        document.getElementById("windDirText").textContent="Dirección: "+["N","NE","E","SE","S","SW","W","NW"][Math.round(windDeg/45)%8];
 
-        actualizarFlecha(windDeg, windKm);
+        actualizarFlechaModerna(windDeg, windKm);
         actualizarGauges(hum, uvIndex);
         actualizarGraficoTemp(tempC);
 
@@ -134,7 +155,6 @@ async function obtenerDatos(){
 
         const h=new Date().getHours();
         document.body.style.background=(h>=6 && h<18)?"linear-gradient(to bottom,#87CEEB,#f0f8ff)":"linear-gradient(to bottom,#001848,#0a1f44)";
-
     }catch(e){ console.log("Error conexión", e); }
 }
 
