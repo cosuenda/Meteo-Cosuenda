@@ -10,7 +10,6 @@ const fToC = f => ((parseFloat(f)-32)*5/9);
 const mphToKmh = mph => parseFloat(mph)*1.60934;
 const inToMm = inches => parseFloat(inches)*25.4;
 const inHgToHpa = inHg => parseFloat(inHg)*33.8639;
-
 function gradosADireccion(grados){
     const direcciones=["N","NE","E","SE","S","SW","W","NW"];
     return direcciones[Math.round(grados/45)%8];
@@ -34,7 +33,7 @@ function actualizarExtremos(temp, hum, wind){
 
 // Récord absoluto
 function actualizarRecord(temp){
-    let record=JSON.parse(localStorage.getItem("recordTemp"));
+    let record = JSON.parse(localStorage.getItem("recordTemp"));
     if(!record) record={max:temp,min:temp};
     else{ if(temp>record.max) record.max=temp; if(temp<record.min) record.min=temp; }
     localStorage.setItem("recordTemp", JSON.stringify(record));
@@ -58,29 +57,30 @@ function actualizarLluvia(rainActual){
     return datos;
 }
 
-// ==== Rosa de viento simplificada ====
+// Flecha viento
 let angAnterior=0;
 function actualizarFlecha(grados, velocidad){
     const flecha=document.getElementById("flechaViento");
+    if(!flecha) return; // seguridad
     let diff=grados-angAnterior;
     if(diff>180) diff-=360;
     if(diff<-180) diff+=360;
     angAnterior+=diff;
     flecha.style.transform=`translateX(-50%) rotate(${angAnterior}deg)`;
-    // Color según velocidad
     if(velocidad<15) flecha.style.background="blue";
     else if(velocidad<30) flecha.style.background="orange";
     else flecha.style.background="red";
 }
 
-// ==== Gauges ====
+// Gauges
 function actualizarGauge(id, valor, max){
     const fill=document.getElementById(id+"Gauge");
+    if(!fill) return;
     const grados=(valor/max)*180;
     fill.style.transform=`rotate(${grados}deg)`;
 }
 
-// ==== Gráfico de temperatura ====
+// Gráfico temperatura
 let tempChart=null;
 const tiempos=[], temperaturas=[];
 function actualizarGraficoTemp(temp){
@@ -88,15 +88,11 @@ function actualizarGraficoTemp(temp){
     tiempos.push(ahora.getHours()+":"+ahora.getMinutes());
     temperaturas.push(temp);
     if(tiempos.length>24){ tiempos.shift(); temperaturas.shift(); }
-
     if(!tempChart){
         const ctx=document.getElementById("tempChart").getContext("2d");
         tempChart=new Chart(ctx,{
             type:'line',
-            data:{
-                labels:tiempos,
-                datasets:[{label:"°C",data:temperaturas,borderColor:"#FF5733",fill:false,tension:0.3}]
-            },
+            data:{labels:tiempos,datasets:[{label:"°C",data:temperaturas,borderColor:"#FF5733",fill:false,tension:0.3}]},
             options:{responsive:true,plugins:{legend:{display:false}}}
         });
     }else{
@@ -118,7 +114,7 @@ async function obtenerDatos(){
         const rainfall=data.data.rainfall;
         const pressure=data.data.pressure;
 
-       // UV y Solar (HP2550)
+        // UV y Solar
         const uvIndex = outdoor.uv?.value ?? null;
         const solarRadiation = outdoor.solar_radiation?.value ?? null;
 
@@ -129,7 +125,7 @@ async function obtenerDatos(){
         const pressHpa=inHgToHpa(pressure.relative.value);
         const windDeg=parseFloat(wind.wind_direction.value);
 
-        // Actualizar DOM
+        // DOM
         document.getElementById("tempBig").textContent=tempC.toFixed(1)+" °C";
         document.getElementById("hum").textContent=hum+" %";
         document.getElementById("wind").textContent=windKm.toFixed(1)+" km/h";
@@ -156,6 +152,14 @@ async function obtenerDatos(){
 
         actualizarGraficoTemp(tempC);
 
+        // UV y Solar
+        const uvCard=document.getElementById("uvCard");
+        const solarCard=document.getElementById("solarCard");
+        if(uvIndex!==null){ uvCard.classList.remove("oculto"); document.getElementById("uv").textContent=uvIndex.toFixed(1); }
+        else uvCard.classList.add("oculto");
+        if(solarRadiation!==null){ solarCard.classList.remove("oculto"); document.getElementById("solar").textContent=solarRadiation.toFixed(0)+" W/m²"; }
+        else solarCard.classList.add("oculto");
+
         // Fondo día/noche
         const hora=new Date().getHours();
         if(hora>=6 && hora<18) document.body.style.background="linear-gradient(to bottom,#87CEEB,#f0f8ff)";
@@ -168,3 +172,4 @@ async function obtenerDatos(){
 
 obtenerDatos();
 setInterval(obtenerDatos,300000);
+
