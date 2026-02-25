@@ -118,15 +118,9 @@ async function obtenerDatos(){
         const rainfall=data.data.rainfall;
         const pressure=data.data.pressure;
 
-       const uvIndex =
-       data.data.uv?.value ??
-       data.data.uv?.index ??
-       null;
-
-       const solarRadiation =
-      data.data.solar_radiation?.value ??
-      data.data.solar?.value ??
-      null;
+       // UV y Solar (HP2550)
+        const uvIndex = outdoor.uv?.value ?? null;
+        const solarRadiation = outdoor.solar_radiation?.value ?? null;
 
         const tempC=fToC(outdoor.temperature.value);
         const hum=parseFloat(outdoor.humidity.value);
