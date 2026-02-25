@@ -5,7 +5,7 @@ const mac = "84:CC:A8:B4:B1:F6";
 
 const url = `https://api.ecowitt.net/api/v3/device/real_time?application_key=${appKey}&api_key=${apiKey}&mac=${mac}&call_back=all`;
 
-let angAnteriorModerna = 0; // inercia flecha
+let angAnteriorModerna = 0;
 
 // ====== CONVERSIONES ======
 const fToC = f => ((parseFloat(f) - 32) * 5 / 9);
@@ -19,7 +19,7 @@ function gradosADireccion(grados){
     return direcciones[index];
 }
 
-// Extremos diarios
+// ====== EXTREMOS DIARIOS ======
 function actualizarExtremos(temp, hum, wind){
     const hoy = new Date().toDateString();
     let datos = JSON.parse(localStorage.getItem("extremos"));
@@ -35,7 +35,7 @@ function actualizarExtremos(temp, hum, wind){
     return datos;
 }
 
-// Récord absoluto
+// ====== RÉCORD ABSOLUTO ======
 function actualizarRecord(temp){
     let record = JSON.parse(localStorage.getItem("recordTemp"));
     if(!record){ record = { max: temp, min: temp }; }
@@ -47,7 +47,7 @@ function actualizarRecord(temp){
     return record;
 }
 
-// Lluvia total
+// ====== LLUVIA TOTAL ======
 function actualizarLluvia(rainActual){
     const hoy = new Date();
     const mesActual = hoy.getMonth();
@@ -65,36 +65,7 @@ function actualizarLluvia(rainActual){
     return datos;
 }
 
-// Crear rosa moderna
-function crearRosaModerna(){
-    const rosa = document.getElementById("rosaVientoModerna");
-    const labelsDiv = rosa.querySelector(".labels");
-    for(let deg=0; deg<360; deg+=10){
-        const punto = document.createElement("div");
-        punto.className = "punto";
-        const rad = deg*Math.PI/180;
-        const r = 85;
-        const x = 100 + r*Math.sin(rad);
-        const y = 100 - r*Math.cos(rad);
-        punto.style.left = x+"px";
-        punto.style.top = y+"px";
-        labelsDiv.appendChild(punto);
-
-        if(deg % 45 === 0){
-            const cardinal = document.createElement("div");
-            cardinal.className = "cardinal";
-            cardinal.textContent = ["N","NE","E","SE","S","SW","W","NW"][deg/45];
-            const lx = 100 + (r+15)*Math.sin(rad);
-            const ly = 100 - (r+15)*Math.cos(rad);
-            cardinal.style.left = lx+"px";
-            cardinal.style.top = ly+"px";
-            labelsDiv.appendChild(cardinal);
-        }
-    }
-}
-crearRosaModerna();
-
-// Animación flecha
+// ====== ANIMACIÓN FLECHA ======
 function actualizarFlechaModerna(grados){
     const flecha = document.getElementById("flechaModerna");
     let diff = grados - angAnteriorModerna;
@@ -109,30 +80,38 @@ async function obtenerDatos(){
     try{
         const response = await fetch(url);
         const data = await response.json();
-        if(data.code !== 0) return;
 
-        const outdoor = data.data.outdoor;
-        const wind = data.data.wind;
-        const rainfall = data.data.rainfall;
-        const pressure = data.data.pressure;
+        if(data.code !== 0) {
+            console.log("Error API:", data);
+            return;
+        }
 
-        // UV y Solar
+        console.log("DATOS COMPLETOS:", data.data);
+
+        const outdoor = data.data.outdoor || {};
+        const wind = data.data.wind || {};
+        const rainfall = data.data.rainfall || {};
+        const pressure = data.data.pressure || {};
+
+        // === CAMPOS COMPATIBLES UV Y SOLAR ===
         const uvIndex =
-    data.data.uv?.value ??
-    data.data.uv?.index ??
-    null;
+            data.data.uv?.value ??
+            outdoor.uv?.value ??
+            data.data.uvi?.value ??
+            null;
 
-const solarRadiation =
-    data.data.solar_radiation?.value ??
-    data.data.solar?.value ??
-    null;
+        const solarRadiation =
+            data.data.solar_radiation?.value ??
+            outdoor.solar_radiation?.value ??
+            data.data.solar?.value ??
+            null;
 
-        const tempC = fToC(outdoor.temperature.value);
-        const hum = parseFloat(outdoor.humidity.value);
-        const windKm = mphToKmh(wind.wind_speed.value);
-        const rainMm = inToMm(rainfall.daily.value);
-        const pressHpa = inHgToHpa(pressure.relative.value);
-        const windDeg = parseFloat(wind.wind_direction.value);
+        const tempC = outdoor.temperature?.value ? fToC(outdoor.temperature.value) : 0;
+        const hum = outdoor.humidity?.value ? parseFloat(outdoor.humidity.value) : 0;
+        const windKm = wind.wind_speed?.value ? mphToKmh(wind.wind_speed.value) : 0;
+        const rainMm = rainfall.daily?.value ? inToMm(rainfall.daily.value) : 0;
+        const pressHpa = pressure.relative?.value ? inHgToHpa(pressure.relative.value) : 0;
+        const windDeg = wind.wind_direction?.value ? parseFloat(wind.wind_direction.value) : 0;
 
         document.getElementById("tempBig").textContent = tempC.toFixed(1)+" °C";
         document.getElementById("hum").textContent = hum+" %";
@@ -140,13 +119,23 @@ const solarRadiation =
         document.getElementById("rain").textContent = rainMm.toFixed(1)+" mm";
         document.getElementById("press").textContent = pressHpa.toFixed(1)+" hPa";
 
-        // UV y Solar
+        // ===== UV =====
         const uvCard = document.getElementById("uvCard");
+        if(uvIndex !== null){
+            uvCard.classList.remove("oculto");
+            document.getElementById("uv").textContent = parseFloat(uvIndex).toFixed(1);
+        } else {
+            uvCard.classList.add("oculto");
+        }
+
+        // ===== SOLAR =====
         const solarCard = document.getElementById("solarCard");
-        if(uvIndex !== null){ uvCard.classList.remove("oculto"); document.getElementById("uv").textContent = uvIndex.toFixed(1); }
-        else{ uvCard.classList.add("oculto"); }
-        if(solarRadiation !== null){ solarCard.classList.remove("oculto"); document.getElementById("solar").textContent = solarRadiation.toFixed(0)+" W/m²"; }
-        else{ solarCard.classList.add("oculto"); }
+        if(solarRadiation !== null){
+            solarCard.classList.remove("oculto");
+            document.getElementById("solar").textContent = parseFloat(solarRadiation).toFixed(0)+" W/m²";
+        } else {
+            solarCard.classList.add("oculto");
+        }
 
         document.getElementById("windDirText").textContent = "Dirección: "+gradosADireccion(windDeg);
         actualizarFlechaModerna(windDeg);
@@ -159,7 +148,7 @@ const solarRadiation =
 
         const record = actualizarRecord(tempC);
         document.getElementById("tempRecordMax").textContent = "🏆 Récord Máx: "+record.max.toFixed(1)+" °C";
-        document.getElementById("tempRecordMin").textContent = "🏆 Récord Mín: "+record.min.toFixed(1)+" °C";
+        document.getElementByById("tempRecordMin").textContent = "🏆 Récord Mín: "+record.min.toFixed(1)+" °C";
 
         const lluvia = actualizarLluvia(rainMm);
         document.getElementById("rainMonth").textContent = "Mes: "+lluvia.totalMes.toFixed(1)+" mm";
