@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meteo Cosuenda - Panel de Alertas</title>
+<title>Meteo Cosuenda - Panel Final</title>
 <link rel="icon" href="data:,">
 
 <!-- Chart.js -->
@@ -75,6 +75,20 @@ header{
     border-radius:4px;
     transition:transform 1s, background 0.5s;
 }
+.labels .punto{
+    width:4px;
+    height:4px;
+    background:#555;
+    border-radius:50%;
+    position:absolute;
+    transform:translate(-50%,-50%);
+}
+.labels .cardinal{
+    position:absolute;
+    font-size:12px;
+    font-weight:bold;
+    transform:translate(-50%,-50%);
+}
 .gauge-container{
     position:relative;
     width:140px;
@@ -82,7 +96,7 @@ header{
     margin:10px auto;
 }
 .gauge-container canvas{ position:absolute; top:0; left:0; }
-canvas#tempChart, canvas#humChart{ width:100%!important; height:200px!important; }
+canvas#tempChart{ width:100%!important; height:200px!important; }
 footer{
     padding:20px;
     font-size:14px;
@@ -101,7 +115,7 @@ footer{
 <body>
 <header>
 <h1>🌤️ Meteo Cosuenda</h1>
-<p>Panel Profesional con Alertas</p>
+<p>Panel Final con Alertas y Rosa Moderna</p>
 </header>
 
 <div class="container">
@@ -127,8 +141,11 @@ footer{
 <div id="wind" class="valor">-- km/h</div>
 <div id="windDirText" class="minmax">Dirección: --</div>
 <div id="windMax" class="minmax">Racha máxima diaria: -- km/h</div>
-<div class="rosa-moderna">
-    <div id="flechaViento" class="flecha-moderna"></div>
+
+<div class="rosa-moderna" id="rosaVientoModerna">
+    <div class="circle"></div>
+    <div class="flecha-moderna" id="flechaModerna"></div>
+    <div class="labels"></div>
 </div>
 </div>
 
@@ -164,7 +181,6 @@ Actualización automática cada 5 minutos · Meteo Cosuenda
 <script src="script.js"></script>
 </body>
 </html>
-
 
 
 
