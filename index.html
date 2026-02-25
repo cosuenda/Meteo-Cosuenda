@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meteo Cosuenda - Dashboard</title>
+<title>Meteo Cosuenda - Panel Profesional</title>
 <link rel="icon" href="data:,">
 
 <!-- Chart.js -->
@@ -12,19 +12,20 @@
 <style>
 body{
     margin:0;
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Arial, sans-serif;
     text-align:center;
     transition: background 1s;
 }
 
 header{
-    background:#003366;
+    background:#0D3B66;
     color:white;
     padding:20px;
+    text-shadow:1px 1px 3px rgba(0,0,0,0.3);
 }
 
 .container{
-    max-width:1100px;
+    max-width:1200px;
     margin:auto;
     padding:20px;
     display:grid;
@@ -35,13 +36,24 @@ header{
 .card{
     background:white;
     padding:20px;
-    border-radius:15px;
-    box-shadow:0 5px 15px rgba(0,0,0,0.2);
+    border-radius:20px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.2);
+    transition: transform 0.3s;
+}
+.card:hover{
+    transform: translateY(-5px);
+}
+
+.card h2{
+    margin-top:0;
+    font-size:20px;
+    color:#0D3B66;
 }
 
 .valor{
-    font-size:36px;
+    font-size:38px;
     font-weight:bold;
+    margin:10px 0;
 }
 
 .minmax{
@@ -50,18 +62,19 @@ header{
     margin-top:5px;
 }
 
-/* Flecha viento circular */
+/* Flecha viento profesional */
 .rosa-moderna{
     width:200px;
     height:200px;
     margin:20px auto;
     position:relative;
     border-radius:50%;
-    border:2px solid #555;
-    background: radial-gradient(circle at center, #f0f0f0 70%, transparent 100%);
+    border:2px solid #0D3B66;
+    background: radial-gradient(circle at center, #e0f7fa 70%, transparent 100%);
+    box-shadow:0 0 15px rgba(0,0,0,0.2);
 }
 .flecha-moderna{
-    width:6px;
+    width:8px;
     height:90px;
     background:blue;
     position:absolute;
@@ -69,15 +82,15 @@ header{
     left:50%;
     transform-origin:50% 80px;
     transform:translateX(-50%) rotate(0deg);
-    border-radius:3px;
+    border-radius:4px;
     transition:transform 1s, background 0.5s;
 }
 
 /* Gauges circulares */
 .gauge-container{
     position:relative;
-    width:120px;
-    height:120px;
+    width:140px;
+    height:140px;
     margin:10px auto;
 }
 .gauge-container canvas{
@@ -85,17 +98,24 @@ header{
     top:0; left:0;
 }
 
+/* Gráfico temperatura y humedad */
+canvas#tempChart, canvas#humChart{
+    width:100%!important;
+    height:200px!important;
+}
+
 /* Responsive */
 @media(max-width:500px){
     .rosa-moderna{ width:150px; height:150px; }
     .flecha-moderna{ height:70px; transform-origin:50% 60px; }
-    .gauge-container{ width:100px; height:100px; }
+    .gauge-container{ width:120px; height:120px; }
 }
 
 footer{
     padding:20px;
     font-size:14px;
     grid-column:1/-1;
+    color:#333;
 }
 </style>
 </head>
@@ -104,7 +124,7 @@ footer{
 
 <header>
 <h1>🌤️ Meteo Cosuenda</h1>
-<p>Estación Meteorológica Profesional</p>
+<p>Panel Profesional de Estación Meteorológica</p>
 </header>
 
 <div class="container">
@@ -115,6 +135,7 @@ footer{
 <div id="tempMin" class="minmax">Min diaria: -- °C | Max diaria: -- °C</div>
 <div id="tempRecordMax" class="minmax">🏆 Récord Máx: -- °C</div>
 <div id="tempRecordMin" class="minmax">🏆 Récord Mín: -- °C</div>
+<canvas id="tempChart"></canvas>
 </div>
 
 <div class="card">
@@ -155,11 +176,6 @@ footer{
 <div class="card" id="solarCard">
 <h2>Radiación Solar</h2>
 <div id="solar" class="valor">-- W/m²</div>
-</div>
-
-<div class="card">
-<h2>Temperatura últimas 24h</h2>
-<canvas id="tempChart"></canvas>
 </div>
 
 </div>
