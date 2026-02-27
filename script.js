@@ -151,7 +151,7 @@ function actualizarNeonHum(hum){
     el.style.textShadow = `0 0 ${brillo/12}px ${color}, 0 0 ${brillo/6}px ${color}, 0 0 ${brillo/3}px ${color}, 0 0 ${brillo}px ${color}`;
 }
 
-// ===== Neón racha máxima =====
+// ===== Neón racha máxima según intensidad =====
 function actualizarNeonWind(maxViento){
     const el = document.getElementById("windMax");
     let color;
