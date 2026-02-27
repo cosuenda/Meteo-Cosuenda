@@ -3,153 +3,163 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meteo Cosuenda</title>
-<link rel="icon" href="data:,">
+<title>Meteo-Cosuenda</title>
+
+<link rel="icon" href="images/favicon.ico">
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body{
-    margin:0;
-    font-family:'Segoe UI', Arial, sans-serif;
-    text-align:center;
-    transition: background 1.5s ease;
+  font-family: Arial, sans-serif;
+  text-align:center;
+  margin:0;
+  padding:20px;
+  transition: background 1s;
 }
 
-header{
-    background:linear-gradient(90deg,#0D3B66,#144f91);
-    color:white;
-    padding:20px;
-    box-shadow:0 4px 10px rgba(0,0,0,0.3);
+.weather-container{
+  max-width:900px;
+  margin:auto;
 }
 
-.container{
-    max-width:1200px;
-    margin:auto;
-    padding:20px;
-    display:grid;
-    grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
-    gap:20px;
+.big-temp{
+  font-size:60px;
+  font-weight:bold;
 }
 
 .card{
-    background:white;
-    padding:20px;
-    border-radius:20px;
-    box-shadow:0 10px 25px rgba(0,0,0,0.2);
-    transition:transform 0.3s, box-shadow 0.3s;
-}
-.card:hover{
-    transform:translateY(-6px);
-    box-shadow:0 15px 35px rgba(0,0,0,0.3);
+  background:white;
+  padding:15px;
+  margin:10px;
+  border-radius:15px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.2);
 }
 
-.valor{
-    font-size:40px;
-    font-weight:bold;
-    transition:all 0.5s ease;
-}
-
-.minmax{
-    font-size:14px;
-    color:#555;
-    margin-top:5px;
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:15px;
 }
 
 /* Rosa viento */
 .rosa{
-    width:200px;
-    height:200px;
-    margin:20px auto;
-    border-radius:50%;
-    border:2px solid #0D3B66;
-    position:relative;
-    background:radial-gradient(circle,#e0f7fa 70%,transparent);
+  position:relative;
+  width:200px;
+  height:200px;
+  border:2px solid #333;
+  border-radius:50%;
+  margin:20px auto;
 }
 
 .flecha{
-    width:8px;
-    height:90px;
-    position:absolute;
-    top:10%;
-    left:50%;
-    transform-origin:50% 80px;
-    transform:translateX(-50%) rotate(0deg);
-    border-radius:4px;
+  position:absolute;
+  top:10px;
+  left:50%;
+  width:6px;
+  height:80px;
+  background:blue;
+  transform-origin:bottom center;
+  transform:translateX(-50%) rotate(0deg);
+  border-radius:3px;
 }
 
-/* Gauges */
+/* Gauge */
 .gauge{
-    width:150px;
-    margin:auto;
+  width:120px;
+  height:60px;
+  border:10px solid #ddd;
+  border-top-left-radius:120px;
+  border-top-right-radius:120px;
+  border-bottom:none;
+  position:relative;
+  margin:auto;
+  overflow:hidden;
 }
 
-footer{
-    padding:20px;
-    grid-column:1/-1;
-}
-
-.oculto{display:none;}
-
-@media(max-width:500px){
-    .rosa{width:150px;height:150px;}
-    .flecha{height:70px;transform-origin:50% 60px;}
+.gauge-fill{
+  width:100%;
+  height:100%;
+  background:green;
+  position:absolute;
+  top:100%;
+  left:0;
+  transform-origin:center top;
+  transform:rotate(0deg);
 }
 </style>
 </head>
 
 <body>
 
-<header>
-<h1>🌤️ Meteo Cosuenda</h1>
-<p>Estación Meteorológica Profesional</p>
-</header>
+<div class="weather-container">
 
-<div class="container">
+<h1>🌤 Meteo-Cosuenda</h1>
+
+<div class="big-temp" id="tempBig">-- °C</div>
+
+<div class="grid">
 
 <div class="card">
-<h2>🌡 Temperatura</h2>
-<div id="tempBig" class="valor">-- °C</div>
-<div id="tempMin" class="minmax">Min diaria: --</div>
-<div id="tempRecordMax" class="minmax">🏆 Récord Máx: --</div>
+<p>Humedad</p>
+<div class="gauge">
+<div class="gauge-fill" id="humGauge"></div>
+</div>
+<p id="hum">-- %</p>
+</div>
+
+<div class="card">
+<p>Viento</p>
+<p id="wind">-- km/h</p>
+<p id="windDirText">Dirección: --</p>
+</div>
+
+<div class="card">
+<p>Lluvia</p>
+<p id="rain">-- mm</p>
+</div>
+
+<div class="card">
+<p>Presión</p>
+<p id="press">-- hPa</p>
+</div>
+
+<div class="card">
+<p>UV</p>
+<div class="gauge">
+<div class="gauge-fill" id="uvGauge"></div>
+</div>
+</div>
+
+</div>
+
+<!-- Rosa viento -->
+<div class="rosa">
+<div class="flecha" id="flechaViento"></div>
+</div>
+
+<!-- Extremos -->
+<div class="card">
+<p id="tempMin"></p>
+<p id="humMax"></p>
+<p id="windMax"></p>
+<p id="tempRecordMax"></p>
+<p id="tempRecordMin"></p>
+<p id="rainMonth"></p>
+<p id="rainYear"></p>
+</div>
+
+<!-- Gráfico -->
+<div class="card">
 <canvas id="tempChart"></canvas>
 </div>
 
-<div class="card">
-<h2>💧 Humedad</h2>
-<div id="hum" class="valor">-- %</div>
-<canvas id="humGauge" class="gauge"></canvas>
 </div>
-
-<div class="card">
-<h2>🌬 Viento</h2>
-<div id="wind" class="valor">-- km/h</div>
-<div id="windDirText" class="minmax">Dirección: --</div>
-<div class="rosa">
-<div id="flecha" class="flecha"></div>
-</div>
-</div>
-
-<div class="card">
-<h2>☀ Índice UV</h2>
-<div id="uv" class="valor">--</div>
-<canvas id="uvGauge" class="gauge"></canvas>
-</div>
-
-<div class="card">
-<h2>🌞 Radiación Solar</h2>
-<div id="solar" class="valor">-- W/m²</div>
-</div>
-
-</div>
-
-<footer>
-Actualización automática cada 5 minutos · Meteo Cosuenda
-</footer>
 
 <script src="script.js"></script>
+
 </body>
 </html>
-
 
 
 
