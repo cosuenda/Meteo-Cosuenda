@@ -16,22 +16,22 @@ function gradosADireccion(g){
  return d[Math.round(g/45)%8];
 }
 
-// ===== ROSA MARCAS =====
+// ===== ROSA =====
 function crearRosa(){
  const rosa=document.getElementById("rosa");
  for(let i=0;i<360;i+=10){
-   const marca=document.createElement("div");
-   marca.className="marca";
-   marca.style.transform=`translateX(-50%) rotate(${i}deg)`;
-   rosa.appendChild(marca);
+   const m=document.createElement("div");
+   m.className="marca";
+   m.style.transform=`translateX(-50%) rotate(${i}deg)`;
+   rosa.appendChild(m);
  }
  const puntos=["N","E","S","W"];
- const posiciones=[[50,5],[95,50],[50,95],[5,50]];
+ const pos=[[50,5],[95,50],[50,95],[5,50]];
  puntos.forEach((p,i)=>{
    const el=document.createElement("div");
    el.className="cardinal";
-   el.style.left=posiciones[i][0]+"%";
-   el.style.top=posiciones[i][1]+"%";
+   el.style.left=pos[i][0]+"%";
+   el.style.top=pos[i][1]+"%";
    el.style.transform="translate(-50%,-50%)";
    el.innerText=p;
    rosa.appendChild(el);
@@ -40,16 +40,16 @@ function crearRosa(){
 crearRosa();
 
 // ===== FLECHA =====
-let angAnt=0;
+let ang=0;
 function actualizarFlecha(grados,vel){
- const flecha=document.getElementById("flechaViento");
- if(!flecha) return;
- let diff=grados-angAnt;
+ const f=document.getElementById("flechaViento");
+ if(!f) return;
+ let diff=grados-ang;
  if(diff>180) diff-=360;
  if(diff<-180) diff+=360;
- angAnt+=diff;
- flecha.style.transform=`translateX(-50%) rotate(${angAnt}deg)`;
- flecha.style.background=vel<15?"blue":vel<30?"orange":"red";
+ ang+=diff;
+ f.style.transform=`translateX(-50%) rotate(${ang}deg)`;
+ f.style.background=vel<15?"blue":vel<30?"orange":"red";
 }
 
 // ===== GAUGE =====
@@ -85,7 +85,8 @@ function actualizarGrafico(t){
 function extremos(temp,hum,wind){
  const hoy=new Date().toDateString();
  let e=JSON.parse(localStorage.getItem("ext"));
- if(!e||e.fecha!==hoy) e={fecha:hoy,min:temp,max:temp,humMax:hum,windMax:wind};
+ if(!e||e.fecha!==hoy)
+   e={fecha:hoy,min:temp,max:temp,humMax:hum,windMax:wind};
  else{
   if(temp<e.min)e.min=temp;
   if(temp>e.max)e.max=temp;
@@ -142,9 +143,10 @@ async function obtenerDatos(){
   document.getElementById("windMax").innerText="Racha máx: "+ex.windMax.toFixed(1)+" km/h";
 
   const hora=new Date().getHours();
-  document.body.style.background=hora>=6&&hora<18?
-  "linear-gradient(to bottom,#87CEEB,#f0f8ff)":
-  "linear-gradient(to bottom,#001848,#0a1f44)";
+  document.body.style.background=
+    hora>=6&&hora<18
+    ?"linear-gradient(to bottom,#87CEEB,#f0f8ff)"
+    :"linear-gradient(to bottom,#001848,#0a1f44)";
 
  }catch(e){console.log("Error",e);}
 }
