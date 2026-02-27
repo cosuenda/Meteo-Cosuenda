@@ -50,13 +50,14 @@ function actualizarFlecha(grados){
 
 // ===== Gráfico temperatura =====
 let tempChart=null;
-const tLabels=[], tData=[];
-
+const tLabels=[], tData=[], tempHist=[];
 function actualizarGraficoTemp(temp){
     const ahora = new Date();
     tLabels.push(ahora.getHours() + ":" + String(ahora.getMinutes()).padStart(2,"0"));
     tData.push(temp);
-    if(tLabels.length>24){ tLabels.shift(); tData.shift(); }
+    tempHist.push(temp); // para calcular min/max diario
+
+    if(tLabels.length>24){ tLabels.shift(); tData.shift(); tempHist.shift(); }
 
     if(!tempChart){
         const ctx = document.getElementById("tempChart").getContext("2d");
@@ -92,10 +93,10 @@ function gradosADireccion(g){
 function actualizarNeon(temp){
     const el = document.getElementById("tempBig");
     let color;
-    if(temp<5) color="#00f";
-    else if(temp<15) color="#0f0";
-    else if(temp<25) color="#ff0";
-    else color="#f00";
+    if(temp<5) color="#00f";      // azul frío
+    else if(temp<15) color="#0f0"; // verde templado
+    else if(temp<25) color="#ff0"; // amarillo cálido
+    else color="#f00";             // rojo caliente
 
     let brillo = Math.min(Math.max(temp*2, 5), 60);
     el.style.color = color;
@@ -127,23 +128,15 @@ async function obtenerDatos(){
         const uvIndex = data.data.uv?.value ?? "--";
         const solar = data.data.solar_radiation?.value ?? "--";
 
-        // Actualizar temperatura principal
+        // Actualizar temperatura principal (solo número)
         document.getElementById("tempBig").textContent = tempC.toFixed(1);
 
-        // ==== Min/Max persistente con localStorage ====
-        let hoy = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-        let historial = JSON.parse(localStorage.getItem("tempHist") || "{}");
+        // Calcular min/max diario desde historial
+        const tempMinC = Math.min(...tempHist.concat(tempC));
+        const tempMaxC = Math.max(...tempHist.concat(tempC));
 
-        if(!historial[hoy]){
-            historial[hoy] = {min: tempC, max: tempC};
-        }else{
-            historial[hoy].min = Math.min(historial[hoy].min, tempC);
-            historial[hoy].max = Math.max(historial[hoy].max, tempC);
-        }
-        localStorage.setItem("tempHist", JSON.stringify(historial));
-
-        document.getElementById("tempMin").textContent = "Min diaria: " + historial[hoy].min.toFixed(1);
-        document.getElementById("tempMax").textContent = "Max diaria: " + historial[hoy].max.toFixed(1);
+        document.getElementById("tempMin").textContent = "Min diaria: " + tempMinC.toFixed(1);
+        document.getElementById("tempMax").textContent = "Max diaria: " + tempMaxC.toFixed(1);
 
         // Otros datos
         document.getElementById("hum").textContent = hum+" %";
