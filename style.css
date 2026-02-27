@@ -46,7 +46,17 @@ body.night .card{
     box-shadow:0 8px 25px rgba(0,0,0,0.3);
 }
 
-/* Temperatura con neón dinámico */
+/* Tarjeta de gráfica ancho total */
+.card-canvas {
+    grid-column: 1 / -1;
+}
+
+.card-canvas canvas {
+    width: 100% !important;
+    height: 300px !important;
+}
+
+/* Temperatura y valores grandes */
 .bigTemp{
     font-size:65px;
     font-weight:bold;
@@ -56,19 +66,6 @@ body.night .card{
         0 0 10px #00eaff,
         0 0 20px #00eaff,
         0 0 40px #00eaff;
-    margin:10px 0;
-    transition: text-shadow 0.5s, color 0.5s;
-}
-
-/* Números grandes (humedad y racha máxima) */
-.bigHum{
-    font-size:50px;
-    font-weight:bold;
-    color:#0077ff;
-    text-shadow:
-        0 0 5px #00bfff,
-        0 0 10px #00bfff,
-        0 0 20px #00bfff;
     margin:10px 0;
     transition: text-shadow 0.5s, color 0.5s;
 }
