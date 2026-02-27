@@ -46,16 +46,6 @@ body.night .card{
     box-shadow:0 8px 25px rgba(0,0,0,0.3);
 }
 
-/* Tarjeta de gráfica ancho total */
-.card-canvas {
-    grid-column: 1 / -1;
-}
-
-.card-canvas canvas {
-    width: 100% !important;
-    height: 300px !important;
-}
-
 /* Temperatura y valores grandes */
 .bigTemp{
     font-size:65px;
@@ -110,4 +100,10 @@ body.night .card{
     transform:translateX(-50%) rotate(0deg);
     border-radius:3px;
     transition: transform 1s ease;
+}
+
+/* Gráfico de temperatura más grande dentro de su tarjeta */
+.card canvas {
+    width: 100% !important;
+    height: 300px !important;
 }
