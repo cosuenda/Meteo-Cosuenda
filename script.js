@@ -151,12 +151,18 @@ function actualizarNeonHum(hum){
     el.style.textShadow = `0 0 ${brillo/12}px ${color}, 0 0 ${brillo/6}px ${color}, 0 0 ${brillo/3}px ${color}, 0 0 ${brillo}px ${color}`;
 }
 
-// ===== Lluvia mensual =====
-let mesActual = new Date().getMonth();
-let lluviaMensual = 0;
-
-// ===== Min/max diario =====
-let fechaActual = new Date().toISOString().split("T")[0];
+// ===== Neón racha máxima =====
+function actualizarNeonWind(maxViento){
+    const el = document.getElementById("windMax");
+    let color;
+    if(maxViento<20) color="#00f";      
+    else if(maxViento<40) color="#0f0"; 
+    else if(maxViento<60) color="#ff0"; 
+    else color="#f00";             
+    let brillo = Math.min(Math.max(maxViento,5),60);
+    el.style.color = color;
+    el.style.textShadow = `0 0 ${brillo/12}px ${color}, 0 0 ${brillo/6}px ${color}, 0 0 ${brillo/3}px ${color}, 0 0 ${brillo}px ${color}`;
+}
 
 // ===== Obtener datos =====
 async function obtenerDatos(){
@@ -176,28 +182,25 @@ async function obtenerDatos(){
         const windDeg = parseFloat(w.wind_direction.value);
         const rainMm = inToMm(rain.daily.value);
 
-        // ===== Lluvia mensual =====
-        const mesHoy = new Date().getMonth();
-        if(mesHoy !== mesActual){
-            mesActual = mesHoy;
-            lluviaMensual = 0;
-        }
+        // Lluvia mensual
         const lluviaMesHoy = rain.month?.value ?? 0;
-        lluviaMensual = inToMm(lluviaMesHoy);
+        const lluviaMensual = inToMm(lluviaMesHoy);
         document.getElementById("rainMonth").textContent = lluviaMensual.toFixed(1) + " mm";
 
         const pressHpa = inHgToHpa(p.relative.value);
         const uvIndex = data.data.uv?.value ?? "--";
         const solar = data.data.solar_radiation?.value ?? "--";
 
-        const hoy = new Date().toISOString().split("T")[0];
-        if(hoy !== fechaActual){ tempHist.length=0; fechaActual=hoy; }
-        tempHist.push(tempC);
+        // Racha máxima de viento
+        const windMaxKmh = mphToKmh(w.wind_gust.value ?? 0);
+        document.getElementById("windMax").textContent = windMaxKmh.toFixed(1) + " km/h";
+        actualizarNeonWind(windMaxKmh);
 
+        tempHist.push(tempC);
         const tempMinC = Math.min(...tempHist);
         const tempMaxC = Math.max(...tempHist);
 
-        // ===== Actualizar HTML =====
+        // Actualizar HTML
         document.getElementById("tempBig").textContent = tempC.toFixed(1);
         document.getElementById("sensacion").textContent = "Sensación térmica: " + calcularSensacionTermica(tempC, hum, windKm);
         document.getElementById("tempMin").textContent = "Min diaria: " + tempMinC.toFixed(1);
