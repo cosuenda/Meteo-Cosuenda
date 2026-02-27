@@ -15,26 +15,47 @@ setInterval(actualizarModo,60000);
 // ===== Rosa de los vientos =====
 function crearRosa(){
     const rosa = document.getElementById("rosa");
+    rosa.innerHTML = '<div id="flechaViento" class="flecha"></div>';
+
     for(let i=0;i<360;i+=10){
         const m = document.createElement("div");
         m.className="marca";
         m.style.transform = `translateX(-50%) rotate(${i}deg)`;
         rosa.appendChild(m);
     }
-    const puntos=["N","NE","E","SE","S","SW","W","NW"];
+
+    const puntos = ["N","NE","E","SE","S","SW","W","NW"];
     puntos.forEach((p,i)=>{
+        const ang = i*45;
+        const rad = ang*Math.PI/180;
         const c = document.createElement("div");
         c.className="cardinal";
-        const angle = i*45;
-        const radius = 90;
-        const rad = angle*Math.PI/180;
-        c.style.left = 50 + radius*Math.sin(rad)/100*100 + "%";
-        c.style.top = 50 - radius*Math.cos(rad)/100*100 + "%";
         c.textContent = p;
+        const x = 50 + Math.sin(rad)*45;
+        const y = 50 - Math.cos(rad)*45;
+        c.style.left = `${x}%`;
+        c.style.top = `${y}%`;
         rosa.appendChild(c);
     });
+
+    actualizarRosaColor();
 }
 crearRosa();
+
+function actualizarRosaColor(){
+    const rosa = document.getElementById("rosa");
+    const cardinals = rosa.querySelectorAll(".cardinal");
+    const flecha = document.getElementById("flechaViento");
+
+    if(document.body.classList.contains("night")){
+        cardinals.forEach(c => { c.style.color="#a0c4ff"; c.style.textShadow="0 0 3px #000"; });
+        flecha.style.background="#00ffff";
+    }else{
+        cardinals.forEach(c => { c.style.color="#003366"; c.style.textShadow="0 0 2px #fff"; });
+        flecha.style.background="blue";
+    }
+}
+setInterval(actualizarRosaColor,1000);
 
 // ===== Flecha viento =====
 let angAnterior = 0;
@@ -51,23 +72,19 @@ function actualizarFlecha(grados){
 // ===== Gráfico temperatura =====
 let tempChart=null;
 const tLabels=[], tData=[], tempHist=[];
+
 function actualizarGraficoTemp(temp){
     const ahora = new Date();
     tLabels.push(ahora.getHours() + ":" + String(ahora.getMinutes()).padStart(2,"0"));
     tData.push(temp);
-    tempHist.push(temp);
-    if(tLabels.length>24){ tLabels.shift(); tData.shift(); tempHist.shift(); }
+    if(tLabels.length>24){ tLabels.shift(); tData.shift(); }
 
     if(!tempChart){
         const ctx = document.getElementById("tempChart").getContext("2d");
         tempChart = new Chart(ctx,{
             type:'line',
             data:{labels:tLabels,datasets:[{data:tData,borderColor:"#ff5733",fill:false}]},
-            options:{
-                responsive:true,
-                maintainAspectRatio:false,
-                plugins:{legend:{display:false}}
-            }
+            options:{plugins:{legend:{display:false}}}
         });
     }else{
         tempChart.data.labels = tLabels;
@@ -92,24 +109,62 @@ function gradosADireccion(g){
     return d[Math.round(g/45)%8];
 }
 
-// ===== Neón dinámico según temperatura =====
+// ===== Sensación térmica =====
+function calcularSensacionTermica(tempC, hum, vientoKmh){
+    let sensacion = tempC;
+    if(tempC <= 10 && vientoKmh > 4.8){ 
+        sensacion = 13.12 + 0.6215*tempC - 11.37*Math.pow(vientoKmh,0.16) + 0.3965*tempC*Math.pow(vientoKmh,0.16);
+    }
+    else if(tempC >= 27 && hum >= 40){ 
+        const T = tempC;
+        const R = hum;
+        sensacion = -8.784695 + 1.61139411*T + 2.338549*R - 0.14611605*T*R 
+                    - 0.012308094*Math.pow(T,2) - 0.016424828*Math.pow(R,2) 
+                    + 0.002211732*Math.pow(T,2)*R + 0.00072546*T*Math.pow(R,2) 
+                    - 0.000003582*Math.pow(T,2)*Math.pow(R,2);
+    }
+    return sensacion.toFixed(1);
+}
+
+// ===== Neón temperatura =====
 function actualizarNeon(temp){
     const el = document.getElementById("tempBig");
     let color;
-    if(temp<5) color="#00f";
-    else if(temp<15) color="#0f0";
-    else if(temp<25) color="#ff0";
-    else color="#f00";
-    let brillo = Math.min(Math.max(temp*2, 5), 60);
+    if(temp<5) color="#00f";      
+    else if(temp<15) color="#0f0"; 
+    else if(temp<25) color="#ff0"; 
+    else color="#f00";             
+    let brillo = Math.min(Math.max(temp*2,5),60);
     el.style.color = color;
-    el.style.textShadow =
-        `0 0 ${brillo/12}px ${color},
-         0 0 ${brillo/6}px ${color},
-         0 0 ${brillo/3}px ${color},
-         0 0 ${brillo}px ${color}`;
+    el.style.textShadow = `0 0 ${brillo/12}px ${color}, 0 0 ${brillo/6}px ${color}, 0 0 ${brillo/3}px ${color}, 0 0 ${brillo}px ${color}`;
 }
 
-// ===== Obtener datos reales =====
+// ===== Neón humedad =====
+function actualizarNeonHum(hum){
+    const el = document.getElementById("hum");
+    let color;
+    if(hum < 30) color = "#00f";
+    else if(hum < 60) color = "#0f0";
+    else color = "#ff0";
+    let brillo = Math.min(Math.max(hum,5),60);
+    el.style.color = color;
+    el.style.textShadow = `0 0 ${brillo/12}px ${color}, 0 0 ${brillo/6}px ${color}, 0 0 ${brillo/3}px ${color}, 0 0 ${brillo}px ${color}`;
+}
+
+// ===== Neón racha máxima =====
+function actualizarNeonWind(maxViento){
+    const el = document.getElementById("windMax");
+    let color;
+    if(maxViento<20) color="#00f";      
+    else if(maxViento<40) color="#0f0"; 
+    else if(maxViento<60) color="#ff0"; 
+    else color="#f00";             
+    let brillo = Math.min(Math.max(maxViento,5),60);
+    el.style.color = color;
+    el.style.textShadow = `0 0 ${brillo/12}px ${color}, 0 0 ${brillo/6}px ${color}, 0 0 ${brillo/3}px ${color}, 0 0 ${brillo}px ${color}`;
+}
+
+// ===== Obtener datos =====
 async function obtenerDatos(){
     try{
         const response = await fetch(url);
@@ -126,16 +181,30 @@ async function obtenerDatos(){
         const windKm = mphToKmh(w.wind_speed.value);
         const windDeg = parseFloat(w.wind_direction.value);
         const rainMm = inToMm(rain.daily.value);
+
+        // Lluvia mensual
+        const lluviaMesHoy = rain.month?.value ?? 0;
+        const lluviaMensual = inToMm(lluviaMesHoy);
+        document.getElementById("rainMonth").textContent = lluviaMensual.toFixed(1) + " mm";
+
         const pressHpa = inHgToHpa(p.relative.value);
         const uvIndex = data.data.uv?.value ?? "--";
         const solar = data.data.solar_radiation?.value ?? "--";
 
+        // Racha máxima de viento
+        const windMaxKmh = mphToKmh(w.wind_gust.value ?? 0);
+        document.getElementById("windMax").textContent = windMaxKmh.toFixed(1) + " km/h";
+        actualizarNeonWind(windMaxKmh);
+
+        tempHist.push(tempC);
+        const tempMinC = Math.min(...tempHist);
+        const tempMaxC = Math.max(...tempHist);
+
+        // Actualizar HTML
         document.getElementById("tempBig").textContent = tempC.toFixed(1);
-        const tempMinC = Math.min(...tempHist.concat(tempC));
-        const tempMaxC = Math.max(...tempHist.concat(tempC));
+        document.getElementById("sensacion").textContent = "Sensación térmica: " + calcularSensacionTermica(tempC, hum, windKm);
         document.getElementById("tempMin").textContent = "Min diaria: " + tempMinC.toFixed(1);
         document.getElementById("tempMax").textContent = "Max diaria: " + tempMaxC.toFixed(1);
-
         document.getElementById("hum").textContent = hum+" %";
         document.getElementById("wind").textContent = windKm.toFixed(1)+" km/h";
         document.getElementById("windDirText").textContent = "Dirección: "+gradosADireccion(windDeg);
@@ -144,9 +213,15 @@ async function obtenerDatos(){
         document.getElementById("uv").textContent = uvIndex;
         document.getElementById("solar").textContent = solar+" W/m²";
 
+        const ahora = new Date();
+        document.getElementById("ultimaActualizacion").textContent = 
+            "Última actualización: " + ahora.getHours() + ":" + String(ahora.getMinutes()).padStart(2,"0");
+
         actualizarFlecha(windDeg);
         actualizarGraficoTemp(tempC);
         actualizarNeon(tempC);
+        actualizarNeonHum(hum);
+        actualizarRosaColor();
 
     }catch(error){
         console.log("Error conexión", error);
