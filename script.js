@@ -15,22 +15,33 @@ setInterval(actualizarModo,60000);
 // ===== Rosa de los vientos =====
 function crearRosa(){
     const rosa = document.getElementById("rosa");
+    rosa.innerHTML = '<div id="flechaViento" class="flecha"></div>'; // limpiar marcas previas
+
+    // Marcas cada 10 grados
     for(let i=0;i<360;i+=10){
         const m = document.createElement("div");
         m.className="marca";
         m.style.transform = `translateX(-50%) rotate(${i}deg)`;
         rosa.appendChild(m);
     }
-    const puntos=["N","NE","E","SE","S","SW","W","NW"];
+
+    // Puntos cardinales
+    const puntos = ["N","NE","E","SE","S","SW","W","NW"];
+    const radius = 90; // distancia desde el centro
     puntos.forEach((p,i)=>{
         const c = document.createElement("div");
         c.className="cardinal";
-        const angle = i*45;
-        const radius = 90;
-        const rad = angle*Math.PI/180;
-        c.style.left = 50 + radius*Math.sin(rad)/100*100 + "%";
-        c.style.top = 50 - radius*Math.cos(rad)/100*100 + "%";
         c.textContent = p;
+        const angle = i*45;
+        const rad = angle*Math.PI/180;
+        // Posición centrada en el borde de la rosa
+        c.style.left = 50 + (radius * Math.sin(rad) / 100 * 100) + "%";
+        c.style.top = 50 - (radius * Math.cos(rad) / 100 * 100) + "%";
+        c.style.fontSize = "16px";         
+        c.style.fontWeight = "bold";
+        c.style.color = "#ff5733";         
+        c.style.textShadow = "0 0 3px #000"; 
+        c.style.transform = "translate(-50%, -50%)";
         rosa.appendChild(c);
     });
 }
@@ -91,10 +102,10 @@ function gradosADireccion(g){
 function actualizarNeon(temp){
     const el = document.getElementById("tempBig");
     let color;
-    if(temp<5) color="#00f";      // azul frío
-    else if(temp<15) color="#0f0"; // verde templado
-    else if(temp<25) color="#ff0"; // amarillo cálido
-    else color="#f00";             // rojo caliente
+    if(temp<5) color="#00f";      
+    else if(temp<15) color="#0f0"; 
+    else if(temp<25) color="#ff0"; 
+    else color="#f00";             
 
     let brillo = Math.min(Math.max(temp*2, 5), 60);
     el.style.color = color;
