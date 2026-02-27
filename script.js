@@ -1,4 +1,4 @@
-// Modo día/noche
+// ===== Modo día/noche =====
 function actualizarModo(){
     const hora = new Date().getHours();
     if(hora>=19 || hora<6){
@@ -12,7 +12,7 @@ function actualizarModo(){
 actualizarModo();
 setInterval(actualizarModo,60000);
 
-// Rosa de los vientos
+// ===== Rosa de los vientos =====
 function crearRosa(){
     const rosa = document.getElementById("rosa");
     for(let i=0;i<360;i+=10){
@@ -36,7 +36,7 @@ function crearRosa(){
 }
 crearRosa();
 
-// Flecha viento
+// ===== Flecha viento =====
 let angAnterior = 0;
 function actualizarFlecha(grados){
     const flecha = document.getElementById("flechaViento");
@@ -48,13 +48,17 @@ function actualizarFlecha(grados){
     flecha.style.transform = `translateX(-50%) rotate(${angAnterior}deg)`;
 }
 
-// Gráfico temperatura
+// ===== Gráfico temperatura =====
 let tempChart=null;
-const tLabels=[], tData=[];
+const tLabels=[], tData=[], tempHist=[];
 function actualizarGraficoTemp(temp){
-    tLabels.push(new Date().getHours()+":"+String(new Date().getMinutes()).padStart(2,"0"));
+    const ahora = new Date();
+    tLabels.push(ahora.getHours() + ":" + String(ahora.getMinutes()).padStart(2,"0"));
     tData.push(temp);
-    if(tLabels.length>24){ tLabels.shift(); tData.shift(); }
+    tempHist.push(temp); // para calcular min/max diario
+
+    if(tLabels.length>24){ tLabels.shift(); tData.shift(); tempHist.shift(); }
+
     if(!tempChart){
         const ctx = document.getElementById("tempChart").getContext("2d");
         tempChart = new Chart(ctx,{
@@ -69,12 +73,13 @@ function actualizarGraficoTemp(temp){
     }
 }
 
-// API Ecowitt
+// ===== API Ecowitt =====
 const appKey="26C4D6AD21CF8F8C4F3BA85E1CAF6701";
 const apiKey="adf65434-1ace-43dd-b9a9-27915843d243";
 const mac="84:CC:A8:B4:B1:F6";
 const url=`https://api.ecowitt.net/api/v3/device/real_time?application_key=${appKey}&api_key=${apiKey}&mac=${mac}&call_back=all`;
 
+// ===== Conversiones =====
 const fToC = f => (parseFloat(f)-32)*5/9;
 const mphToKmh = mph => parseFloat(mph)*1.60934;
 const inToMm = inches => parseFloat(inches)*25.4;
@@ -84,7 +89,7 @@ function gradosADireccion(g){
     return d[Math.round(g/45)%8];
 }
 
-// Neón dinámico según temperatura
+// ===== Neón dinámico según temperatura =====
 function actualizarNeon(temp){
     const el = document.getElementById("tempBig");
     let color;
@@ -102,7 +107,7 @@ function actualizarNeon(temp){
          0 0 ${brillo}px ${color}`;
 }
 
-// Obtener datos reales
+// ===== Obtener datos reales =====
 async function obtenerDatos(){
     try{
         const response = await fetch(url);
@@ -123,7 +128,17 @@ async function obtenerDatos(){
         const uvIndex = data.data.uv?.value ?? "--";
         const solar = data.data.solar_radiation?.value ?? "--";
 
+        // Actualizar temperatura
         document.getElementById("tempBig").textContent = tempC.toFixed(1)+" °C";
+
+        // Calcular min/max diario desde historial
+        const tempMinC = Math.min(...tempHist.concat(tempC));
+        const tempMaxC = Math.max(...tempHist.concat(tempC));
+
+        document.getElementById("tempMin").textContent = "Min diaria: " + tempMinC.toFixed(1) + " °C";
+        document.getElementById("tempMax").textContent = "Max diaria: " + tempMaxC.toFixed(1) + " °C";
+
+        // Otros datos
         document.getElementById("hum").textContent = hum+" %";
         document.getElementById("wind").textContent = windKm.toFixed(1)+" km/h";
         document.getElementById("windDirText").textContent = "Dirección: "+gradosADireccion(windDeg);
@@ -142,4 +157,4 @@ async function obtenerDatos(){
 }
 
 obtenerDatos();
-setInterval(obtenerDatos,300000);
+setInterval(obtenerDatos,300000); // cada 5 minutos
