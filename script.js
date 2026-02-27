@@ -139,6 +139,18 @@ function actualizarNeon(temp){
     el.style.textShadow = `0 0 ${brillo/12}px ${color}, 0 0 ${brillo/6}px ${color}, 0 0 ${brillo/3}px ${color}, 0 0 ${brillo}px ${color}`;
 }
 
+// ===== Neón humedad =====
+function actualizarNeonHum(hum){
+    const el = document.getElementById("hum");
+    let color;
+    if(hum < 30) color = "#00f";
+    else if(hum < 60) color = "#0f0";
+    else color = "#ff0";
+    let brillo = Math.min(Math.max(hum,5),60);
+    el.style.color = color;
+    el.style.textShadow = `0 0 ${brillo/12}px ${color}, 0 0 ${brillo/6}px ${color}, 0 0 ${brillo/3}px ${color}, 0 0 ${brillo}px ${color}`;
+}
+
 // ===== Lluvia mensual =====
 let mesActual = new Date().getMonth();
 let lluviaMensual = 0;
@@ -205,6 +217,7 @@ async function obtenerDatos(){
         actualizarFlecha(windDeg);
         actualizarGraficoTemp(tempC);
         actualizarNeon(tempC);
+        actualizarNeonHum(hum);
         actualizarRosaColor();
 
     }catch(error){
