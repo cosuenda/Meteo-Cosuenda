@@ -128,7 +128,7 @@ async function obtenerDatos(){
         const uvIndex = data.data.uv?.value ?? "--";
         const solar = data.data.solar_radiation?.value ?? "--";
 
-        // Actualizar temperatura
+        // Actualizar temperatura principal (solo número)
         document.getElementById("tempBig").textContent = tempC.toFixed(1);
 
         // Calcular min/max diario desde historial
