@@ -3,10 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meteo Cosuenda - Panel Final</title>
+<title>Meteo Cosuenda</title>
 <link rel="icon" href="data:,">
-
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
@@ -14,14 +12,16 @@ body{
     margin:0;
     font-family:'Segoe UI', Arial, sans-serif;
     text-align:center;
-    transition: background 1s;
+    transition: background 1.5s ease;
 }
+
 header{
-    background:#0D3B66;
+    background:linear-gradient(90deg,#0D3B66,#144f91);
     color:white;
     padding:20px;
-    text-shadow:1px 1px 3px rgba(0,0,0,0.3);
+    box-shadow:0 4px 10px rgba(0,0,0,0.3);
 }
+
 .container{
     max-width:1200px;
     margin:auto;
@@ -30,145 +30,113 @@ header{
     grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
     gap:20px;
 }
+
 .card{
     background:white;
     padding:20px;
     border-radius:20px;
     box-shadow:0 10px 25px rgba(0,0,0,0.2);
-    transition: transform 0.3s;
+    transition:transform 0.3s, box-shadow 0.3s;
 }
-.card:hover{ transform: translateY(-5px); }
-.card h2{
-    margin-top:0;
-    font-size:20px;
-    color:#0D3B66;
+.card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 15px 35px rgba(0,0,0,0.3);
 }
+
 .valor{
-    font-size:38px;
+    font-size:40px;
     font-weight:bold;
-    margin:10px 0;
+    transition:all 0.5s ease;
 }
+
 .minmax{
     font-size:14px;
     color:#555;
     margin-top:5px;
 }
-.rosa-moderna{
+
+/* Rosa viento */
+.rosa{
     width:200px;
     height:200px;
     margin:20px auto;
-    position:relative;
     border-radius:50%;
     border:2px solid #0D3B66;
-    background: radial-gradient(circle at center,#e0f7fa 70%,transparent 100%);
-    box-shadow:0 0 15px rgba(0,0,0,0.2);
+    position:relative;
+    background:radial-gradient(circle,#e0f7fa 70%,transparent);
 }
-.flecha-moderna{
+
+.flecha{
     width:8px;
     height:90px;
-    background:blue;
     position:absolute;
     top:10%;
     left:50%;
     transform-origin:50% 80px;
     transform:translateX(-50%) rotate(0deg);
     border-radius:4px;
-    transition:transform 1s, background 0.5s;
 }
-.labels .punto{
-    width:4px;
-    height:4px;
-    background:#555;
-    border-radius:50%;
-    position:absolute;
-    transform:translate(-50%,-50%);
+
+/* Gauges */
+.gauge{
+    width:150px;
+    margin:auto;
 }
-.labels .cardinal{
-    position:absolute;
-    font-size:12px;
-    font-weight:bold;
-    transform:translate(-50%,-50%);
-}
-.gauge-container{
-    position:relative;
-    width:140px;
-    height:140px;
-    margin:10px auto;
-}
-.gauge-container canvas{ position:absolute; top:0; left:0; }
-canvas#tempChart{ width:100%!important; height:200px!important; }
+
 footer{
     padding:20px;
-    font-size:14px;
     grid-column:1/-1;
-    color:#333;
 }
-.oculto{ display:none; }
+
+.oculto{display:none;}
+
 @media(max-width:500px){
-    .rosa-moderna{ width:150px; height:150px; }
-    .flecha-moderna{ height:70px; transform-origin:50% 60px; }
-    .gauge-container{ width:120px; height:120px; }
+    .rosa{width:150px;height:150px;}
+    .flecha{height:70px;transform-origin:50% 60px;}
 }
 </style>
 </head>
 
 <body>
+
 <header>
 <h1>🌤️ Meteo Cosuenda</h1>
-<p>Panel Final con Alertas y Rosa Moderna</p>
+<p>Estación Meteorológica Profesional</p>
 </header>
 
 <div class="container">
 
 <div class="card">
-<h2>Temperatura</h2>
+<h2>🌡 Temperatura</h2>
 <div id="tempBig" class="valor">-- °C</div>
-<div id="tempMin" class="minmax">Min diaria: -- °C | Max diaria: -- °C</div>
-<div id="tempRecordMax" class="minmax">🏆 Récord Máx: -- °C</div>
-<div id="tempRecordMin" class="minmax">🏆 Récord Mín: -- °C</div>
+<div id="tempMin" class="minmax">Min diaria: --</div>
+<div id="tempRecordMax" class="minmax">🏆 Récord Máx: --</div>
 <canvas id="tempChart"></canvas>
 </div>
 
 <div class="card">
-<h2>Humedad</h2>
+<h2>💧 Humedad</h2>
 <div id="hum" class="valor">-- %</div>
-<div class="gauge-container"><canvas id="humGauge"></canvas></div>
-<div id="humMax" class="minmax">Max diaria: -- %</div>
+<canvas id="humGauge" class="gauge"></canvas>
 </div>
 
 <div class="card">
-<h2>Viento</h2>
+<h2>🌬 Viento</h2>
 <div id="wind" class="valor">-- km/h</div>
 <div id="windDirText" class="minmax">Dirección: --</div>
-<div id="windMax" class="minmax">Racha máxima diaria: -- km/h</div>
-
-<div class="rosa-moderna" id="rosaVientoModerna">
-    <div class="circle"></div>
-    <div class="flecha-moderna" id="flechaModerna"></div>
-    <div class="labels"></div>
+<div class="rosa">
+<div id="flecha" class="flecha"></div>
 </div>
 </div>
 
 <div class="card">
-<h2>Lluvia</h2>
-<div id="rain" class="valor">-- mm</div>
-<div id="rainMonth" class="minmax">Mes: -- mm</div>
-<div id="rainYear" class="minmax">Año: -- mm</div>
-</div>
-
-<div class="card">
-<h2>Presión</h2>
-<div id="press" class="valor">-- hPa</div>
-</div>
-
-<div class="card" id="uvCard">
-<h2>Índice UV</h2>
+<h2>☀ Índice UV</h2>
 <div id="uv" class="valor">--</div>
-<div class="gauge-container"><canvas id="uvGauge"></canvas></div>
+<canvas id="uvGauge" class="gauge"></canvas>
 </div>
 
-<div class="card" id="solarCard">
-<h2>Radiación Solar</h2>
+<div class="card">
+<h2>🌞 Radiación Solar</h2>
 <div id="solar" class="valor">-- W/m²</div>
 </div>
 
