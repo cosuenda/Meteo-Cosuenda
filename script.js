@@ -73,6 +73,7 @@ function actualizarFlecha(grados){
 // ===== Gráfico temperatura =====
 let tempChart=null;
 const tLabels=[], tData=[], tempHist=[];
+
 function actualizarGraficoTemp(temp){
     const ahora = new Date();
     tLabels.push(ahora.getHours() + ":" + String(ahora.getMinutes()).padStart(2,"0"));
@@ -125,6 +126,10 @@ function actualizarNeon(temp){
 // ===== Reinicio min/max diario por sesión =====
 let fechaActual = new Date().toISOString().split("T")[0];
 
+// ===== Lluvia mensual automática =====
+let mesActual = new Date().getMonth();
+let lluviaMensual = 0;
+
 // ===== Obtener datos reales =====
 async function obtenerDatos(){
     try{
@@ -143,10 +148,15 @@ async function obtenerDatos(){
         const windDeg = parseFloat(w.wind_direction.value);
         const rainMm = inToMm(rain.daily.value);
 
-        // Lluvia mensual
-        const rainMonthInches = rain.month?.value ?? 0; // revisa el nombre exacto según API
-        const rainMonthMm = inToMm(rainMonthInches);
-        document.getElementById("rainMonth").textContent = rainMonthMm.toFixed(1) + " mm";
+        // ===== Lluvia mensual con reinicio automático =====
+        const mesHoy = new Date().getMonth();
+        if(mesHoy !== mesActual){
+            mesActual = mesHoy;
+            lluviaMensual = 0;
+        }
+        const lluviaMesHoy = rain.month?.value ?? 0;
+        lluviaMensual = inToMm(lluviaMesHoy);
+        document.getElementById("rainMonth").textContent = lluviaMensual.toFixed(1) + " mm";
 
         const pressHpa = inHgToHpa(p.relative.value);
         const uvIndex = data.data.uv?.value ?? "--";
@@ -160,10 +170,10 @@ async function obtenerDatos(){
         const tempMinC = Math.min(...tempHist);
         const tempMaxC = Math.max(...tempHist);
 
+        // Actualizar HTML
         document.getElementById("tempBig").textContent = tempC.toFixed(1);
         document.getElementById("tempMin").textContent = "Min diaria: " + tempMinC.toFixed(1);
         document.getElementById("tempMax").textContent = "Max diaria: " + tempMaxC.toFixed(1);
-
         document.getElementById("hum").textContent = hum+" %";
         document.getElementById("wind").textContent = windKm.toFixed(1)+" km/h";
         document.getElementById("windDirText").textContent = "Dirección: "+gradosADireccion(windDeg);
