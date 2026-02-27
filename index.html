@@ -5,49 +5,53 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meteo-Cosuenda</title>
 
-<link rel="icon" href="images/favicon.ico">
+<link rel="icon" href="data:,">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body{
   font-family:Arial, sans-serif;
-  text-align:center;
   margin:0;
   padding:20px;
+  text-align:center;
   transition:background 1s;
 }
 
-.container{max-width:1100px;margin:auto;}
+h1{margin-bottom:10px;}
 
-.bigTemp{font-size:65px;font-weight:bold;}
+.bigTemp{
+  font-size:70px;
+  font-weight:bold;
+}
 
 .grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
   gap:15px;
+  margin-top:20px;
 }
 
 .card{
   background:white;
   padding:15px;
   border-radius:15px;
-  box-shadow:0 4px 10px rgba(0,0,0,0.2);
+  box-shadow:0 4px 12px rgba(0,0,0,0.2);
 }
 
-/* ROSA */
+/* ROSA VIENTO */
 .rosa{
   position:relative;
   width:220px;
   height:220px;
   border:3px solid #333;
   border-radius:50%;
-  margin:20px auto;
+  margin:25px auto;
 }
 
 .marca{
   position:absolute;
   width:2px;
-  height:10px;
+  height:12px;
   background:#333;
   left:50%;
   top:0;
@@ -65,14 +69,14 @@ body{
   width:6px;
   height:90px;
   background:blue;
-  top:20px;
+  top:25px;
   left:50%;
   transform-origin:bottom center;
   transform:translateX(-50%) rotate(0deg);
   border-radius:3px;
 }
 
-/* GAUGE */
+/* GAUGES */
 .gauge{
   width:120px;
   height:60px;
@@ -80,8 +84,9 @@ body{
   border-top-left-radius:120px;
   border-top-right-radius:120px;
   border-bottom:none;
-  position:relative;
   margin:auto;
+  position:relative;
+  overflow:hidden;
 }
 
 .gaugeFill{
@@ -97,8 +102,6 @@ body{
 </head>
 
 <body>
-
-<div class="container">
 
 <h1>🌤 Meteo-Cosuenda</h1>
 
@@ -133,7 +136,7 @@ body{
 </div>
 
 <div class="card">
-<h3>UV</h3>
+<h3>Índice UV</h3>
 <div class="gauge"><div class="gaugeFill" id="uvGauge"></div></div>
 <p id="uvText"></p>
 </div>
@@ -145,33 +148,25 @@ body{
 
 </div>
 
-<!-- ROSA -->
 <div class="rosa" id="rosa">
 <div class="flecha" id="flechaViento"></div>
 </div>
 
-<!-- EXTREMOS -->
 <div class="card">
 <h3>Extremos del día</h3>
 <p id="tempMin"></p>
 <p id="tempMax"></p>
 <p id="humMax"></p>
 <p id="windMax"></p>
-<p id="recordMax"></p>
-<p id="recordMin"></p>
 </div>
 
 <div class="card">
 <canvas id="tempChart"></canvas>
 </div>
 
-</div>
-
 <script src="script.js"></script>
-
 </body>
 </html>
-
 
 
 
