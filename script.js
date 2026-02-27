@@ -12,7 +12,7 @@ function actualizarModo(){
 actualizarModo();
 setInterval(actualizarModo,60000);
 
-// ===== Rosa de los vientos =====
+// ===== Rosa de los vientos con modo día/noche =====
 function crearRosa(){
     const rosa = document.getElementById("rosa");
     rosa.innerHTML = '<div id="flechaViento" class="flecha"></div>'; // limpiar marcas previas
@@ -27,25 +27,39 @@ function crearRosa(){
 
     // Puntos cardinales
     const puntos = ["N","NE","E","SE","S","SW","W","NW"];
-    const radius = 90; // distancia desde el centro
+    const radius = 90; 
     puntos.forEach((p,i)=>{
         const c = document.createElement("div");
         c.className="cardinal";
         c.textContent = p;
         const angle = i*45;
         const rad = angle*Math.PI/180;
-        // Posición centrada en el borde de la rosa
         c.style.left = 50 + (radius * Math.sin(rad) / 100 * 100) + "%";
         c.style.top = 50 - (radius * Math.cos(rad) / 100 * 100) + "%";
         c.style.fontSize = "16px";         
         c.style.fontWeight = "bold";
-        c.style.color = "#ff5733";         
-        c.style.textShadow = "0 0 3px #000"; 
+        c.style.textShadow = "0 0 3px #000";
         c.style.transform = "translate(-50%, -50%)";
         rosa.appendChild(c);
     });
+
+    actualizarRosaColor(); // color inicial según modo
 }
-crearRosa();
+
+// ===== Actualizar colores de la rosa según modo =====
+function actualizarRosaColor(){
+    const rosa = document.getElementById("rosa");
+    const cardinals = rosa.querySelectorAll(".cardinal");
+    const flecha = document.getElementById("flechaViento");
+    if(document.body.classList.contains("night")){
+        cardinals.forEach(c=>c.style.color="#a0c4ff");
+        flecha.style.background = "#0ff";
+    }else{
+        cardinals.forEach(c=>c.style.color="#ff5733");
+        flecha.style.background = "blue";
+    }
+}
+setInterval(actualizarRosaColor,1000);
 
 // ===== Flecha viento =====
 let angAnterior = 0;
@@ -147,10 +161,8 @@ async function obtenerDatos(){
             fechaActual = hoy;
         }
 
-        // Guardar temperatura actual
         tempHist.push(tempC);
 
-        // Calcular min/max
         const tempMinC = Math.min(...tempHist);
         const tempMaxC = Math.max(...tempHist);
 
@@ -170,6 +182,7 @@ async function obtenerDatos(){
         actualizarFlecha(windDeg);
         actualizarGraficoTemp(tempC);
         actualizarNeon(tempC);
+        actualizarRosaColor();
 
     }catch(error){
         console.log("Error conexión", error);
@@ -177,4 +190,4 @@ async function obtenerDatos(){
 }
 
 obtenerDatos();
-setInterval(obtenerDatos,300000); // cada 5 minutos
+setInterval(obtenerDatos,300000);
