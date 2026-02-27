@@ -6,65 +6,73 @@
 <title>Meteo-Cosuenda</title>
 
 <link rel="icon" href="images/favicon.ico">
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body{
-  font-family: Arial, sans-serif;
+  font-family:Arial, sans-serif;
   text-align:center;
   margin:0;
   padding:20px;
-  transition: background 1s;
+  transition:background 1s;
 }
 
-.weather-container{
-  max-width:900px;
-  margin:auto;
-}
+.container{max-width:1100px;margin:auto;}
 
-.big-temp{
-  font-size:60px;
-  font-weight:bold;
+.bigTemp{font-size:65px;font-weight:bold;}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:15px;
 }
 
 .card{
   background:white;
   padding:15px;
-  margin:10px;
   border-radius:15px;
   box-shadow:0 4px 10px rgba(0,0,0,0.2);
 }
 
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-  gap:15px;
-}
-
-/* Rosa viento */
+/* ROSA */
 .rosa{
   position:relative;
-  width:200px;
-  height:200px;
-  border:2px solid #333;
+  width:220px;
+  height:220px;
+  border:3px solid #333;
   border-radius:50%;
   margin:20px auto;
 }
 
+.marca{
+  position:absolute;
+  width:2px;
+  height:10px;
+  background:#333;
+  left:50%;
+  top:0;
+  transform-origin:bottom center;
+}
+
+.cardinal{
+  position:absolute;
+  font-weight:bold;
+  font-size:14px;
+}
+
 .flecha{
   position:absolute;
-  top:10px;
-  left:50%;
   width:6px;
-  height:80px;
+  height:90px;
   background:blue;
+  top:20px;
+  left:50%;
   transform-origin:bottom center;
   transform:translateX(-50%) rotate(0deg);
   border-radius:3px;
 }
 
-/* Gauge */
+/* GAUGE */
 .gauge{
   width:120px;
   height:60px;
@@ -74,16 +82,14 @@ body{
   border-bottom:none;
   position:relative;
   margin:auto;
-  overflow:hidden;
 }
 
-.gauge-fill{
+.gaugeFill{
   width:100%;
   height:100%;
   background:green;
   position:absolute;
   top:100%;
-  left:0;
   transform-origin:center top;
   transform:rotate(0deg);
 }
@@ -92,64 +98,69 @@ body{
 
 <body>
 
-<div class="weather-container">
+<div class="container">
 
 <h1>🌤 Meteo-Cosuenda</h1>
 
-<div class="big-temp" id="tempBig">-- °C</div>
+<div class="bigTemp" id="tempBig">-- °C</div>
+<div id="feelsLike"></div>
 
 <div class="grid">
 
 <div class="card">
-<p>Humedad</p>
-<div class="gauge">
-<div class="gauge-fill" id="humGauge"></div>
-</div>
-<p id="hum">-- %</p>
+<h3>Humedad</h3>
+<div class="gauge"><div class="gaugeFill" id="humGauge"></div></div>
+<p id="hum"></p>
 </div>
 
 <div class="card">
-<p>Viento</p>
-<p id="wind">-- km/h</p>
-<p id="windDirText">Dirección: --</p>
+<h3>Viento</h3>
+<p id="wind"></p>
+<p id="gust"></p>
+<p id="windDirText"></p>
 </div>
 
 <div class="card">
-<p>Lluvia</p>
-<p id="rain">-- mm</p>
-</div>
-
-<div class="card">
-<p>Presión</p>
-<p id="press">-- hPa</p>
-</div>
-
-<div class="card">
-<p>UV</p>
-<div class="gauge">
-<div class="gauge-fill" id="uvGauge"></div>
-</div>
-</div>
-
-</div>
-
-<!-- Rosa viento -->
-<div class="rosa">
-<div class="flecha" id="flechaViento"></div>
-</div>
-
-<!-- Extremos -->
-<div class="card">
-<p id="tempMin"></p>
-<p id="humMax"></p>
-<p id="windMax"></p>
-<p id="tempRecordMax"></p>
-<p id="tempRecordMin"></p>
+<h3>Lluvia</h3>
+<p id="rainDay"></p>
 <p id="rainMonth"></p>
 <p id="rainYear"></p>
 </div>
 
-<!-- Gráfico -->
+<div class="card">
+<h3>Presión</h3>
+<p id="press"></p>
+</div>
+
+<div class="card">
+<h3>UV</h3>
+<div class="gauge"><div class="gaugeFill" id="uvGauge"></div></div>
+<p id="uvText"></p>
+</div>
+
+<div class="card">
+<h3>Radiación Solar</h3>
+<p id="solar"></p>
+</div>
+
+</div>
+
+<!-- ROSA -->
+<div class="rosa" id="rosa">
+<div class="flecha" id="flechaViento"></div>
+</div>
+
+<!-- EXTREMOS -->
+<div class="card">
+<h3>Extremos del día</h3>
+<p id="tempMin"></p>
+<p id="tempMax"></p>
+<p id="humMax"></p>
+<p id="windMax"></p>
+<p id="recordMax"></p>
+<p id="recordMin"></p>
+</div>
+
 <div class="card">
 <canvas id="tempChart"></canvas>
 </div>
