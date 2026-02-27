@@ -12,12 +12,11 @@ function actualizarModo(){
 actualizarModo();
 setInterval(actualizarModo,60000);
 
-// ===== Rosa de los vientos con modo día/noche =====
+// ===== Rosa de los vientos =====
 function crearRosa(){
     const rosa = document.getElementById("rosa");
-    rosa.innerHTML = '<div id="flechaViento" class="flecha"></div>'; // limpiar marcas previas
+    rosa.innerHTML = '<div id="flechaViento" class="flecha"></div>';
 
-    // Marcas cada 10 grados
     for(let i=0;i<360;i+=10){
         const m = document.createElement("div");
         m.className="marca";
@@ -25,38 +24,36 @@ function crearRosa(){
         rosa.appendChild(m);
     }
 
-    // Puntos cardinales
     const puntos = ["N","NE","E","SE","S","SW","W","NW"];
-    const radius = 90; 
     puntos.forEach((p,i)=>{
+        const ang = i*45;
+        const rad = ang*Math.PI/180;
         const c = document.createElement("div");
         c.className="cardinal";
         c.textContent = p;
-        const angle = i*45;
-        const rad = angle*Math.PI/180;
-        c.style.left = 50 + (radius * Math.sin(rad) / 100 * 100) + "%";
-        c.style.top = 50 - (radius * Math.cos(rad) / 100 * 100) + "%";
-        c.style.fontSize = "16px";         
-        c.style.fontWeight = "bold";
-        c.style.textShadow = "0 0 3px #000";
-        c.style.transform = "translate(-50%, -50%)";
+        const x = 50 + Math.sin(rad)*45;
+        const y = 50 - Math.cos(rad)*45;
+        c.style.left = `${x}%`;
+        c.style.top = `${y}%`;
         rosa.appendChild(c);
     });
 
-    actualizarRosaColor(); // color inicial según modo
+    actualizarRosaColor();
 }
+crearRosa();
 
-// ===== Actualizar colores de la rosa según modo =====
+// ===== Colores rosa/flecha según modo =====
 function actualizarRosaColor(){
     const rosa = document.getElementById("rosa");
     const cardinals = rosa.querySelectorAll(".cardinal");
     const flecha = document.getElementById("flechaViento");
+
     if(document.body.classList.contains("night")){
-        cardinals.forEach(c=>c.style.color="#a0c4ff");
-        flecha.style.background = "#0ff";
+        cardinals.forEach(c => { c.style.color="#a0c4ff"; c.style.textShadow="0 0 3px #000"; });
+        flecha.style.background="#00ffff";
     }else{
-        cardinals.forEach(c=>c.style.color="#ff5733");
-        flecha.style.background = "blue";
+        cardinals.forEach(c => { c.style.color="#003366"; c.style.textShadow="0 0 2px #fff"; });
+        flecha.style.background="blue";
     }
 }
 setInterval(actualizarRosaColor,1000);
@@ -112,7 +109,7 @@ function gradosADireccion(g){
     return d[Math.round(g/45)%8];
 }
 
-// ===== Neón dinámico según temperatura =====
+// ===== Neón temperatura =====
 function actualizarNeon(temp){
     const el = document.getElementById("tempBig");
     let color;
@@ -120,14 +117,9 @@ function actualizarNeon(temp){
     else if(temp<15) color="#0f0"; 
     else if(temp<25) color="#ff0"; 
     else color="#f00";             
-
-    let brillo = Math.min(Math.max(temp*2, 5), 60);
+    let brillo = Math.min(Math.max(temp*2,5),60);
     el.style.color = color;
-    el.style.textShadow =
-        `0 0 ${brillo/12}px ${color},
-         0 0 ${brillo/6}px ${color},
-         0 0 ${brillo/3}px ${color},
-         0 0 ${brillo}px ${color}`;
+    el.style.textShadow = `0 0 ${brillo/12}px ${color}, 0 0 ${brillo/6}px ${color}, 0 0 ${brillo/3}px ${color}, 0 0 ${brillo}px ${color}`;
 }
 
 // ===== Reinicio min/max diario por sesión =====
@@ -154,19 +146,14 @@ async function obtenerDatos(){
         const uvIndex = data.data.uv?.value ?? "--";
         const solar = data.data.solar_radiation?.value ?? "--";
 
-        // Reiniciar historial si cambia el día
         const hoy = new Date().toISOString().split("T")[0];
-        if(hoy !== fechaActual){
-            tempHist.length = 0;
-            fechaActual = hoy;
-        }
+        if(hoy !== fechaActual){ tempHist.length=0; fechaActual=hoy; }
 
         tempHist.push(tempC);
 
         const tempMinC = Math.min(...tempHist);
         const tempMaxC = Math.max(...tempHist);
 
-        // Actualizar DOM
         document.getElementById("tempBig").textContent = tempC.toFixed(1);
         document.getElementById("tempMin").textContent = "Min diaria: " + tempMinC.toFixed(1);
         document.getElementById("tempMax").textContent = "Max diaria: " + tempMaxC.toFixed(1);
