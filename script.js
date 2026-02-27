@@ -5,109 +5,148 @@ const mac="84:CC:A8:B4:B1:F6";
 
 const url=`https://api.ecowitt.net/api/v3/device/real_time?application_key=${appKey}&api_key=${apiKey}&mac=${mac}&call_back=all`;
 
-// ====== CONVERSIONES ======
-const fToC = f => ((parseFloat(f)-32)*5/9);
-const mphToKmh = mph => parseFloat(mph)*1.60934;
-const inToMm = inches => parseFloat(inches)*25.4;
-const inHgToHpa = inHg => parseFloat(inHg)*33.8639;
+// ===== CONVERSIONES =====
+const fToC=f=>(f-32)*5/9;
+const mphToKmh=m=>m*1.60934;
+const inToMm=i=>i*25.4;
+const inHgToHpa=i=>i*33.8639;
 
-function gradosADireccion(grados){
-    const dir=["N","NE","E","SE","S","SW","W","NW"];
-    return dir[Math.round(grados/45)%8];
+function gradosADireccion(g){
+ const d=["N","NE","E","SE","S","SW","W","NW"];
+ return d[Math.round(g/45)%8];
 }
 
-// ==== Rosa viento segura ====
-let angAnterior=0;
-function actualizarFlecha(grados, velocidad){
-    const flecha=document.getElementById("flechaViento");
-    if(!flecha) return;
+// ===== ROSA MARCAS =====
+function crearRosa(){
+ const rosa=document.getElementById("rosa");
+ for(let i=0;i<360;i+=10){
+   const marca=document.createElement("div");
+   marca.className="marca";
+   marca.style.transform=`translateX(-50%) rotate(${i}deg)`;
+   rosa.appendChild(marca);
+ }
+ const puntos=["N","E","S","W"];
+ const posiciones=[[50,5],[95,50],[50,95],[5,50]];
+ puntos.forEach((p,i)=>{
+   const el=document.createElement("div");
+   el.className="cardinal";
+   el.style.left=posiciones[i][0]+"%";
+   el.style.top=posiciones[i][1]+"%";
+   el.style.transform="translate(-50%,-50%)";
+   el.innerText=p;
+   rosa.appendChild(el);
+ });
+}
+crearRosa();
 
-    let diff=grados-angAnterior;
-    if(diff>180) diff-=360;
-    if(diff<-180) diff+=360;
-    angAnterior+=diff;
-
-    flecha.style.transform=`translateX(-50%) rotate(${angAnterior}deg)`;
-
-    if(velocidad<15) flecha.style.background="blue";
-    else if(velocidad<30) flecha.style.background="orange";
-    else flecha.style.background="red";
+// ===== FLECHA =====
+let angAnt=0;
+function actualizarFlecha(grados,vel){
+ const flecha=document.getElementById("flechaViento");
+ if(!flecha) return;
+ let diff=grados-angAnt;
+ if(diff>180) diff-=360;
+ if(diff<-180) diff+=360;
+ angAnt+=diff;
+ flecha.style.transform=`translateX(-50%) rotate(${angAnt}deg)`;
+ flecha.style.background=vel<15?"blue":vel<30?"orange":"red";
 }
 
-// ==== Gauge ====
-function actualizarGauge(id, valor, max){
-    const fill=document.getElementById(id+"Gauge");
-    if(!fill) return;
-    const grados=(valor/max)*180;
-    fill.style.transform=`rotate(${grados}deg)`;
+// ===== GAUGE =====
+function actualizarGauge(id,val,max){
+ const g=document.getElementById(id+"Gauge");
+ if(!g) return;
+ const deg=(val/max)*180;
+ g.style.transform=`rotate(${deg}deg)`;
 }
 
-// ==== Gráfico ====
-let tempChart=null;
-const tiempos=[], temperaturas=[];
-
-function actualizarGraficoTemp(temp){
-    const ahora=new Date();
-    tiempos.push(ahora.getHours()+":"+ahora.getMinutes());
-    temperaturas.push(temp);
-    if(tiempos.length>24){ tiempos.shift(); temperaturas.shift(); }
-
-    if(!tempChart){
-        const ctx=document.getElementById("tempChart").getContext("2d");
-        tempChart=new Chart(ctx,{
-            type:'line',
-            data:{
-                labels:tiempos,
-                datasets:[{
-                    label:"°C",
-                    data:temperaturas,
-                    borderColor:"#ff5733",
-                    fill:false,
-                    tension:0.3
-                }]
-            },
-            options:{responsive:true}
-        });
-    }else{
-        tempChart.data.labels=tiempos;
-        tempChart.data.datasets[0].data=temperaturas;
-        tempChart.update();
-    }
+// ===== GRÁFICO =====
+let chart;
+const labels=[],temps=[];
+function actualizarGrafico(t){
+ const ahora=new Date();
+ labels.push(ahora.getHours()+":"+String(ahora.getMinutes()).padStart(2,"0"));
+ temps.push(t);
+ if(labels.length>24){labels.shift();temps.shift();}
+ if(!chart){
+  chart=new Chart(document.getElementById("tempChart"),{
+   type:"line",
+   data:{labels:labels,datasets:[{data:temps,borderColor:"#ff5733",tension:.3}]},
+   options:{plugins:{legend:{display:false}}}
+  });
+ }else{
+  chart.data.labels=labels;
+  chart.data.datasets[0].data=temps;
+  chart.update();
+ }
 }
 
-// ====== PRINCIPAL ======
+// ===== EXTREMOS =====
+function extremos(temp,hum,wind){
+ const hoy=new Date().toDateString();
+ let e=JSON.parse(localStorage.getItem("ext"));
+ if(!e||e.fecha!==hoy) e={fecha:hoy,min:temp,max:temp,humMax:hum,windMax:wind};
+ else{
+  if(temp<e.min)e.min=temp;
+  if(temp>e.max)e.max=temp;
+  if(hum>e.humMax)e.humMax=hum;
+  if(wind>e.windMax)e.windMax=wind;
+ }
+ localStorage.setItem("ext",JSON.stringify(e));
+ return e;
+}
+
+// ===== PRINCIPAL =====
 async function obtenerDatos(){
-    try{
-        const response=await fetch(url);
-        const data=await response.json();
-        if(data.code!==0) return;
+ try{
+  const r=await fetch(url);
+  const d=await r.json();
+  if(d.code!==0) return;
 
-        const outdoor=data.data.outdoor;
-        const wind=data.data.wind;
-        const rainfall=data.data.rainfall;
-        const pressure=data.data.pressure;
+  const o=d.data.outdoor;
+  const w=d.data.wind;
+  const rain=d.data.rainfall;
+  const p=d.data.pressure;
 
-        const tempC=fToC(outdoor.temperature.value);
-        const hum=parseFloat(outdoor.humidity.value);
-        const windKm=mphToKmh(wind.wind_speed.value);
-        const rainMm=inToMm(rainfall.daily.value);
-        const pressHpa=inHgToHpa(pressure.relative.value);
-        const windDeg=parseFloat(wind.wind_direction.value);
+  const temp=fToC(o.temperature.value);
+  const feels=fToC(o.feels_like?.value||o.temperature.value);
+  const hum=o.humidity.value;
+  const wind=mphToKmh(w.wind_speed.value);
+  const gust=mphToKmh(w.wind_gust.value);
+  const deg=w.wind_direction.value;
+  const rainDay=inToMm(rain.daily.value);
+  const press=inHgToHpa(p.relative.value);
+  const uv=o.uv?.value||0;
+  const solar=o.solar_radiation?.value||0;
 
-        document.getElementById("tempBig").textContent=tempC.toFixed(1)+" °C";
-        document.getElementById("hum").textContent=hum+" %";
-        document.getElementById("wind").textContent=windKm.toFixed(1)+" km/h";
-        document.getElementById("rain").textContent=rainMm.toFixed(1)+" mm";
-        document.getElementById("press").textContent=pressHpa.toFixed(1)+" hPa";
-        document.getElementById("windDirText").textContent="Dirección: "+gradosADireccion(windDeg);
+  document.getElementById("tempBig").innerText=temp.toFixed(1)+" °C";
+  document.getElementById("feelsLike").innerText="Sensación: "+feels.toFixed(1)+" °C";
+  document.getElementById("hum").innerText=hum+" %";
+  document.getElementById("wind").innerText="Viento: "+wind.toFixed(1)+" km/h";
+  document.getElementById("gust").innerText="Racha: "+gust.toFixed(1)+" km/h";
+  document.getElementById("windDirText").innerText="Dirección: "+deg+"° "+gradosADireccion(deg);
+  document.getElementById("rainDay").innerText="Hoy: "+rainDay.toFixed(1)+" mm";
+  document.getElementById("press").innerText=press.toFixed(1)+" hPa";
+  document.getElementById("uvText").innerText="Índice UV: "+uv;
+  document.getElementById("solar").innerText=solar+" W/m²";
 
-        actualizarFlecha(windDeg, windKm);
-        actualizarGauge("hum", hum, 100);
-        actualizarGraficoTemp(tempC);
+  actualizarFlecha(deg,wind);
+  actualizarGauge("hum",hum,100);
+  actualizarGauge("uv",uv,11);
+  actualizarGrafico(temp);
 
-    }catch(error){
-        console.log("Error conexión", error);
-    }
+  const ex=extremos(temp,hum,wind);
+  document.getElementById("tempMin").innerText="Mín: "+ex.min.toFixed(1)+" °C";
+  document.getElementById("tempMax").innerText="Máx: "+ex.max.toFixed(1)+" °C";
+  document.getElementById("humMax").innerText="Humedad máx: "+ex.humMax+" %";
+  document.getElementById("windMax").innerText="Racha máx: "+ex.windMax.toFixed(1)+" km/h";
+
+  const hora=new Date().getHours();
+  document.body.style.background=hora>=6&&hora<18?
+  "linear-gradient(to bottom,#87CEEB,#f0f8ff)":
+  "linear-gradient(to bottom,#001848,#0a1f44)";
+
+ }catch(e){console.log("Error",e);}
 }
 
 obtenerDatos();
