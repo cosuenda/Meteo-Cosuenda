@@ -3,171 +3,149 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meteo-Cosuenda</title>
-
-<link rel="icon" href="data:,">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>Meteo Cosuenda</title>
 
 <style>
 body{
-  font-family:Arial, sans-serif;
-  margin:0;
-  padding:20px;
-  text-align:center;
-  transition:background 1s;
+    margin:0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    text-align:center;
+    transition: background 1s;
+    color:white;
 }
 
-h1{margin-bottom:10px;}
-
-.bigTemp{
-  font-size:70px;
-  font-weight:bold;
+header{
+    padding:25px;
+    font-size:22px;
+    font-weight:bold;
 }
 
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
-  gap:15px;
-  margin-top:20px;
+.container{
+    max-width:1100px;
+    margin:auto;
+    padding:20px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
 }
 
 .card{
-  background:white;
-  padding:15px;
-  border-radius:15px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.2);
+    background:rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+    border-radius:20px;
+    padding:25px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.3);
 }
 
-/* ROSA VIENTO */
-.rosa{
-  position:relative;
-  width:220px;
-  height:220px;
-  border:3px solid #333;
-  border-radius:50%;
-  margin:25px auto;
+/* TEMPERATURA NEÓN */
+.bigTemp{
+    font-size:80px;
+    font-weight:800;
+    letter-spacing:2px;
+    transition: all 0.5s ease;
 }
 
-.marca{
-  position:absolute;
-  width:2px;
-  height:12px;
-  background:#333;
-  left:50%;
-  top:0;
-  transform-origin:bottom center;
+/* Frío */
+.frio{
+    color:#00eaff;
+    text-shadow:
+      0 0 5px rgba(0,234,255,0.9),
+      0 0 15px rgba(0,234,255,0.6),
+      0 0 30px rgba(0,234,255,0.4);
 }
 
-.cardinal{
-  position:absolute;
-  font-weight:bold;
-  font-size:14px;
+/* Templado */
+.templado{
+    color:#ffae00;
+    text-shadow:
+      0 0 5px rgba(255,174,0,0.8),
+      0 0 15px rgba(255,174,0,0.5),
+      0 0 30px rgba(255,174,0,0.3);
 }
 
-.flecha{
-  position:absolute;
-  width:6px;
-  height:90px;
-  background:blue;
-  top:25px;
-  left:50%;
-  transform-origin:bottom center;
-  transform:translateX(-50%) rotate(0deg);
-  border-radius:3px;
+/* Calor */
+.calor{
+    color:#ff3c00;
+    text-shadow:
+      0 0 5px rgba(255,60,0,0.9),
+      0 0 15px rgba(255,60,0,0.6),
+      0 0 35px rgba(255,60,0,0.4);
 }
 
-/* GAUGES */
-.gauge{
-  width:120px;
-  height:60px;
-  border:10px solid #ddd;
-  border-top-left-radius:120px;
-  border-top-right-radius:120px;
-  border-bottom:none;
-  margin:auto;
-  position:relative;
-  overflow:hidden;
+.valor{
+    font-size:28px;
+    font-weight:600;
 }
 
-.gaugeFill{
-  width:100%;
-  height:100%;
-  background:green;
-  position:absolute;
-  top:100%;
-  transform-origin:center top;
-  transform:rotate(0deg);
+.minmax{
+    font-size:15px;
+    opacity:0.8;
+}
+
+footer{
+    padding:20px;
+    font-size:14px;
+    opacity:0.7;
 }
 </style>
 </head>
 
 <body>
 
-<h1>🌤 Meteo-Cosuenda</h1>
+<header>
+🌤️ Meteo Cosuenda · Estación HP2550
+</header>
 
-<div class="bigTemp" id="tempBig">-- °C</div>
-<div id="feelsLike"></div>
-
-<div class="grid">
-
-<div class="card">
-<h3>Humedad</h3>
-<div class="gauge"><div class="gaugeFill" id="humGauge"></div></div>
-<p id="hum"></p>
-</div>
+<div class="container">
 
 <div class="card">
-<h3>Viento</h3>
-<p id="wind"></p>
-<p id="gust"></p>
-<p id="windDirText"></p>
+<h2>Temperatura</h2>
+<div id="tempBig" class="bigTemp">-- °C</div>
+<div id="tempMin" class="minmax">Min diaria: --</div>
+<div id="tempMax" class="minmax">Max diaria: --</div>
 </div>
 
 <div class="card">
-<h3>Lluvia</h3>
-<p id="rainDay"></p>
-<p id="rainMonth"></p>
-<p id="rainYear"></p>
+<h2>Humedad</h2>
+<div id="hum" class="valor">-- %</div>
 </div>
 
 <div class="card">
-<h3>Presión</h3>
-<p id="press"></p>
+<h2>Viento</h2>
+<div id="wind" class="valor">-- km/h</div>
+<div id="windDirText" class="minmax">Dirección: --</div>
 </div>
 
 <div class="card">
-<h3>Índice UV</h3>
-<div class="gauge"><div class="gaugeFill" id="uvGauge"></div></div>
-<p id="uvText"></p>
+<h2>Lluvia</h2>
+<div id="rain" class="valor">-- mm</div>
 </div>
 
 <div class="card">
-<h3>Radiación Solar</h3>
-<p id="solar"></p>
-</div>
-
-</div>
-
-<div class="rosa" id="rosa">
-<div class="flecha" id="flechaViento"></div>
+<h2>Presión</h2>
+<div id="press" class="valor">-- hPa</div>
 </div>
 
 <div class="card">
-<h3>Extremos del día</h3>
-<p id="tempMin"></p>
-<p id="tempMax"></p>
-<p id="humMax"></p>
-<p id="windMax"></p>
+<h2>Índice UV</h2>
+<div id="uv" class="valor">--</div>
 </div>
 
 <div class="card">
-<canvas id="tempChart"></canvas>
+<h2>Radiación Solar</h2>
+<div id="solar" class="valor">-- W/m²</div>
 </div>
+
+</div>
+
+<footer>
+Actualización automática cada 5 minutos
+</footer>
 
 <script src="script.js"></script>
+
 </body>
 </html>
-
 
 
 
