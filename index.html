@@ -23,18 +23,20 @@
 <div class="card">
 <h2>Temperatura</h2>
 <div id="tempBig" class="bigTemp">--</div>
+<div id="sensacion">--</div>
 <div id="tempMin">Min diaria: --</div>
 <div id="tempMax">Max diaria: --</div>
+<div id="ultimaActualizacion">Última actualización: --</div>
 </div>
 
 <div class="card">
 <h2>Humedad</h2>
-<div id="hum" class="bigTemp">-- %</div>
+<div id="hum" class="bigHum">-- %</div>
 </div>
 
 <div class="card">
 <h2>Viento</h2>
-<div id="wind" class="bigTemp">-- km/h</div>
+<div id="wind">-- km/h</div>
 <div id="windDirText">Dirección: --</div>
 
 <div class="rosa" id="rosa">
@@ -43,30 +45,34 @@
 </div>
 
 <div class="card">
+<h2>Racha máxima de viento</h2>
+<div id="windMax" class="bigHum">-- km/h</div>
+</div>
+
+<div class="card">
 <h2>Lluvia diaria</h2>
-<div id="rain" class="bigTemp">-- mm</div>
+<div id="rain">-- mm</div>
+<h2>Lluvia mensual</h2>
+<div id="rainMonth">-- mm</div>
 </div>
 
 <div class="card">
 <h2>Presión</h2>
-<div id="press" class="bigTemp">-- hPa</div>
+<div id="press">-- hPa</div>
 </div>
 
 <div class="card">
 <h2>Índice UV</h2>
-<div id="uv" class="bigTemp">--</div>
+<div id="uv">--</div>
 </div>
 
 <div class="card">
 <h2>Radiación Solar</h2>
-<div id="solar" class="bigTemp">-- W/m²</div>
+<div id="solar">-- W/m²</div>
 </div>
 
-<!-- Gráfico dentro de su tarjeta, más grande -->
 <div class="card">
 <canvas id="tempChart"></canvas>
-</div>
-
 </div>
 
 <script src="script.js"></script>
