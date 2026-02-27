@@ -83,10 +83,10 @@ body.night .card{
 
 .cardinal{
     position:absolute;
-    font-size:14px;
+    font-size:15px;
     font-weight:bold;
     transform: translate(-50%, -50%);
-    color:#003366;
+    pointer-events:none;
 }
 
 .flecha{
