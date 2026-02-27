@@ -1,18 +1,22 @@
 body{
     margin:0;
-    font-family:Arial, sans-serif;
+    font-family: Arial, sans-serif;
     text-align:center;
     transition: background 1s, color 1s;
 }
 
-/* Modo día/noche */
-body.day{background:#e0f7fa; color:#000;}
-body.night{background:#001f3f; color:#fff;}
+body.day{
+    background: linear-gradient(to bottom, #87ceeb, #f0f8ff);
+    color:#003366;
+}
+body.night{
+    background: linear-gradient(to bottom, #00122e, #003366);
+    color:#a0c4ff;
+}
 
 header{
-    background:#003366;
-    color:white;
     padding:20px;
+    box-shadow:0 3px 8px rgba(0,0,0,0.3);
 }
 
 .container{
@@ -21,22 +25,39 @@ header{
     padding:20px;
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-    gap:15px;
+    gap:20px;
 }
 
 .card{
     background:white;
     padding:15px;
     border-radius:15px;
-    box-shadow:0 4px 10px rgba(0,0,0,0.2);
+    box-shadow:0 4px 15px rgba(0,0,0,0.2);
+    transition: transform 0.3s, box-shadow 0.3s, background 1s, color 1s;
 }
 
-/* Temperatura neón */
+body.night .card{
+    background:#003366;
+    color:#a0c4ff;
+}
+
+.card:hover{
+    transform: translateY(-5px);
+    box-shadow:0 8px 25px rgba(0,0,0,0.3);
+}
+
+/* Temperatura con neón dinámico */
 .bigTemp{
-    font-size:60px;
+    font-size:65px;
     font-weight:bold;
-    color:#222;
-    transition:text-shadow 0.5s, color 0.5s;
+    color:#00eaff;
+    text-shadow:
+        0 0 5px #00eaff,
+        0 0 10px #00eaff,
+        0 0 20px #00eaff,
+        0 0 40px #00eaff;
+    margin:10px 0;
+    transition: text-shadow 0.5s, color 0.5s;
 }
 
 /* Rosa de los vientos */
@@ -46,7 +67,8 @@ header{
     height:200px;
     border:3px solid #333;
     border-radius:50%;
-    margin:auto;
+    margin:20px auto 0 auto;
+    background: radial-gradient(circle at center, #f9f9f9 90%, #e0e0e0 100%);
 }
 
 .marca{
@@ -61,8 +83,10 @@ header{
 
 .cardinal{
     position:absolute;
-    font-size:13px;
+    font-size:14px;
     font-weight:bold;
+    transform: translate(-50%, -50%);
+    color:#003366;
 }
 
 .flecha{
@@ -75,5 +99,5 @@ header{
     transform-origin:bottom center;
     transform:translateX(-50%) rotate(0deg);
     border-radius:3px;
-    transition:transform 1s ease;
+    transition: transform 1s ease;
 }
