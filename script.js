@@ -55,9 +55,7 @@ function actualizarGraficoTemp(temp){
     const ahora = new Date();
     tLabels.push(ahora.getHours() + ":" + String(ahora.getMinutes()).padStart(2,"0"));
     tData.push(temp);
-    tempHist.push(temp); // para calcular min/max diario
-
-    if(tLabels.length>24){ tLabels.shift(); tData.shift(); tempHist.shift(); }
+    if(tLabels.length>24){ tLabels.shift(); tData.shift(); }
 
     if(!tempChart){
         const ctx = document.getElementById("tempChart").getContext("2d");
@@ -107,6 +105,9 @@ function actualizarNeon(temp){
          0 0 ${brillo}px ${color}`;
 }
 
+// ===== Reinicio min/max diario por sesión =====
+let fechaActual = new Date().toISOString().split("T")[0];
+
 // ===== Obtener datos reales =====
 async function obtenerDatos(){
     try{
@@ -128,17 +129,25 @@ async function obtenerDatos(){
         const uvIndex = data.data.uv?.value ?? "--";
         const solar = data.data.solar_radiation?.value ?? "--";
 
-        // Actualizar temperatura principal (solo número)
+        // Reiniciar historial si cambia el día
+        const hoy = new Date().toISOString().split("T")[0];
+        if(hoy !== fechaActual){
+            tempHist.length = 0;
+            fechaActual = hoy;
+        }
+
+        // Guardar temperatura actual
+        tempHist.push(tempC);
+
+        // Calcular min/max
+        const tempMinC = Math.min(...tempHist);
+        const tempMaxC = Math.max(...tempHist);
+
+        // Actualizar DOM
         document.getElementById("tempBig").textContent = tempC.toFixed(1);
-
-        // Calcular min/max diario desde historial
-        const tempMinC = Math.min(...tempHist.concat(tempC));
-        const tempMaxC = Math.max(...tempHist.concat(tempC));
-
         document.getElementById("tempMin").textContent = "Min diaria: " + tempMinC.toFixed(1);
         document.getElementById("tempMax").textContent = "Max diaria: " + tempMaxC.toFixed(1);
 
-        // Otros datos
         document.getElementById("hum").textContent = hum+" %";
         document.getElementById("wind").textContent = windKm.toFixed(1)+" km/h";
         document.getElementById("windDirText").textContent = "Dirección: "+gradosADireccion(windDeg);
