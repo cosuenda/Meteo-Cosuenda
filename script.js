@@ -142,6 +142,12 @@ async function obtenerDatos(){
         const windKm = mphToKmh(w.wind_speed.value);
         const windDeg = parseFloat(w.wind_direction.value);
         const rainMm = inToMm(rain.daily.value);
+
+        // Lluvia mensual
+        const rainMonthInches = rain.month?.value ?? 0; // revisa el nombre exacto según API
+        const rainMonthMm = inToMm(rainMonthInches);
+        document.getElementById("rainMonth").textContent = rainMonthMm.toFixed(1) + " mm";
+
         const pressHpa = inHgToHpa(p.relative.value);
         const uvIndex = data.data.uv?.value ?? "--";
         const solar = data.data.solar_radiation?.value ?? "--";
