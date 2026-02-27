@@ -42,7 +42,6 @@ function crearRosa(){
 }
 crearRosa();
 
-// ===== Colores rosa/flecha según modo =====
 function actualizarRosaColor(){
     const rosa = document.getElementById("rosa");
     const cardinals = rosa.querySelectorAll(".cardinal");
@@ -110,6 +109,23 @@ function gradosADireccion(g){
     return d[Math.round(g/45)%8];
 }
 
+// ===== Sensación térmica =====
+function calcularSensacionTermica(tempC, hum, vientoKmh){
+    let sensacion = tempC;
+    if(tempC <= 10 && vientoKmh > 4.8){ 
+        sensacion = 13.12 + 0.6215*tempC - 11.37*Math.pow(vientoKmh,0.16) + 0.3965*tempC*Math.pow(vientoKmh,0.16);
+    }
+    else if(tempC >= 27 && hum >= 40){ 
+        const T = tempC;
+        const R = hum;
+        sensacion = -8.784695 + 1.61139411*T + 2.338549*R - 0.14611605*T*R 
+                    - 0.012308094*Math.pow(T,2) - 0.016424828*Math.pow(R,2) 
+                    + 0.002211732*Math.pow(T,2)*R + 0.00072546*T*Math.pow(R,2) 
+                    - 0.000003582*Math.pow(T,2)*Math.pow(R,2);
+    }
+    return sensacion.toFixed(1);
+}
+
 // ===== Neón temperatura =====
 function actualizarNeon(temp){
     const el = document.getElementById("tempBig");
@@ -123,14 +139,14 @@ function actualizarNeon(temp){
     el.style.textShadow = `0 0 ${brillo/12}px ${color}, 0 0 ${brillo/6}px ${color}, 0 0 ${brillo/3}px ${color}, 0 0 ${brillo}px ${color}`;
 }
 
-// ===== Reinicio min/max diario por sesión =====
-let fechaActual = new Date().toISOString().split("T")[0];
-
-// ===== Lluvia mensual automática =====
+// ===== Lluvia mensual =====
 let mesActual = new Date().getMonth();
 let lluviaMensual = 0;
 
-// ===== Obtener datos reales =====
+// ===== Min/max diario =====
+let fechaActual = new Date().toISOString().split("T")[0];
+
+// ===== Obtener datos =====
 async function obtenerDatos(){
     try{
         const response = await fetch(url);
@@ -148,7 +164,7 @@ async function obtenerDatos(){
         const windDeg = parseFloat(w.wind_direction.value);
         const rainMm = inToMm(rain.daily.value);
 
-        // ===== Lluvia mensual con reinicio automático =====
+        // ===== Lluvia mensual =====
         const mesHoy = new Date().getMonth();
         if(mesHoy !== mesActual){
             mesActual = mesHoy;
@@ -164,14 +180,14 @@ async function obtenerDatos(){
 
         const hoy = new Date().toISOString().split("T")[0];
         if(hoy !== fechaActual){ tempHist.length=0; fechaActual=hoy; }
-
         tempHist.push(tempC);
 
         const tempMinC = Math.min(...tempHist);
         const tempMaxC = Math.max(...tempHist);
 
-        // Actualizar HTML
+        // ===== Actualizar HTML =====
         document.getElementById("tempBig").textContent = tempC.toFixed(1);
+        document.getElementById("sensacion").textContent = "Sensación térmica: " + calcularSensacionTermica(tempC, hum, windKm);
         document.getElementById("tempMin").textContent = "Min diaria: " + tempMinC.toFixed(1);
         document.getElementById("tempMax").textContent = "Max diaria: " + tempMaxC.toFixed(1);
         document.getElementById("hum").textContent = hum+" %";
@@ -181,6 +197,10 @@ async function obtenerDatos(){
         document.getElementById("press").textContent = pressHpa.toFixed(1)+" hPa";
         document.getElementById("uv").textContent = uvIndex;
         document.getElementById("solar").textContent = solar+" W/m²";
+
+        const ahora = new Date();
+        document.getElementById("ultimaActualizacion").textContent = 
+            "Última actualización: " + ahora.getHours() + ":" + String(ahora.getMinutes()).padStart(2,"0");
 
         actualizarFlecha(windDeg);
         actualizarGraficoTemp(tempC);
