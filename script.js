@@ -1,23 +1,18 @@
-// ====== API ======
-const appKey="26C4D6AD21CF8F8C4F3BA85E1CAF6701";
-const apiKey="adf65434-1ace-43dd-b9a9-27915843d243";
-const mac="84:CC:A8:B4:B1:F6";
-
-const url=`https://api.ecowitt.net/api/v3/device/real_time?application_key=${appKey}&api_key=${apiKey}&mac=${mac}&call_back=all`;
-
-// ===== CONVERSIONES =====
-const fToC = f => (parseFloat(f)-32)*5/9;
-const mphToKmh = mph => parseFloat(mph)*1.60934;
-const inToMm = inches => parseFloat(inches)*25.4;
-const inHgToHpa = inHg => parseFloat(inHg)*33.8639;
-
-// Dirección cardinal
-function gradosADireccion(g){
-    const d = ["N","NE","E","SE","S","SW","W","NW"];
-    return d[Math.round(g/45)%8];
+// Modo día/noche
+function actualizarModo(){
+    const hora = new Date().getHours();
+    if(hora>=19 || hora<6){
+        document.body.classList.remove('day');
+        document.body.classList.add('night');
+    }else{
+        document.body.classList.remove('night');
+        document.body.classList.add('day');
+    }
 }
+actualizarModo();
+setInterval(actualizarModo,60000);
 
-// Crear rosa con marcas cardinales
+// Rosa de los vientos
 function crearRosa(){
     const rosa = document.getElementById("rosa");
     for(let i=0;i<360;i+=10){
@@ -26,42 +21,40 @@ function crearRosa(){
         m.style.transform = `translateX(-50%) rotate(${i}deg)`;
         rosa.appendChild(m);
     }
-    const puntos=["N","E","S","W"];
-    const pos=[[50,5],[95,50],[50,95],[5,50]];
+    const puntos=["N","NE","E","SE","S","SW","W","NW"];
     puntos.forEach((p,i)=>{
         const c = document.createElement("div");
         c.className="cardinal";
-        c.style.left=pos[i][0]+"%";
-        c.style.top=pos[i][1]+"%";
+        const angle = i*45;
+        const radius = 90;
+        const rad = angle*Math.PI/180;
+        c.style.left = 50 + radius*Math.sin(rad)/100*100 + "%";
+        c.style.top = 50 - radius*Math.cos(rad)/100*100 + "%";
         c.textContent = p;
         rosa.appendChild(c);
     });
 }
 crearRosa();
 
-// Flecha rosa de viento
+// Flecha viento
 let angAnterior = 0;
 function actualizarFlecha(grados){
     const flecha = document.getElementById("flechaViento");
     if(!flecha) return;
-
     let diff = grados - angAnterior;
-    if(diff > 180) diff -= 360;
-    if(diff < -180) diff += 360;
+    if(diff>180) diff-=360;
+    if(diff<-180) diff+=360;
     angAnterior += diff;
-
     flecha.style.transform = `translateX(-50%) rotate(${angAnterior}deg)`;
 }
 
-// ===== Gráfico temperatura =====
+// Gráfico temperatura
 let tempChart=null;
 const tLabels=[], tData=[];
-
 function actualizarGraficoTemp(temp){
     tLabels.push(new Date().getHours()+":"+String(new Date().getMinutes()).padStart(2,"0"));
     tData.push(temp);
     if(tLabels.length>24){ tLabels.shift(); tData.shift(); }
-
     if(!tempChart){
         const ctx = document.getElementById("tempChart").getContext("2d");
         tempChart = new Chart(ctx,{
@@ -76,7 +69,40 @@ function actualizarGraficoTemp(temp){
     }
 }
 
-// ===== Principal =====
+// API Ecowitt
+const appKey="26C4D6AD21CF8F8C4F3BA85E1CAF6701";
+const apiKey="adf65434-1ace-43dd-b9a9-27915843d243";
+const mac="84:CC:A8:B4:B1:F6";
+const url=`https://api.ecowitt.net/api/v3/device/real_time?application_key=${appKey}&api_key=${apiKey}&mac=${mac}&call_back=all`;
+
+const fToC = f => (parseFloat(f)-32)*5/9;
+const mphToKmh = mph => parseFloat(mph)*1.60934;
+const inToMm = inches => parseFloat(inches)*25.4;
+const inHgToHpa = inHg => parseFloat(inHg)*33.8639;
+function gradosADireccion(g){
+    const d = ["N","NE","E","SE","S","SW","W","NW"];
+    return d[Math.round(g/45)%8];
+}
+
+// Neón dinámico según temperatura
+function actualizarNeon(temp){
+    const el = document.getElementById("tempBig");
+    let color;
+    if(temp<5) color="#00f";      // azul frío
+    else if(temp<15) color="#0f0"; // verde templado
+    else if(temp<25) color="#ff0"; // amarillo cálido
+    else color="#f00";             // rojo caliente
+
+    let brillo = Math.min(Math.max(temp*2, 5), 60);
+    el.style.color = color;
+    el.style.textShadow =
+        `0 0 ${brillo/12}px ${color},
+         0 0 ${brillo/6}px ${color},
+         0 0 ${brillo/3}px ${color},
+         0 0 ${brillo}px ${color}`;
+}
+
+// Obtener datos reales
 async function obtenerDatos(){
     try{
         const response = await fetch(url);
@@ -108,6 +134,7 @@ async function obtenerDatos(){
 
         actualizarFlecha(windDeg);
         actualizarGraficoTemp(tempC);
+        actualizarNeon(tempC);
 
     }catch(error){
         console.log("Error conexión", error);
