@@ -60,7 +60,7 @@ body.night .card{
     transition: text-shadow 0.5s, color 0.5s;
 }
 
-/* Humedad grande */
+/* Números grandes (humedad y racha máxima) */
 .bigHum{
     font-size:50px;
     font-weight:bold;
