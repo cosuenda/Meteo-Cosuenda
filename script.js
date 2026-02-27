@@ -129,14 +129,14 @@ async function obtenerDatos(){
         const solar = data.data.solar_radiation?.value ?? "--";
 
         // Actualizar temperatura
-        document.getElementById("tempBig").textContent = tempC.toFixed(1)+" °C";
+        document.getElementById("tempBig").textContent = tempC.toFixed(1);
 
         // Calcular min/max diario desde historial
         const tempMinC = Math.min(...tempHist.concat(tempC));
         const tempMaxC = Math.max(...tempHist.concat(tempC));
 
-        document.getElementById("tempMin").textContent = "Min diaria: " + tempMinC.toFixed(1) + " °C";
-        document.getElementById("tempMax").textContent = "Max diaria: " + tempMaxC.toFixed(1) + " °C";
+        document.getElementById("tempMin").textContent = "Min diaria: " + tempMinC.toFixed(1);
+        document.getElementById("tempMax").textContent = "Max diaria: " + tempMaxC.toFixed(1);
 
         // Otros datos
         document.getElementById("hum").textContent = hum+" %";
