@@ -5,13 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meteo Cosuenda</title>
 
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="day">
 
 <header>
 <h1>🌤️ Meteo Cosuenda</h1>
@@ -23,10 +21,11 @@
 <div class="card">
 <h2>Temperatura</h2>
 <div id="tempBig" class="bigTemp">--</div>
-<div id="sensacion">--</div>
-<div id="tempMin">Min diaria: --</div>
-<div id="tempMax">Max diaria: --</div>
-<div id="ultimaActualizacion">Última actualización: --</div>
+
+<div class="minmax">
+    <div>Mín diaria: <span id="tempMin">--</span></div>
+    <div>Máx diaria: <span id="tempMax">--</span></div>
+</div>
 </div>
 
 <div class="card">
@@ -37,6 +36,7 @@
 <div class="card">
 <h2>Viento</h2>
 <div id="wind">-- km/h</div>
+<div>Racha máx diaria: <span id="gustMax" class="neonWind">-- km/h</span></div>
 <div id="windDirText">Dirección: --</div>
 
 <div class="rosa" id="rosa">
@@ -45,15 +45,8 @@
 </div>
 
 <div class="card">
-<h2>Racha máxima de viento</h2>
-<div id="windMax" class="bigHum">-- km/h</div>
-</div>
-
-<div class="card">
-<h2>Lluvia diaria</h2>
+<h2>Lluvia</h2>
 <div id="rain">-- mm</div>
-<h2>Lluvia mensual</h2>
-<div id="rainMonth">-- mm</div>
 </div>
 
 <div class="card">
@@ -71,8 +64,10 @@
 <div id="solar">-- W/m²</div>
 </div>
 
-<div class="card">
+<div class="card chartCard">
 <canvas id="tempChart"></canvas>
+</div>
+
 </div>
 
 <script src="script.js"></script>
