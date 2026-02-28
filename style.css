@@ -114,3 +114,25 @@ body.night .card{
     border-radius:3px;
     transition: transform 1s ease;
 }
+.minmax{
+    margin-top:10px;
+    font-size:14px;
+}
+
+.bigHum{
+    font-size:45px;
+    font-weight:bold;
+}
+
+.neonWind{
+    color:#00eaff;
+    text-shadow:
+        0 0 5px #00eaff,
+        0 0 10px #00eaff,
+        0 0 20px #00eaff;
+}
+
+.chartCard canvas{
+    width:100% !important;
+    height:250px !important;
+}
