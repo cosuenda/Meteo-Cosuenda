@@ -1,14 +1,25 @@
 body{
     margin:0;
-    font-family:Arial, sans-serif;
+    font-family: Arial, sans-serif;
     text-align:center;
-    background:linear-gradient(to bottom,#87ceeb,#f0f8ff);
+    transition: background 1s, color 1s;
+}
+
+/* ===== FONDO DÍA/NOCHE ===== */
+
+body.day{
+    background: linear-gradient(to bottom, #87ceeb, #f0f8ff);
+    color:#003366;
+}
+
+body.night{
+    background: linear-gradient(to bottom, #00122e, #003366);
+    color:#a0c4ff;
 }
 
 header{
     padding:20px;
-    background:#003366;
-    color:white;
+    box-shadow:0 3px 8px rgba(0,0,0,0.3);
 }
 
 .container{
@@ -20,27 +31,58 @@ header{
     gap:20px;
 }
 
+/* ===== TARJETAS BONITAS ===== */
+
 .card{
     background:white;
     padding:15px;
-    border-radius:15px;
-    box-shadow:0 4px 15px rgba(0,0,0,0.2);
+    border-radius:20px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.25);
+    transition: transform 0.3s, box-shadow 0.3s, background 1s;
 }
+
+body.night .card{
+    background:#003366;
+    color:#a0c4ff;
+}
+
+.card:hover{
+    transform: translateY(-6px);
+    box-shadow:0 12px 30px rgba(0,0,0,0.35);
+}
+
+/* ===== TEMPERATURA GRANDE CON EFECTO NEÓN ===== */
 
 .bigTemp{
-    font-size:65px;
+    font-size:70px;
     font-weight:bold;
-    margin:10px 0;
+    margin:15px 0;
+    transition: text-shadow 0.5s, color 0.5s;
 }
 
-/* TEMPERATURA DINÁMICA */
+/* Colores dinámicos */
 
-.frio{color:#00d4ff;text-shadow:0 0 20px #00d4ff;}
-.templado{color:#00ff88;text-shadow:0 0 20px #00ff88;}
-.calor{color:#ff9900;text-shadow:0 0 25px #ff5500;}
-.muyCalor{color:#ff0033;text-shadow:0 0 35px #ff0000;}
+.frio{
+    color:#00eaff;
+    text-shadow:0 0 10px #00eaff,0 0 25px #00eaff,0 0 45px #00eaff;
+}
 
-/* ROSA */
+.templado{
+    color:#00ff88;
+    text-shadow:0 0 10px #00ff88,0 0 25px #00ff88;
+}
+
+.calor{
+    color:#ff9900;
+    text-shadow:0 0 15px #ff9900,0 0 30px #ff5500;
+}
+
+.muyCalor{
+    color:#ff0033;
+    text-shadow:0 0 20px #ff0033,0 0 40px #ff0000;
+}
+
+/* ===== ROSA DE LOS VIENTOS ===== */
 
 .rosa{
     position:relative;
@@ -49,6 +91,12 @@ header{
     border:3px solid #333;
     border-radius:50%;
     margin:20px auto;
+    background: radial-gradient(circle at center, #f9f9f9 90%, #e0e0e0 100%);
+    transition: box-shadow 0.3s;
+}
+
+body.night .rosa{
+    background: radial-gradient(circle at center, #003366 90%, #00122e 100%);
 }
 
 .marca{
@@ -65,41 +113,46 @@ header{
     position:absolute;
     font-size:14px;
     font-weight:bold;
-    transform:translate(-50%,-50%);
+    transform: translate(-50%, -50%);
 }
 
 .flecha{
     position:absolute;
     width:6px;
     height:80px;
-    background:blue;
+    background:deepskyblue;
     top:20px;
     left:50%;
     transform-origin:bottom center;
     transform:translateX(-50%) rotate(0deg);
     border-radius:3px;
-    transition:transform 1s ease;
+    transition: transform 1s ease;
 }
 
-/* VIENTO FUERTE */
+/* ===== VIENTO FUERTE EFECTO VISUAL ===== */
 
 @keyframes vibrar{
     0%{transform:translateX(-50%) rotate(0deg);}
-    50%{transform:translateX(-48%) rotate(2deg);}
+    25%{transform:translateX(-48%) rotate(2deg);}
+    50%{transform:translateX(-52%) rotate(-2deg);}
+    75%{transform:translateX(-48%) rotate(2deg);}
     100%{transform:translateX(-50%) rotate(0deg);}
 }
 
 .vientoFuerte{
     animation:vibrar 0.4s infinite;
-    box-shadow:0 0 25px orange;
+    box-shadow:0 0 30px rgba(255,150,0,0.8);
 }
 
 .vientoExtremo{
     animation:vibrar 0.2s infinite;
-    box-shadow:0 0 35px red;
+    box-shadow:0 0 45px rgba(255,0,0,1);
 }
 
+/* ===== ÚLTIMA ACTUALIZACIÓN ===== */
+
 #ultimaActualizacion{
-    margin:15px;
+    margin:20px;
     font-size:14px;
+    opacity:0.8;
 }
