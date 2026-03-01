@@ -1,5 +1,5 @@
 // ===============================
-// CONFIGURACIÓN API ECOWITT
+// CONFIGURACIÓN ECOWITT
 // ===============================
 
 const appKey="26C4D6AD21CF8F8C4F3BA85E1CAF6701";
@@ -10,27 +10,37 @@ const url=`https://api.ecowitt.net/api/v3/device/real_time?application_key=${app
 
 
 // ===============================
-// CONTROL CAMBIO DE DÍA
+// CREAR ROSA CON MARCAS 10°
 // ===============================
 
-function hoyString(){
-    const h = new Date();
-    return h.getFullYear()+"-"+(h.getMonth()+1)+"-"+h.getDate();
-}
+function crearRosa(){
+    const rosa = document.getElementById("rosa");
 
-function comprobarCambioDia(){
-    const hoy = hoyString();
-    const guardado = localStorage.getItem("diaActual");
-
-    if(guardado !== hoy){
-        localStorage.setItem("diaActual", hoy);
-        localStorage.setItem("tempMin", "999");
-        localStorage.setItem("tempMax", "-999");
-        localStorage.setItem("windMax", "0");
+    for(let i=0;i<360;i+=10){
+        const marca = document.createElement("div");
+        marca.className="marca";
+        marca.style.transform=`translateX(-50%) rotate(${i}deg)`;
+        rosa.appendChild(marca);
     }
+
+    const cardinales = [
+        {letra:"N", x:100, y:10},
+        {letra:"S", x:100, y:190},
+        {letra:"E", x:190, y:100},
+        {letra:"W", x:10, y:100}
+    ];
+
+    cardinales.forEach(c=>{
+        const el=document.createElement("div");
+        el.className="cardinal";
+        el.textContent=c.letra;
+        el.style.left=c.x+"px";
+        el.style.top=c.y+"px";
+        rosa.appendChild(el);
+    });
 }
 
-comprobarCambioDia();
+crearRosa();
 
 
 // ===============================
@@ -74,12 +84,10 @@ async function obtenerDatos(){
         const uvIndex = data.data.uv?.value ?? "--";
         const solar = data.data.solar_radiation?.value ?? "--";
 
-        // ===== TEMPERATURA DINÁMICA COLOR =====
-
+        // TEMPERATURA DINÁMICA
         const tempElement = document.getElementById("tempBig");
         tempElement.textContent = tempC.toFixed(1)+"°";
-
-        tempElement.classList.remove("frio","templado","calor","muyCalor");
+        tempElement.className="bigTemp";
 
         if(tempC <= 5){
             tempElement.classList.add("frio");
@@ -91,8 +99,7 @@ async function obtenerDatos(){
             tempElement.classList.add("muyCalor");
         }
 
-        // ===== ANIMACIÓN RACHAS FUERTES =====
-
+        // ANIMACIÓN VIENTO
         const rosa = document.getElementById("rosa");
         rosa.classList.remove("vientoFuerte","vientoExtremo");
 
@@ -102,11 +109,10 @@ async function obtenerDatos(){
             rosa.classList.add("vientoFuerte");
         }
 
-        // ===== ACTUALIZAR RESTO =====
-
+        // ACTUALIZAR DATOS
         document.getElementById("hum").textContent = hum+" %";
         document.getElementById("wind").textContent = windKm.toFixed(1)+" km/h";
-        document.getElementById("windMax").textContent = windGust.toFixed(1)+" km/h";
+        document.getElementById("windMax").textContent = "Racha máx: "+windGust.toFixed(1)+" km/h";
         document.getElementById("windDirText").textContent = "Dirección: "+gradosADireccion(windDeg);
         document.getElementById("rain").textContent = rainMm.toFixed(1)+" mm";
         document.getElementById("rainMonth").textContent = lluviaMensual.toFixed(1)+" mm";
