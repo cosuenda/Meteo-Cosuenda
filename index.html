@@ -4,11 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meteo Cosuenda</title>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <header>
@@ -18,7 +16,6 @@
 
 <div class="container">
 
-  <!-- TEMPERATURA -->
   <div class="card temp-card">
     <h2>Temperatura</h2>
     <div id="tempBig" class="bigTemp">--</div>
@@ -27,13 +24,11 @@
     <div id="sensacion" class="subValue">Sensación térmica: --</div>
   </div>
 
-  <!-- HUMEDAD -->
   <div class="card hum-card">
     <h2>Humedad</h2>
     <div id="hum" class="bigNumber">-- %</div>
   </div>
 
-  <!-- VIENTO -->
   <div class="card wind-card">
     <h2>Viento</h2>
     <div class="wind-row">
@@ -52,7 +47,6 @@
     </div>
   </div>
 
-  <!-- LLUVIA -->
   <div class="card rain-card">
     <h2>Lluvia</h2>
     <div class="rain-row">
@@ -67,25 +61,21 @@
     </div>
   </div>
 
-  <!-- PRESIÓN -->
   <div class="card pressure-card">
     <h2>Presión</h2>
     <div id="press" class="bigNumber">-- hPa</div>
   </div>
 
-  <!-- ÍNDICE UV -->
   <div class="card uv-card">
     <h2>Índice UV</h2>
     <div id="uv" class="bigNumber">--</div>
   </div>
 
-  <!-- RADIACIÓN SOLAR -->
   <div class="card solar-card">
     <h2>Radiación Solar</h2>
     <div id="solar" class="bigNumber">-- W/m²</div>
   </div>
 
-  <!-- GRÁFICA DE TEMPERATURA -->
   <div class="card chart-card">
     <canvas id="tempChart"></canvas>
   </div>
