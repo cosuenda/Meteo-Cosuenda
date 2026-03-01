@@ -36,7 +36,25 @@ const url=`https://api.ecowitt.net/api/v3/device/real_time?application_key=${app
 // ===============================
 // Conversiones
 // ===============================
+// ===== Guardado diario automático =====
+function hoyString(){
+    const h = new Date();
+    return h.getFullYear()+"-"+(h.getMonth()+1)+"-"+h.getDate();
+}
 
+function comprobarCambioDia(){
+    const hoy = hoyString();
+    const guardado = localStorage.getItem("diaActual");
+
+    if(guardado !== hoy){
+        localStorage.setItem("diaActual", hoy);
+        localStorage.setItem("tempMin", "999");
+        localStorage.setItem("tempMax", "-999");
+        localStorage.setItem("windMax", "0");
+    }
+}
+
+comprobarCambioDia();
 const fToC = f => (parseFloat(f)-32)*5/9;
 const mphToKmh = mph => parseFloat(mph)*1.60934;
 const inToMm = inches => parseFloat(inches)*25.4;
