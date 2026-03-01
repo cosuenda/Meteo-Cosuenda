@@ -143,7 +143,7 @@ if(data.data.solar_and_uvi){
         document.getElementById("rainMonth").textContent = lluviaMensual.toFixed(1)+" mm";
         document.getElementById("press").textContent = pressHpa.toFixed(1)+" hPa";
         document.getElementById("uv").textContent = uvIndex;
-        document.getElementById("solar").textContent = solar+" W/m²";
+        document.getElementById("solar").textContent = solar;
 
         document.getElementById("flechaViento").style.transform =
             `translateX(-50%) rotate(${windDeg}deg)`;
