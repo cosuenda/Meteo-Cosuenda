@@ -1,20 +1,13 @@
 /* ===============================
-   ESTILOS GENERALES
+   ESTILO GENERAL
    =============================== */
 body{
     margin:0;
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
     text-align:center;
     transition: background 1s, color 1s;
-}
-
-body.day{
-    background: linear-gradient(to bottom, #87ceeb, #f0f8ff);
-    color:#003366;
-}
-body.night{
-    background: linear-gradient(to bottom, #00122e, #003366);
-    color:#a0c4ff;
+    background: linear-gradient(to bottom, #f0f8ff, #87ceeb);
+    color: #003366;
 }
 
 header{
@@ -22,60 +15,60 @@ header{
     box-shadow:0 3px 8px rgba(0,0,0,0.3);
 }
 
+/* ===============================
+   CONTAINER GRID
+   =============================== */
 .container{
-    max-width:1000px;
+    max-width:1200px;
     margin:auto;
     padding:20px;
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
     gap:20px;
 }
 
+/* ===============================
+   RECUADROS CARD
+   =============================== */
 .card{
     background:white;
-    padding:15px;
-    border-radius:15px;
-    box-shadow:0 4px 15px rgba(0,0,0,0.2);
-    transition: transform 0.3s, box-shadow 0.3s, background 1s, color 1s;
-}
-
-body.night .card{
-    background:#003366;
-    color:#a0c4ff;
+    padding:20px;
+    border-radius:20px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.15);
+    transition: transform 0.3s, box-shadow 0.3s, background 0.5s;
 }
 
 .card:hover{
     transform: translateY(-5px);
-    box-shadow:0 8px 25px rgba(0,0,0,0.3);
+    box-shadow:0 12px 30px rgba(0,0,0,0.25);
 }
 
 /* ===============================
-   TEMPERATURA CON NEÓN
+   NÚMEROS GRANDES
    =============================== */
 .bigTemp{
     font-size:65px;
     font-weight:bold;
     color:#00eaff;
-    text-shadow:
-        0 0 5px #00eaff,
-        0 0 10px #00eaff,
-        0 0 20px #00eaff,
-        0 0 40px #00eaff;
+    text-shadow:0 0 5px #00eaff, 0 0 10px #00eaff,0 0 20px #00eaff,0 0 40px #00eaff;
     margin:10px 0;
-    transition: text-shadow 0.5s, color 0.5s;
+    transition: color 0.5s;
+}
+
+.bigNumber{
+    font-size:45px;
+    font-weight:bold;
+    color:#0077ff;
+    text-shadow:0 0 5px #00bfff,0 0 10px #00bfff,0 0 20px #00bfff;
+    margin:10px 0;
 }
 
 /* ===============================
-   HUMEDAD
+   SUBVALORES
    =============================== */
-.hum-value{
-    font-size:50px;
-    font-weight:bold;
-    color:#0077ff;
-    text-shadow:
-        0 0 5px #00bfff,
-        0 0 10px #00bfff,
-        0 0 20px #00bfff;
+.subValue{
+    font-size:18px;
+    margin:5px 0;
 }
 
 /* ===============================
@@ -84,27 +77,11 @@ body.night .card{
 .wind-row{
     display:flex;
     justify-content:space-around;
-    align-items:center;
     margin-top:10px;
-}
-.wind-item{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
 }
 .wind-label{
     font-size:14px;
     font-weight:bold;
-    margin-bottom:5px;
-}
-.wind-value{
-    font-size:40px;
-    font-weight:bold;
-    color:#0077ff;
-    text-shadow:
-        0 0 5px #00bfff,
-        0 0 10px #00bfff,
-        0 0 20px #00bfff;
 }
 
 /* ===============================
@@ -114,26 +91,10 @@ body.night .card{
     position:relative;
     width:200px;
     height:200px;
-    border:3px solid #333;
     border-radius:50%;
-    margin:20px auto 0 auto;
+    border:3px solid #333;
+    margin:15px auto;
     background: radial-gradient(circle at center, #f9f9f9 90%, #e0e0e0 100%);
-}
-.marca{
-    position:absolute;
-    width:2px;
-    height:10px;
-    background:#333;
-    left:50%;
-    top:0;
-    transform-origin:bottom center;
-}
-.cardinal{
-    position:absolute;
-    font-size:14px;
-    font-weight:bold;
-    transform: translate(-50%, -50%);
-    color:#003366;
 }
 .flecha{
     position:absolute;
@@ -154,25 +115,13 @@ body.night .card{
 .rain-row{
     display:flex;
     justify-content:space-around;
-    align-items:center;
-    margin-top:10px;
 }
-.rain-item{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-}
-.rain-label{
+
+/* ===============================
+   ÚLTIMA ACTUALIZACIÓN
+   =============================== */
+.update-text{
+    text-align:center;
+    margin:15px 0;
     font-size:14px;
-    font-weight:bold;
-    margin-bottom:5px;
-}
-.rain-value{
-    font-size:40px;
-    font-weight:bold;
-    color:#0077ff;
-    text-shadow:
-        0 0 5px #00bfff,
-        0 0 10px #00bfff,
-        0 0 20px #00bfff;
 }
