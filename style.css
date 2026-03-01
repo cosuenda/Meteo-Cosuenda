@@ -48,6 +48,31 @@ header{
     color:#555;
 }
 
+/* ROSA DE LOS VIENTOS */
+
+.rosa{
+    position:relative;
+    width:180px;
+    height:180px;
+    border:3px solid #003366;
+    border-radius:50%;
+    margin:20px auto 0 auto;
+    background: radial-gradient(circle at center, #ffffff 70%, #e6f2ff 100%);
+}
+
+.flecha{
+    position:absolute;
+    width:6px;
+    height:70px;
+    background:#003366;
+    top:25px;
+    left:50%;
+    transform-origin:bottom center;
+    transform:translateX(-50%) rotate(0deg);
+    border-radius:3px;
+    transition: transform 0.8s ease;
+}
+
 #ultimaActualizacion{
     margin:20px;
     font-size:14px;
