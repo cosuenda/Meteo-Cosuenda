@@ -89,17 +89,15 @@ async function obtenerDatos() {
         // SENSACIÓN TÉRMICA
         // -----------------------
         let sensTerm = "--";
-
         if (o.heat_index && o.heat_index.value !== undefined) {
             sensTerm = fToC(o.heat_index.value).toFixed(1) + "°";
         } else if (o.windchill && o.windchill.value !== undefined) {
             sensTerm = fToC(o.windchill.value).toFixed(1) + "°";
         }
-
         document.getElementById("sensacion").textContent = "Sensación térmica: " + sensTerm;
 
         // -----------------------
-        // UV Y RADIACIÓN SOLAR SEGUROS
+        // UV Y RADIACIÓN SOLAR
         // -----------------------
         let uvIndex = "No disponible";
         let solar = "No disponible";
@@ -112,20 +110,11 @@ async function obtenerDatos() {
             solar = data.data.solar_radiation.value + " W/m²";
         }
 
-        if (data.data.solar_and_uvi) {
-            if (data.data.solar_and_uvi.uvi?.value !== undefined) {
-                uvIndex = data.data.solar_and_uvi.uvi.value;
-            }
-            if (data.data.solar_and_uvi.solar?.value !== undefined) {
-                solar = data.data.solar_and_uvi.solar.value + " W/m²";
-            }
-        }
-
         // -----------------------
-        // MÍNIMA Y MÁXIMA DIARIA
+        // MÍNIMA, MÁXIMA Y RACHA MÁXIMA DIARIA
         // -----------------------
         const hoy = new Date().toISOString().split("T")[0];
-        if (localStorage.getItem("diaActual") !== hoy) {
+        if (localStorage.getItem("diaActual") !== hoy || !localStorage.getItem("tempMin")) {
             localStorage.setItem("diaActual", hoy);
             localStorage.setItem("tempMin", tempC.toFixed(1));
             localStorage.setItem("tempMax", tempC.toFixed(1));
@@ -158,6 +147,8 @@ async function obtenerDatos() {
         if (windGust > 40) rosa.classList.add("vientoExtremo");
         else if (windGust > 25) rosa.classList.add("vientoFuerte");
 
+        document.getElementById("tempMin").textContent = "Min diaria: " + tempMin.toFixed(1) + "°";
+        document.getElementById("tempMax").textContent = "Max diaria: " + tempMax.toFixed(1) + "°";
         document.getElementById("hum").textContent = hum + " %";
         document.getElementById("wind").textContent = windKm.toFixed(1) + " km/h";
         document.getElementById("windMax").textContent = "Racha máx: " + windMax.toFixed(1) + " km/h";
