@@ -22,33 +22,28 @@
   <div class="card temp-card">
     <h2>Temperatura</h2>
     <div id="tempBig" class="bigTemp">--</div>
-    <div id="tempMin">Min diaria: --</div>
-    <div id="tempMax">Max diaria: --</div>
-    <div id="sensacion">Sensación térmica: --</div>
+    <div id="tempMin" class="subValue">Min diaria: --</div>
+    <div id="tempMax" class="subValue">Max diaria: --</div>
+    <div id="sensacion" class="subValue">Sensación térmica: --</div>
   </div>
 
   <!-- HUMEDAD -->
   <div class="card hum-card">
     <h2>Humedad</h2>
-    <div class="hum-row">
-      <div class="hum-item">
-        <div class="hum-label">Humedad</div>
-        <div id="hum" class="hum-value">-- %</div>
-      </div>
-    </div>
+    <div id="hum" class="bigNumber">-- %</div>
   </div>
 
   <!-- VIENTO -->
   <div class="card wind-card">
     <h2>Viento</h2>
     <div class="wind-row">
-      <div class="wind-item">
+      <div>
         <div class="wind-label">Velocidad</div>
-        <div id="wind" class="wind-value">-- km/h</div>
+        <div id="wind" class="bigNumber">-- km/h</div>
       </div>
-      <div class="wind-item">
+      <div>
         <div class="wind-label">Racha máx</div>
-        <div id="windMax" class="wind-value">-- km/h</div>
+        <div id="windMax" class="bigNumber">-- km/h</div>
       </div>
     </div>
     <div id="windDirText">Dirección: --</div>
@@ -61,13 +56,13 @@
   <div class="card rain-card">
     <h2>Lluvia</h2>
     <div class="rain-row">
-      <div class="rain-item">
+      <div>
         <div class="rain-label">Diaria</div>
-        <div id="rain" class="rain-value">-- mm</div>
+        <div id="rain" class="bigNumber">-- mm</div>
       </div>
-      <div class="rain-item">
+      <div>
         <div class="rain-label">Mensual</div>
-        <div id="rainMonth" class="rain-value">-- mm</div>
+        <div id="rainMonth" class="bigNumber">-- mm</div>
       </div>
     </div>
   </div>
@@ -75,19 +70,19 @@
   <!-- PRESIÓN -->
   <div class="card pressure-card">
     <h2>Presión</h2>
-    <div id="press">-- hPa</div>
+    <div id="press" class="bigNumber">-- hPa</div>
   </div>
 
   <!-- ÍNDICE UV -->
   <div class="card uv-card">
     <h2>Índice UV</h2>
-    <div id="uv">--</div>
+    <div id="uv" class="bigNumber">--</div>
   </div>
 
   <!-- RADIACIÓN SOLAR -->
   <div class="card solar-card">
     <h2>Radiación Solar</h2>
-    <div id="solar">-- W/m²</div>
+    <div id="solar" class="bigNumber">-- W/m²</div>
   </div>
 
   <!-- GRÁFICA DE TEMPERATURA -->
@@ -97,7 +92,7 @@
 
 </div>
 
-<div id="ultimaActualizacion" style="text-align:center;margin:10px 0;font-size:14px;">
+<div id="ultimaActualizacion" class="update-text">
   Última actualización: --
 </div>
 
