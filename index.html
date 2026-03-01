@@ -9,67 +9,75 @@
 <link rel="stylesheet" href="style.css">
 </head>
 
-<body class="day">
+<body>
 
 <header>
-<h1>🌤️ Meteo Cosuenda</h1>
-<p>Estación Meteorológica Profesional</p>
+  <h1>🌤️ Meteo Cosuenda</h1>
+  <p>Estación Meteorológica Profesional</p>
 </header>
 
 <div class="container">
 
-<div class="card">
-<h2>Temperatura</h2>
-<div id="tempBig" class="bigTemp">--</div>
-<div id="tempMin">Min diaria: --</div>
-<div id="tempMax">Max diaria: --</div>
-<div id="sensacion">Sensación térmica: --</div>
-</div>
+  <div class="card">
+    <h2>Temperatura</h2>
+    <div id="tempBig" class="bigTemp">--</div>
+    <div id="tempMin">Min diaria: --</div>
+    <div id="tempMax">Max diaria: --</div>
+    <div id="sensacion">Sensación térmica: --</div>
+  </div>
 
-<div class="card">
-<h2>Humedad</h2>
-<div id="hum" class="bigHum">-- %</div>
-</div>
+  <div class="card">
+    <h2>Humedad</h2>
+    <div id="hum" class="bigHum">-- %</div>
+  </div>
 
-<div class="card">
-<h2>Viento</h2>
-<div id="wind">-- km/h</div>
-<div id="windMax">Racha máx: -- km/h</div>
-<div id="windDirText">Dirección: --</div>
-<div class="rosa" id="rosa">
-<div id="flechaViento" class="flecha"></div>
-</div>
-</div>
+  <div class="card">
+    <h2>Viento</h2>
+    <div id="wind">-- km/h</div>
+    <div id="windMax">-- km/h</div>
+    <div id="windDirText">Dirección: --</div>
+    <div class="rosa" id="rosa">
+      <div id="flechaViento" class="flecha"></div>
+    </div>
+  </div>
 
-<div class="card">
-<h2>Lluvia</h2>
-<div id="rain">-- mm</div>
-<div id="rainMonth">Lluvias mensuales: -- mm</div>
-</div>
+  <div class="card">
+    <h2>Lluvia</h2>
+    <div class="rain-row">
+      <div class="rain-item">
+        <div class="rain-label">Diaria</div>
+        <div id="rain" class="rain-value">-- mm</div>
+      </div>
+      <div class="rain-item">
+        <div class="rain-label">Mensual</div>
+        <div id="rainMonth" class="rain-value">-- mm</div>
+      </div>
+    </div>
+  </div>
 
-<div class="card">
-<h2>Presión</h2>
-<div id="press">-- hPa</div>
-</div>
+  <div class="card">
+    <h2>Presión</h2>
+    <div id="press">-- hPa</div>
+  </div>
 
-<div class="card">
-<h2>Índice UV</h2>
-<div id="uv">--</div>
-</div>
+  <div class="card">
+    <h2>Índice UV</h2>
+    <div id="uv">--</div>
+  </div>
 
-<div class="card">
-<h2>Radiación Solar</h2>
-<div id="solar">--</div>
-</div>
+  <div class="card">
+    <h2>Radiación Solar</h2>
+    <div id="solar">-- W/m²</div>
+  </div>
 
-<div class="card">
-<canvas id="tempChart"></canvas>
-</div>
+  <div class="card">
+    <canvas id="tempChart"></canvas>
+  </div>
 
 </div>
 
 <div id="ultimaActualizacion" style="text-align:center;margin:10px 0;font-size:14px;">
-Última actualización: --
+  Última actualización: --
 </div>
 
 <script src="script.js"></script>
