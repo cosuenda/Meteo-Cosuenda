@@ -49,55 +49,6 @@ function gradosADireccion(g){
 
 
 // ===============================
-// CREAR ROSA CON MARCAS CADA 10°
-// ===============================
-
-function crearRosa(){
-    const rosa = document.getElementById("rosa");
-
-    for(let i=0;i<360;i+=10){
-        const marca = document.createElement("div");
-        marca.className="marca";
-        marca.style.transform=`translateX(-50%) rotate(${i}deg)`;
-        rosa.appendChild(marca);
-    }
-
-    const cardinales = [
-        {letra:"N", x:100, y:10},
-        {letra:"S", x:100, y:190},
-        {letra:"E", x:190, y:100},
-        {letra:"W", x:10, y:100}
-    ];
-
-    cardinales.forEach(c=>{
-        const el=document.createElement("div");
-        el.className="cardinal";
-        el.textContent=c.letra;
-        el.style.left=c.x+"px";
-        el.style.top=c.y+"px";
-        rosa.appendChild(el);
-    });
-}
-
-crearRosa();
-
-
-// ===============================
-// MODO DÍA / NOCHE AUTOMÁTICO
-// ===============================
-
-function actualizarModoDiaNoche(hora){
-    if(hora>=7 && hora<=20){
-        document.body.classList.add("day");
-        document.body.classList.remove("night");
-    }else{
-        document.body.classList.add("night");
-        document.body.classList.remove("day");
-    }
-}
-
-
-// ===============================
 // OBTENER DATOS
 // ===============================
 
@@ -116,45 +67,46 @@ async function obtenerDatos(){
         const hum = parseFloat(o.humidity.value);
         const windKm = mphToKmh(w.wind_speed.value);
         const windDeg = parseFloat(w.wind_direction.value);
+        const windGust = mphToKmh(w.wind_gust.value ?? 0);
         const rainMm = inToMm(rain.daily.value);
         const lluviaMensual = inToMm(rain.month?.value ?? 0);
         const pressHpa = inHgToHpa(p.relative.value);
         const uvIndex = data.data.uv?.value ?? "--";
         const solar = data.data.solar_radiation?.value ?? "--";
-        const windGust = mphToKmh(w.wind_gust.value ?? 0);
 
-        // ===== MÍNIMA Y MÁXIMA DIARIA =====
+        // ===== TEMPERATURA DINÁMICA COLOR =====
 
-        let tempMin = parseFloat(localStorage.getItem("tempMin"));
-        let tempMax = parseFloat(localStorage.getItem("tempMax"));
+        const tempElement = document.getElementById("tempBig");
+        tempElement.textContent = tempC.toFixed(1)+"°";
 
-        if(tempC < tempMin){
-            tempMin = tempC;
-            localStorage.setItem("tempMin", tempMin);
+        tempElement.classList.remove("frio","templado","calor","muyCalor");
+
+        if(tempC <= 5){
+            tempElement.classList.add("frio");
+        }else if(tempC <= 20){
+            tempElement.classList.add("templado");
+        }else if(tempC <= 32){
+            tempElement.classList.add("calor");
+        }else{
+            tempElement.classList.add("muyCalor");
         }
 
-        if(tempC > tempMax){
-            tempMax = tempC;
-            localStorage.setItem("tempMax", tempMax);
+        // ===== ANIMACIÓN RACHAS FUERTES =====
+
+        const rosa = document.getElementById("rosa");
+        rosa.classList.remove("vientoFuerte","vientoExtremo");
+
+        if(windGust > 40){
+            rosa.classList.add("vientoExtremo");
+        }else if(windGust > 25){
+            rosa.classList.add("vientoFuerte");
         }
 
-        // ===== RACHA MÁXIMA =====
+        // ===== ACTUALIZAR RESTO =====
 
-        let windMax = parseFloat(localStorage.getItem("windMax"));
-
-        if(windGust > windMax){
-            windMax = windGust;
-            localStorage.setItem("windMax", windMax);
-        }
-
-        // ===== ACTUALIZAR HTML =====
-
-        document.getElementById("tempBig").textContent = tempC.toFixed(1)+"°";
-        document.getElementById("tempMin").textContent = "Min diaria: " + tempMin.toFixed(1)+"°";
-        document.getElementById("tempMax").textContent = "Max diaria: " + tempMax.toFixed(1)+"°";
         document.getElementById("hum").textContent = hum+" %";
         document.getElementById("wind").textContent = windKm.toFixed(1)+" km/h";
-        document.getElementById("windMax").textContent = windMax.toFixed(1)+" km/h";
+        document.getElementById("windMax").textContent = windGust.toFixed(1)+" km/h";
         document.getElementById("windDirText").textContent = "Dirección: "+gradosADireccion(windDeg);
         document.getElementById("rain").textContent = rainMm.toFixed(1)+" mm";
         document.getElementById("rainMonth").textContent = lluviaMensual.toFixed(1)+" mm";
@@ -162,16 +114,10 @@ async function obtenerDatos(){
         document.getElementById("uv").textContent = uvIndex;
         document.getElementById("solar").textContent = solar+" W/m²";
 
-        // ===== GIRAR FLECHA ROSA =====
-
         document.getElementById("flechaViento").style.transform =
             `translateX(-50%) rotate(${windDeg}deg)`;
 
-        // ===== HORA Y MODO =====
-
         const ahora = new Date();
-        actualizarModoDiaNoche(ahora.getHours());
-
         document.getElementById("ultimaActualizacion").textContent =
             "Última actualización: " +
             ahora.getHours()+":"+
