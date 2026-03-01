@@ -156,7 +156,7 @@ async function obtenerDatos() {
         document.getElementById("windMax").textContent = "Racha máx: " + windMax.toFixed(1) + " km/h";
         document.getElementById("windDirText").textContent = "Dirección: " + gradosADireccion(windDeg);
         document.getElementById("rain").textContent = rainMm.toFixed(1) + " mm";
-        document.getElementById("rainMonth").textContent = lluviaMensual.toFixed(1) + " mm";
+        document.getElementById("rainMonth").textContent = "Lluvias mensuales: " + lluviaMensual.toFixed(1) + " mm";
         document.getElementById("press").textContent = pressHpa.toFixed(1) + " hPa";
         document.getElementById("uv").textContent = uvIndex;
         document.getElementById("solar").textContent = solar;
