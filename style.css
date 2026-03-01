@@ -89,15 +89,4 @@ header{
     transform-origin:0 -80px;   /* distancia al borde del círculo */
 }
 
-<div class="rosa">
-    <div class="cardinal norte">N</div>
-    <div class="cardinal noreste">NE</div>
-    <div class="cardinal este">E</div>
-    <div class="cardinal sureste">SE</div>
-    <div class="cardinal sur">S</div>
-    <div class="cardinal suroeste">SW</div>
-    <div class="cardinal oeste">W</div>
-    <div class="cardinal noroeste">NW</div>
 
-    <div id="flechaViento" class="flecha"></div>
-</div>
