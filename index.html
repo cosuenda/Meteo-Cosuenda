@@ -5,101 +5,71 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meteo Cosuenda</title>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <header>
-    <h1>🌤️ Meteo Cosuenda</h1>
-    <p>Estación Meteorológica Profesional</p>
+<h1>🌤️ Meteo Cosuenda</h1>
+<p>Estación Meteorológica Profesional</p>
 </header>
 
 <div class="container">
 
-    <!-- TEMPERATURA -->
-    <div class="card highlight">
-        <h2>Temperatura</h2>
-        <div id="tempBig" class="bigTemp">--°</div>
-        <div id="sensacion" class="subValue">Sensación térmica: --</div>
-        <div class="minmax">
-            <div id="tempMin">Min: --</div>
-            <div id="tempMax">Max: --</div>
-        </div>
-    </div>
+<div class="card">
+<h2>Temperatura</h2>
+<div id="tempBig" class="bigTemp">--</div>
+<div id="sensacion">Sensación térmica: --</div>
+<div id="tempMin">Mínima diaria: --</div>
+<div id="tempMax">Máxima diaria: --</div>
+</div>
 
-    <!-- HUMEDAD -->
-    <div class="card">
-        <h2>Humedad</h2>
-        <div id="hum" class="bigNumber">-- %</div>
-    </div>
+<div class="card">
+<h2>Humedad</h2>
+<div id="hum" class="bigNumber">--</div>
+</div>
 
-    <!-- VIENTO -->
-    <div class="card">
-        <h2>Viento</h2>
+<div class="card">
+<h2>Viento (km/h)</h2>
+<div id="windValue" class="bigNumber">--</div>
+<div id="windMax">Racha máxima diaria: --</div>
+<div id="windDirText">Dirección: --</div>
+</div>
 
-        <div class="windRow">
-            <div>
-                <div class="label">Velocidad</div>
-                <div id="wind" class="bigNumber">-- km/h</div>
-            </div>
-            <div>
-                <div class="label">Racha máx</div>
-                <div id="windMax" class="bigNumber">-- km/h</div>
-            </div>
-        </div>
+<div class="card">
+<h2>Lluvia</h2>
+<div class="rainBox">
+<div>
+<span class="rainLabel">Hoy</span>
+<div id="rain" class="bigNumber">--</div>
+</div>
+<div>
+<span class="rainLabel">Mensual</span>
+<div id="rainMonth" class="bigNumber">--</div>
+</div>
+</div>
+</div>
 
-        <div id="windDirText">Dirección: --</div>
+<div class="card">
+<h2>Presión</h2>
+<div id="press" class="bigNumber">--</div>
+</div>
 
-        <div class="rosa">
-            <div id="flechaViento" class="flecha"></div>
-        </div>
-    </div>
+<div class="card">
+<h2>Índice UV</h2>
+<div id="uv" class="bigNumber">--</div>
+</div>
 
-    <!-- LLUVIA -->
-    <div class="card">
-        <h2>Lluvia</h2>
-
-        <div class="rainRow">
-            <div>
-                <div class="label">Diaria</div>
-                <div id="rain" class="bigNumber">-- mm</div>
-            </div>
-            <div>
-                <div class="label">Mensual</div>
-                <div id="rainMonth" class="bigNumber">-- mm</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- PRESIÓN -->
-    <div class="card">
-        <h2>Presión</h2>
-        <div id="press" class="bigNumber">-- hPa</div>
-    </div>
-
-    <!-- UV -->
-    <div class="card">
-        <h2>Índice UV</h2>
-        <div id="uv" class="bigNumber">--</div>
-    </div>
-
-    <!-- SOLAR -->
-    <div class="card">
-        <h2>Radiación Solar</h2>
-        <div id="solar" class="bigNumber">-- W/m²</div>
-    </div>
-
-    <!-- GRÁFICA -->
-    <div class="card chartCard">
-        <canvas id="tempChart"></canvas>
-    </div>
+<div class="card">
+<h2>Radiación Solar</h2>
+<div id="solar" class="bigNumber">--</div>
+</div>
 
 </div>
 
-<div id="ultimaActualizacion" class="update">
-    Última actualización: --
+<div id="ultimaActualizacion">
+Última actualización: --
 </div>
 
 <script src="script.js"></script>
