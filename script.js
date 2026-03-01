@@ -66,7 +66,32 @@ async function obtenerDatos(){
     try{
         const response = await fetch(url);
         const data = await response.json();
-        if(data.code!==0) return;
+        if(data.code!==0) return;  
+// ===============================
+// UV Y RADIACIÓN (SEGURO)
+// ===============================
+
+let uvIndex = "No disponible";
+let solar = "No disponible";
+
+// Caso normal
+if(data.data.uv && data.data.uv.value !== undefined){
+    uvIndex = data.data.uv.value;
+}
+
+if(data.data.solar_radiation && data.data.solar_radiation.value !== undefined){
+    solar = data.data.solar_radiation.value + " W/m²";
+}
+
+// Algunos modelos lo envían diferente
+if(data.data.solar_and_uvi){
+    if(data.data.solar_and_uvi.uvi?.value !== undefined){
+        uvIndex = data.data.solar_and_uvi.uvi.value;
+    }
+    if(data.data.solar_and_uvi.solar?.value !== undefined){
+        solar = data.data.solar_and_uvi.solar.value + " W/m²";
+    }
+}
 
         const o = data.data.outdoor;
         const w = data.data.wind;
