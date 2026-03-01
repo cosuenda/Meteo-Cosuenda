@@ -4,10 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meteo Cosuenda</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="day">
 
 <header>
 <h1>🌤️ Meteo Cosuenda</h1>
@@ -21,11 +23,12 @@
 <div id="tempBig" class="bigTemp">--</div>
 <div id="tempMin">Min diaria: --</div>
 <div id="tempMax">Max diaria: --</div>
+<div id="sensacion">Sensación térmica: --</div>
 </div>
 
 <div class="card">
 <h2>Humedad</h2>
-<div id="hum">-- %</div>
+<div id="hum" class="bigHum">-- %</div>
 </div>
 
 <div class="card">
@@ -33,11 +36,9 @@
 <div id="wind">-- km/h</div>
 <div id="windMax">Racha máx: -- km/h</div>
 <div id="windDirText">Dirección: --</div>
-
 <div class="rosa" id="rosa">
 <div id="flechaViento" class="flecha"></div>
 </div>
-
 </div>
 
 <div class="card">
@@ -58,12 +59,16 @@
 
 <div class="card">
 <h2>Radiación Solar</h2>
-<div id="solar">-- W/m²</div>
+<div id="solar">--</div>
+</div>
+
+<div class="card">
+<canvas id="tempChart"></canvas>
 </div>
 
 </div>
 
-<div id="ultimaActualizacion">
+<div id="ultimaActualizacion" style="text-align:center;margin:10px 0;font-size:14px;">
 Última actualización: --
 </div>
 
