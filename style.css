@@ -1,104 +1,100 @@
-body{
+/* ===============================
+   ESTILOS GENERALES
+   =============================== */
+
+body {
     margin:0;
     font-family: Arial, sans-serif;
     text-align:center;
     transition: background 1s, color 1s;
 }
 
-body.day{
+body.day {
     background: linear-gradient(to bottom, #87ceeb, #f0f8ff);
     color:#003366;
 }
 
-body.night{
+body.night {
     background: linear-gradient(to bottom, #00122e, #003366);
     color:#a0c4ff;
 }
 
-header{
+header {
     padding:20px;
     box-shadow:0 3px 8px rgba(0,0,0,0.3);
 }
 
-.container{
-    max-width:1100px;
+.container {
+    max-width:1000px;
     margin:auto;
     padding:20px;
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
     gap:20px;
 }
 
-.card{
+.card {
     background:white;
     padding:15px;
-    border-radius:20px;
-    box-shadow:0 6px 20px rgba(0,0,0,0.25);
-    transition: transform 0.3s, box-shadow 0.3s, background 1s;
+    border-radius:15px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.2);
+    transition: transform 0.3s, box-shadow 0.3s, background 1s, color 1s;
 }
 
-body.night .card{
+body.night .card {
     background:#003366;
     color:#a0c4ff;
 }
 
-.card:hover{
-    transform: translateY(-6px);
-    box-shadow:0 12px 30px rgba(0,0,0,0.35);
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow:0 8px 25px rgba(0,0,0,0.3);
 }
 
-.bigTemp{
-    font-size:70px;
+/* ===============================
+   TEMPERATURA CON NEÓN
+   =============================== */
+
+.bigTemp {
+    font-size:65px;
     font-weight:bold;
-    margin:15px 0;
-    transition: text-shadow 0.5s, color 0.5s;
-}
-
-.frio{
     color:#00eaff;
-    text-shadow:0 0 10px #00eaff,0 0 25px #00eaff,0 0 45px #00eaff;
-}
-
-.templado{
-    color:#00ff88;
-    text-shadow:0 0 10px #00ff88,0 0 25px #00ff88;
-}
-
-.calor{
-    color:#ff9900;
-    text-shadow:0 0 15px #ff9900,0 0 30px #ff5500;
-}
-
-.muyCalor{
-    color:#ff0033;
-    text-shadow:0 0 20px #ff0033,0 0 40px #ff0000;
-}
-
-.bigHum{
-    font-size:50px;
-    font-weight:bold;
-    color:#0077ff;
-    text-shadow:0 0 5px #00bfff,0 0 10px #00bfff,0 0 20px #00bfff;
+    text-shadow:
+        0 0 5px #00eaff,
+        0 0 10px #00eaff,
+        0 0 20px #00eaff,
+        0 0 40px #00eaff;
     margin:10px 0;
     transition: text-shadow 0.5s, color 0.5s;
 }
 
-.rosa{
+.bigHum {
+    font-size:50px;
+    font-weight:bold;
+    color:#0077ff;
+    text-shadow:
+        0 0 5px #00bfff,
+        0 0 10px #00bfff,
+        0 0 20px #00bfff;
+    margin:10px 0;
+    transition: text-shadow 0.5s, color 0.5s;
+}
+
+/* ===============================
+   ROSA DE LOS VIENTOS
+   =============================== */
+
+.rosa {
     position:relative;
     width:200px;
     height:200px;
     border:3px solid #333;
     border-radius:50%;
-    margin:20px auto;
+    margin:20px auto 0 auto;
     background: radial-gradient(circle at center, #f9f9f9 90%, #e0e0e0 100%);
-    transition: box-shadow 0.3s;
 }
 
-body.night .rosa{
-    background: radial-gradient(circle at center, #003366 90%, #00122e 100%);
-}
-
-.marca{
+.marca {
     position:absolute;
     width:2px;
     height:10px;
@@ -108,18 +104,19 @@ body.night .rosa{
     transform-origin:bottom center;
 }
 
-.cardinal{
+.cardinal {
     position:absolute;
     font-size:14px;
     font-weight:bold;
     transform: translate(-50%, -50%);
+    color:#003366;
 }
 
-.flecha{
+.flecha {
     position:absolute;
     width:6px;
     height:80px;
-    background:deepskyblue;
+    background:blue;
     top:20px;
     left:50%;
     transform-origin:bottom center;
@@ -128,26 +125,36 @@ body.night .rosa{
     transition: transform 1s ease;
 }
 
-@keyframes vibrar{
-    0%{transform:translateX(-50%) rotate(0deg);}
-    25%{transform:translateX(-48%) rotate(2deg);}
-    50%{transform:translateX(-52%) rotate(-2deg);}
-    75%{transform:translateX(-48%) rotate(2deg);}
-    100%{transform:translateX(-50%) rotate(0deg);}
+/* ===============================
+   LLUVIA
+   =============================== */
+
+.rain-row {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 10px;
 }
 
-.vientoFuerte{
-    animation:vibrar 0.4s infinite;
-    box-shadow:0 0 30px rgba(255,150,0,0.8);
+.rain-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.vientoExtremo{
-    animation:vibrar 0.2s infinite;
-    box-shadow:0 0 45px rgba(255,0,0,1);
+.rain-label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 5px;
 }
 
-#ultimaActualizacion{
-    margin:20px;
-    font-size:14px;
-    opacity:0.8;
+.rain-value {
+    font-size: 40px;
+    font-weight: bold;
+    color: #0077ff;
+    text-shadow:
+        0 0 5px #00bfff,
+        0 0 10px #00bfff,
+        0 0 20px #00bfff;
+    transition: text-shadow 0.5s, color 0.5s;
 }
