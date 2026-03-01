@@ -11,24 +11,20 @@ const url = `https://api.ecowitt.net/api/v3/device/real_time?application_key=${a
 // ===============================
 // CREAR ROSA DE LOS VIENTOS
 // ===============================
-
 function crearRosa() {
     const rosa = document.getElementById("rosa");
-
     for (let i = 0; i < 360; i += 10) {
         const marca = document.createElement("div");
         marca.className = "marca";
         marca.style.transform = `translateX(-50%) rotate(${i}deg)`;
         rosa.appendChild(marca);
     }
-
     const cardinales = [
         { letra: "N", x: 100, y: 10 },
         { letra: "S", x: 100, y: 190 },
         { letra: "E", x: 190, y: 100 },
         { letra: "W", x: 10, y: 100 }
     ];
-
     cardinales.forEach(c => {
         const el = document.createElement("div");
         el.className = "cardinal";
@@ -38,13 +34,11 @@ function crearRosa() {
         rosa.appendChild(el);
     });
 }
-
 crearRosa();
 
 // ===============================
 // CONVERSIONES
 // ===============================
-
 const fToC = f => (parseFloat(f) - 32) * 5 / 9;
 const mphToKmh = mph => parseFloat(mph) * 1.60934;
 const inToMm = inches => parseFloat(inches) * 25.4;
@@ -56,9 +50,22 @@ function gradosADireccion(g) {
 }
 
 // ===============================
+// MIN, MAX Y RACHA DIARIA
+// ===============================
+function inicializarDia() {
+    const hoy = new Date().toISOString().split("T")[0];
+    if (localStorage.getItem("diaActual") !== hoy) {
+        localStorage.setItem("diaActual", hoy);
+        localStorage.setItem("tempMin", "999");
+        localStorage.setItem("tempMax", "-999");
+        localStorage.setItem("windMax", "0");
+    }
+}
+inicializarDia();
+
+// ===============================
 // OBTENER DATOS
 // ===============================
-
 async function obtenerDatos() {
     try {
         const response = await fetch(url);
@@ -70,6 +77,7 @@ async function obtenerDatos() {
         const rain = data.data.rainfall;
         const press = data.data.pressure;
 
+        // Conversiones
         const tempC = fToC(o.temperature.value);
         const hum = parseFloat(o.humidity.value);
         const windKm = mphToKmh(w.wind_speed.value);
@@ -88,52 +96,58 @@ async function obtenerDatos() {
         } else {
             sensTerm = tempC.toFixed(1) + "°";
         }
-        document.getElementById("sensacion").textContent = "Sensación térmica: " + sensTerm;
 
-        // UV y Radiación
+        // UV y Radiación Solar
         let uvIndex = "No disponible";
         let solar = "No disponible";
         if (data.data.uv?.value != null) uvIndex = data.data.uv.value;
         if (data.data.solar_radiation?.value != null) solar = data.data.solar_radiation.value + " W/m²";
 
-        // Min, Max y Racha Máx diaria
-        const hoy = new Date().toISOString().split("T")[0];
-        if (localStorage.getItem("diaActual") !== hoy || !localStorage.getItem("tempMin")) {
-            localStorage.setItem("diaActual", hoy);
-            localStorage.setItem("tempMin", tempC.toFixed(1));
-            localStorage.setItem("tempMax", tempC.toFixed(1));
-            localStorage.setItem("windMax", windGust.toFixed(1));
-        }
-
+        // Mínima, máxima y racha diaria
         let tempMin = parseFloat(localStorage.getItem("tempMin"));
         let tempMax = parseFloat(localStorage.getItem("tempMax"));
         let windMax = parseFloat(localStorage.getItem("windMax"));
 
-        if (tempC < tempMin) { tempMin = tempC; localStorage.setItem("tempMin", tempMin.toFixed(1)); }
-        if (tempC > tempMax) { tempMax = tempC; localStorage.setItem("tempMax", tempMax.toFixed(1)); }
-        if (windGust > windMax) { windMax = windGust; localStorage.setItem("windMax", windMax.toFixed(1)); }
+        if(tempC < tempMin){ tempMin = tempC; localStorage.setItem("tempMin", tempMin.toFixed(1)); }
+        if(tempC > tempMax){ tempMax = tempC; localStorage.setItem("tempMax", tempMax.toFixed(1)); }
+        if(windGust > windMax){ windMax = windGust; localStorage.setItem("windMax", windMax.toFixed(1)); }
 
         // Actualizar HTML
         const tempElement = document.getElementById("tempBig");
         tempElement.textContent = tempC.toFixed(1) + "°";
-        tempElement.className = "bigTemp";
+        tempElement.style.color = tempC <= 10 ? "#00bfff" : tempC >= 25 ? "#ff4c4c" : "#00eaff"; // color frío/calor
 
         document.getElementById("tempMin").textContent = "Min diaria: " + tempMin.toFixed(1) + "°";
         document.getElementById("tempMax").textContent = "Max diaria: " + tempMax.toFixed(1) + "°";
+        document.getElementById("sensacion").textContent = "Sensación térmica: " + sensTerm;
+
         document.getElementById("hum").textContent = hum + " %";
         document.getElementById("wind").textContent = windKm.toFixed(1) + " km/h";
         document.getElementById("windMax").textContent = windMax.toFixed(1) + " km/h";
         document.getElementById("windDirText").textContent = "Dirección: " + gradosADireccion(windDeg);
+
         document.getElementById("rain").textContent = rainMm.toFixed(1) + " mm";
         document.getElementById("rainMonth").textContent = lluviaMensual.toFixed(1) + " mm";
+
         document.getElementById("press").textContent = pressHpa.toFixed(1) + " hPa";
         document.getElementById("uv").textContent = uvIndex;
         document.getElementById("solar").textContent = solar;
+
+        // Animar flecha del viento
         document.getElementById("flechaViento").style.transform = `translateX(-50%) rotate(${windDeg}deg)`;
 
+        // Última actualización
         const ahora = new Date();
         document.getElementById("ultimaActualizacion").textContent =
             "Última actualización: " + ahora.getHours() + ":" + String(ahora.getMinutes()).padStart(2,"0");
+
+        // Animación especial rachas fuertes
+        const windMaxElement = document.getElementById("windMax");
+        if(windGust >= 50){ // ejemplo: racha fuerte
+            windMaxElement.style.textShadow = "0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000";
+        } else {
+            windMaxElement.style.textShadow = "0 0 5px #00bfff,0 0 10px #00bfff,0 0 20px #00bfff";
+        }
 
     } catch (error) {
         console.log("Error conexión:", error);
