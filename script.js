@@ -86,13 +86,15 @@ async function obtenerDatos() {
         const pressHpa = inHgToHpa(press.relative?.value ?? 1013);
 
         // -----------------------
-        // SENSACIÓN TÉRMICA
+        // SENSACIÓN TÉRMICA (CORREGIDA)
         // -----------------------
         let sensTerm = "--";
-        if (o.heat_index && o.heat_index.value !== undefined) {
+        if (o.heat_index?.value != null) {
             sensTerm = fToC(o.heat_index.value).toFixed(1) + "°";
-        } else if (o.windchill && o.windchill.value !== undefined) {
+        } else if (o.windchill?.value != null) {
             sensTerm = fToC(o.windchill.value).toFixed(1) + "°";
+        } else {
+            sensTerm = tempC.toFixed(1) + "°"; // fallback seguro
         }
         document.getElementById("sensacion").textContent = "Sensación térmica: " + sensTerm;
 
