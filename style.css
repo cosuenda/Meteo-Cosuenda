@@ -1,30 +1,28 @@
 /* ===============================
    ESTILOS GENERALES
    =============================== */
-
-body {
+body{
     margin:0;
     font-family: Arial, sans-serif;
     text-align:center;
     transition: background 1s, color 1s;
 }
 
-body.day {
+body.day{
     background: linear-gradient(to bottom, #87ceeb, #f0f8ff);
     color:#003366;
 }
-
-body.night {
+body.night{
     background: linear-gradient(to bottom, #00122e, #003366);
     color:#a0c4ff;
 }
 
-header {
+header{
     padding:20px;
     box-shadow:0 3px 8px rgba(0,0,0,0.3);
 }
 
-.container {
+.container{
     max-width:1000px;
     margin:auto;
     padding:20px;
@@ -33,7 +31,7 @@ header {
     gap:20px;
 }
 
-.card {
+.card{
     background:white;
     padding:15px;
     border-radius:15px;
@@ -41,20 +39,20 @@ header {
     transition: transform 0.3s, box-shadow 0.3s, background 1s, color 1s;
 }
 
-body.night .card {
+body.night .card{
     background:#003366;
     color:#a0c4ff;
 }
 
-.card:hover {
+.card:hover{
     transform: translateY(-5px);
     box-shadow:0 8px 25px rgba(0,0,0,0.3);
 }
 
 /* ===============================
-   TEMPERATURA
+   TEMPERATURA CON NEÓN
    =============================== */
-.bigTemp {
+.bigTemp{
     font-size:65px;
     font-weight:bold;
     color:#00eaff;
@@ -67,7 +65,10 @@ body.night .card {
     transition: text-shadow 0.5s, color 0.5s;
 }
 
-.bigHum, .hum-value {
+/* ===============================
+   HUMEDAD
+   =============================== */
+.hum-value{
     font-size:50px;
     font-weight:bold;
     color:#0077ff;
@@ -75,47 +76,41 @@ body.night .card {
         0 0 5px #00bfff,
         0 0 10px #00bfff,
         0 0 20px #00bfff;
-    margin:10px 0;
-    transition: text-shadow 0.5s, color 0.5s;
 }
 
 /* ===============================
    VIENTO
    =============================== */
-.wind-row {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    margin-top: 10px;
+.wind-row{
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    margin-top:10px;
 }
-
-.wind-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.wind-item{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
 }
-
-.wind-label {
-    font-size: 14px;
-    font-weight: bold;
-    margin-bottom: 5px;
+.wind-label{
+    font-size:14px;
+    font-weight:bold;
+    margin-bottom:5px;
 }
-
-.wind-value {
-    font-size: 40px;
-    font-weight: bold;
-    color: #0077ff;
+.wind-value{
+    font-size:40px;
+    font-weight:bold;
+    color:#0077ff;
     text-shadow:
         0 0 5px #00bfff,
         0 0 10px #00bfff,
         0 0 20px #00bfff;
-    transition: text-shadow 0.5s, color 0.5s;
 }
 
 /* ===============================
    ROSA DE LOS VIENTOS
    =============================== */
-.rosa {
+.rosa{
     position:relative;
     width:200px;
     height:200px;
@@ -124,8 +119,7 @@ body.night .card {
     margin:20px auto 0 auto;
     background: radial-gradient(circle at center, #f9f9f9 90%, #e0e0e0 100%);
 }
-
-.marca {
+.marca{
     position:absolute;
     width:2px;
     height:10px;
@@ -134,16 +128,14 @@ body.night .card {
     top:0;
     transform-origin:bottom center;
 }
-
-.cardinal {
+.cardinal{
     position:absolute;
     font-size:14px;
     font-weight:bold;
     transform: translate(-50%, -50%);
     color:#003366;
 }
-
-.flecha {
+.flecha{
     position:absolute;
     width:6px;
     height:80px;
@@ -159,32 +151,28 @@ body.night .card {
 /* ===============================
    LLUVIA
    =============================== */
-.rain-row {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    margin-top: 10px;
+.rain-row{
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    margin-top:10px;
 }
-
-.rain-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.rain-item{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
 }
-
-.rain-label {
-    font-size: 14px;
-    font-weight: bold;
-    margin-bottom: 5px;
+.rain-label{
+    font-size:14px;
+    font-weight:bold;
+    margin-bottom:5px;
 }
-
-.rain-value {
-    font-size: 40px;
-    font-weight: bold;
-    color: #0077ff;
+.rain-value{
+    font-size:40px;
+    font-weight:bold;
+    color:#0077ff;
     text-shadow:
         0 0 5px #00bfff,
         0 0 10px #00bfff,
         0 0 20px #00bfff;
-    transition: text-shadow 0.5s, color 0.5s;
 }
