@@ -86,6 +86,19 @@ async function obtenerDatos() {
         const pressHpa = inHgToHpa(press.relative?.value ?? 1013);
 
         // -----------------------
+        // SENSACIÓN TÉRMICA
+        // -----------------------
+        let sensTerm = "--";
+
+        if (o.heat_index && o.heat_index.value !== undefined) {
+            sensTerm = fToC(o.heat_index.value).toFixed(1) + "°";
+        } else if (o.windchill && o.windchill.value !== undefined) {
+            sensTerm = fToC(o.windchill.value).toFixed(1) + "°";
+        }
+
+        document.getElementById("sensacion").textContent = "Sensación térmica: " + sensTerm;
+
+        // -----------------------
         // UV Y RADIACIÓN SOLAR SEGUROS
         // -----------------------
         let uvIndex = "No disponible";
@@ -108,32 +121,24 @@ async function obtenerDatos() {
             }
         }
 
- // ===============================
-// MÍNIMA Y MÁXIMA DIARIA
-// ===============================
+        // -----------------------
+        // MÍNIMA Y MÁXIMA DIARIA
+        // -----------------------
+        const hoy = new Date().toISOString().split("T")[0];
+        if (localStorage.getItem("diaActual") !== hoy) {
+            localStorage.setItem("diaActual", hoy);
+            localStorage.setItem("tempMin", tempC.toFixed(1));
+            localStorage.setItem("tempMax", tempC.toFixed(1));
+            localStorage.setItem("windMax", windGust.toFixed(1));
+        }
 
-// Inicializar valores del día si no existen
-const hoy = new Date().toISOString().split("T")[0];
-if (localStorage.getItem("diaActual") !== hoy) {
-    localStorage.setItem("diaActual", hoy);
-    localStorage.setItem("tempMin", tempC.toFixed(1)); // Inicializa con primera lectura
-    localStorage.setItem("tempMax", tempC.toFixed(1));
-    localStorage.setItem("windMax", windGust.toFixed(1));
-}
+        let tempMin = parseFloat(localStorage.getItem("tempMin"));
+        let tempMax = parseFloat(localStorage.getItem("tempMax"));
+        let windMax = parseFloat(localStorage.getItem("windMax"));
 
-let tempMin = parseFloat(localStorage.getItem("tempMin"));
-let tempMax = parseFloat(localStorage.getItem("tempMax"));
-let windMax = parseFloat(localStorage.getItem("windMax"));
-
-// Actualizar min/max si corresponde
-if (tempC < tempMin) { tempMin = tempC; localStorage.setItem("tempMin", tempMin.toFixed(1)); }
-if (tempC > tempMax) { tempMax = tempC; localStorage.setItem("tempMax", tempMax.toFixed(1)); }
-if (windGust > windMax) { windMax = windGust; localStorage.setItem("windMax", windMax.toFixed(1)); }
-
-// Actualizar HTML
-document.getElementById("tempMin").textContent = "Min diaria: " + tempMin.toFixed(1) + "°";
-document.getElementById("tempMax").textContent = "Max diaria: " + tempMax.toFixed(1) + "°";
-document.getElementById("windMax").textContent = "Racha máx: " + windMax.toFixed(1) + " km/h";
+        if (tempC < tempMin) { tempMin = tempC; localStorage.setItem("tempMin", tempMin.toFixed(1)); }
+        if (tempC > tempMax) { tempMax = tempC; localStorage.setItem("tempMax", tempMax.toFixed(1)); }
+        if (windGust > windMax) { windMax = windGust; localStorage.setItem("windMax", windMax.toFixed(1)); }
 
         // -----------------------
         // ACTUALIZAR HTML
