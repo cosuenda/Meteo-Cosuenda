@@ -72,11 +72,6 @@ header{
     border-radius:3px;
     transition: transform 0.8s ease;
 }
-
-#ultimaActualizacion{
-    margin:20px;
-    font-size:14px;
-}
 /* ===== PUNTOS CARDINALES PERFECTAMENTE CENTRADOS ===== */
 
 .cardinal{
@@ -88,5 +83,16 @@ header{
     color:#003366;
     transform-origin:0 -80px;   /* distancia al borde del círculo */
 }
+
+/* 8 direcciones exactas */
+
+.norte     { transform: rotate(0deg) translate(-50%, -50%) rotate(0deg); }
+.noreste   { transform: rotate(45deg) translate(-50%, -50%) rotate(-45deg); }
+.este      { transform: rotate(90deg) translate(-50%, -50%) rotate(-90deg); }
+.sureste   { transform: rotate(135deg) translate(-50%, -50%) rotate(-135deg); }
+.sur       { transform: rotate(180deg) translate(-50%, -50%) rotate(-180deg); }
+.suroeste  { transform: rotate(225deg) translate(-50%, -50%) rotate(-225deg); }
+.oeste     { transform: rotate(270deg) translate(-50%, -50%) rotate(-270deg); }
+.noroeste  { transform: rotate(315deg) translate(-50%, -50%) rotate(-315deg); }
 
 
