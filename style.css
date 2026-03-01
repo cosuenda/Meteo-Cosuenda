@@ -52,9 +52,8 @@ body.night .card {
 }
 
 /* ===============================
-   TEMPERATURA CON NEÓN
+   TEMPERATURA
    =============================== */
-
 .bigTemp {
     font-size:65px;
     font-weight:bold;
@@ -68,7 +67,7 @@ body.night .card {
     transition: text-shadow 0.5s, color 0.5s;
 }
 
-.bigHum {
+.bigHum, .hum-value {
     font-size:50px;
     font-weight:bold;
     color:#0077ff;
@@ -81,9 +80,41 @@ body.night .card {
 }
 
 /* ===============================
+   VIENTO
+   =============================== */
+.wind-row {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.wind-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.wind-label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.wind-value {
+    font-size: 40px;
+    font-weight: bold;
+    color: #0077ff;
+    text-shadow:
+        0 0 5px #00bfff,
+        0 0 10px #00bfff,
+        0 0 20px #00bfff;
+    transition: text-shadow 0.5s, color 0.5s;
+}
+
+/* ===============================
    ROSA DE LOS VIENTOS
    =============================== */
-
 .rosa {
     position:relative;
     width:200px;
@@ -128,7 +159,6 @@ body.night .card {
 /* ===============================
    LLUVIA
    =============================== */
-
 .rain-row {
     display: flex;
     justify-content: space-around;
