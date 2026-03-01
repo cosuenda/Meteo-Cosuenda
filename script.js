@@ -1,29 +1,5 @@
 // ===============================
-// GUARDADO DIARIO AUTOMÁTICO
-// ===============================
-
-function hoyString(){
-    const hoy = new Date();
-    return hoy.getFullYear()+"-"+(hoy.getMonth()+1)+"-"+hoy.getDate();
-}
-
-function inicializarDia(){
-    const hoy = hoyString();
-    const diaGuardado = localStorage.getItem("diaActual");
-
-    if(diaGuardado !== hoy){
-        localStorage.setItem("diaActual", hoy);
-        localStorage.setItem("tempMin", "999");
-        localStorage.setItem("tempMax", "-999");
-        localStorage.setItem("windMax", "0");
-    }
-}
-
-inicializarDia();
-
-
-// ===============================
-// API Ecowitt
+// CONFIGURACIÓN API ECOWITT
 // ===============================
 
 const appKey="26C4D6AD21CF8F8C4F3BA85E1CAF6701";
@@ -34,9 +10,9 @@ const url=`https://api.ecowitt.net/api/v3/device/real_time?application_key=${app
 
 
 // ===============================
-// Conversiones
+// CONTROL CAMBIO DE DÍA
 // ===============================
-// ===== Guardado diario automático =====
+
 function hoyString(){
     const h = new Date();
     return h.getFullYear()+"-"+(h.getMonth()+1)+"-"+h.getDate();
@@ -55,6 +31,12 @@ function comprobarCambioDia(){
 }
 
 comprobarCambioDia();
+
+
+// ===============================
+// CONVERSIONES
+// ===============================
+
 const fToC = f => (parseFloat(f)-32)*5/9;
 const mphToKmh = mph => parseFloat(mph)*1.60934;
 const inToMm = inches => parseFloat(inches)*25.4;
@@ -63,6 +45,55 @@ const inHgToHpa = inHg => parseFloat(inHg)*33.8639;
 function gradosADireccion(g){
     const d = ["N","NE","E","SE","S","SW","W","NW"];
     return d[Math.round(g/45)%8];
+}
+
+
+// ===============================
+// CREAR ROSA CON MARCAS CADA 10°
+// ===============================
+
+function crearRosa(){
+    const rosa = document.getElementById("rosa");
+
+    for(let i=0;i<360;i+=10){
+        const marca = document.createElement("div");
+        marca.className="marca";
+        marca.style.transform=`translateX(-50%) rotate(${i}deg)`;
+        rosa.appendChild(marca);
+    }
+
+    const cardinales = [
+        {letra:"N", x:100, y:10},
+        {letra:"S", x:100, y:190},
+        {letra:"E", x:190, y:100},
+        {letra:"W", x:10, y:100}
+    ];
+
+    cardinales.forEach(c=>{
+        const el=document.createElement("div");
+        el.className="cardinal";
+        el.textContent=c.letra;
+        el.style.left=c.x+"px";
+        el.style.top=c.y+"px";
+        rosa.appendChild(el);
+    });
+}
+
+crearRosa();
+
+
+// ===============================
+// MODO DÍA / NOCHE AUTOMÁTICO
+// ===============================
+
+function actualizarModoDiaNoche(hora){
+    if(hora>=7 && hora<=20){
+        document.body.classList.add("day");
+        document.body.classList.remove("night");
+    }else{
+        document.body.classList.add("night");
+        document.body.classList.remove("day");
+    }
 }
 
 
@@ -107,7 +138,7 @@ async function obtenerDatos(){
             localStorage.setItem("tempMax", tempMax);
         }
 
-        // ===== RACHA MÁXIMA DIARIA =====
+        // ===== RACHA MÁXIMA =====
 
         let windMax = parseFloat(localStorage.getItem("windMax"));
 
@@ -118,9 +149,9 @@ async function obtenerDatos(){
 
         // ===== ACTUALIZAR HTML =====
 
-        document.getElementById("tempBig").textContent = tempC.toFixed(1);
-        document.getElementById("tempMin").textContent = "Min diaria: " + tempMin.toFixed(1);
-        document.getElementById("tempMax").textContent = "Max diaria: " + tempMax.toFixed(1);
+        document.getElementById("tempBig").textContent = tempC.toFixed(1)+"°";
+        document.getElementById("tempMin").textContent = "Min diaria: " + tempMin.toFixed(1)+"°";
+        document.getElementById("tempMax").textContent = "Max diaria: " + tempMax.toFixed(1)+"°";
         document.getElementById("hum").textContent = hum+" %";
         document.getElementById("wind").textContent = windKm.toFixed(1)+" km/h";
         document.getElementById("windMax").textContent = windMax.toFixed(1)+" km/h";
@@ -131,7 +162,16 @@ async function obtenerDatos(){
         document.getElementById("uv").textContent = uvIndex;
         document.getElementById("solar").textContent = solar+" W/m²";
 
+        // ===== GIRAR FLECHA ROSA =====
+
+        document.getElementById("flechaViento").style.transform =
+            `translateX(-50%) rotate(${windDeg}deg)`;
+
+        // ===== HORA Y MODO =====
+
         const ahora = new Date();
+        actualizarModoDiaNoche(ahora.getHours());
+
         document.getElementById("ultimaActualizacion").textContent =
             "Última actualización: " +
             ahora.getHours()+":"+
