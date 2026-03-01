@@ -1,105 +1,54 @@
 body{
     margin:0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg,#dbefff,#87ceeb);
-    color:#003366;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom, #87ceeb, #f0f8ff);
     text-align:center;
 }
 
 header{
     padding:20px;
-    background:white;
-    box-shadow:0 4px 15px rgba(0,0,0,0.15);
+    background:#003366;
+    color:white;
 }
 
 .container{
-    max-width:1200px;
+    max-width:1100px;
     margin:auto;
     padding:20px;
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
     gap:20px;
 }
 
 .card{
     background:white;
     padding:20px;
-    border-radius:25px;
-    box-shadow:0 10px 25px rgba(0,0,0,0.15);
-    transition:0.3s;
-}
-
-.card:hover{
-    transform:translateY(-6px);
-    box-shadow:0 15px 35px rgba(0,0,0,0.25);
-}
-
-.highlight{
-    background:linear-gradient(135deg,#ffffff,#f0faff);
+    border-radius:15px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.2);
 }
 
 .bigTemp{
-    font-size:70px;
+    font-size:60px;
     font-weight:bold;
-    margin:10px 0;
-    transition:0.5s;
+    color:#00aaff;
 }
 
 .bigNumber{
-    font-size:45px;
+    font-size:40px;
     font-weight:bold;
-    color:#0077ff;
 }
 
-.subValue{
-    font-size:18px;
-    margin-bottom:10px;
-}
-
-.minmax{
-    display:flex;
-    justify-content:space-around;
-    font-size:16px;
-}
-
-.windRow,.rainRow{
+.rainBox{
     display:flex;
     justify-content:space-around;
 }
 
-.label{
+.rainLabel{
     font-size:14px;
-    font-weight:bold;
+    color:#555;
 }
 
-.rosa{
-    width:180px;
-    height:180px;
-    border-radius:50%;
-    border:3px solid #333;
-    margin:15px auto;
-    position:relative;
-    background:radial-gradient(circle,#ffffff 80%,#e0e0e0);
-}
-
-.flecha{
-    width:6px;
-    height:70px;
-    background:red;
-    position:absolute;
-    top:20px;
-    left:50%;
-    transform-origin:bottom center;
-    transform:translateX(-50%) rotate(0deg);
-    border-radius:3px;
-    transition:1s ease;
-}
-
-.chartCard{
-    grid-column:1/-1;
-}
-
-.update{
+#ultimaActualizacion{
     margin:20px;
     font-size:14px;
 }
