@@ -53,8 +53,8 @@ async function obtenerDatos(){
         const rainMm = inToMm(rain.daily.value);
         const rainMonthMm = inToMm(rain.month?.value ?? 0);
         const pressHpa = inHgToHpa(p.relative.value);
-        const uvIndex = data.data.uv?.value ?? "--";
-        const solar = data.data.solar_radiation?.value ?? "--";
+        const uvIndex = o.uv?.value ?? "--";
+        const solar = o.solar_radiation?.value ?? "--";
 
         let tempMin = parseFloat(localStorage.getItem("tempMin"));
         let tempMax = parseFloat(localStorage.getItem("tempMax"));
