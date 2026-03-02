@@ -93,7 +93,38 @@ async function obtenerDatos(){
 
         // ROTAR ROSA
         document.getElementById("flechaViento").style.transform =
-            `translateX(-50%) rotate(${windDeg}deg)`;
+    `translate(-50%, -50%) rotate(${windDeg}deg)`;
+
+// HUMEDAD COLOR DINÁMICO
+const humElement = document.getElementById("hum");
+humElement.textContent = hum+"%";
+
+if(hum < 40){
+    humElement.style.color = "#ffd700";
+}
+else if(hum < 70){
+    humElement.style.color = "#00e0ff";
+}
+else{
+    humElement.style.color = "#0066ff";
+}
+
+// UV COLOR
+const uvElement = document.getElementById("uv");
+uvElement.textContent = uvIndex;
+
+if(uvIndex <= 2){
+    uvElement.style.color = "#00ff00";
+}
+else if(uvIndex <= 5){
+    uvElement.style.color = "#ffff00";
+}
+else if(uvIndex <= 7){
+    uvElement.style.color = "#ff9900";
+}
+else{
+    uvElement.style.color = "#ff0000";
+}
 
         const ahora = new Date();
         document.getElementById("ultimaActualizacion").textContent =
