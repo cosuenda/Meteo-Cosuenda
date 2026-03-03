@@ -1,14 +1,17 @@
+/* ===========================
+   ESTILOS GENERALES
+=========================== */
 body{
     margin:0;
     font-family: Arial, sans-serif;
-    background: linear-gradient(to bottom, #1e3c72, #2a5298);
+    background: linear-gradient(to bottom, #87ceeb, #f0f8ff);
     text-align:center;
-    color:white;
 }
 
 header{
     padding:20px;
-    background:#001f3f;
+    background:#003366;
+    color:white;
 }
 
 .container{
@@ -21,22 +24,16 @@ header{
 }
 
 .card{
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(10px);
+    background:white;
     padding:20px;
     border-radius:15px;
-    box-shadow:0 4px 15px rgba(0,0,0,0.4);
+    box-shadow:0 4px 15px rgba(0,0,0,0.2);
 }
 
 .bigTemp{
-    font-size:70px;
+    font-size:60px;
     font-weight:bold;
-    color:#ffffff;
-    text-shadow:
-        0 0 5px #00f2ff,
-        0 0 10px #00f2ff,
-        0 0 20px #00f2ff,
-        0 0 40px rgba(0,242,255,0.4);
+    color:#00aaff;
 }
 
 .bigNumber{
@@ -51,54 +48,55 @@ header{
 
 .rainLabel{
     font-size:14px;
-    opacity:0.8;
+    color:#555;
 }
 
-/* ROSA DE LOS VIENTOS */
-
+/* ===========================
+   ROSA DE LOS VIENTOS
+=========================== */
 .rosa{
-    position:relative;
-    width:180px;
-    height:180px;
-    border:3px solid white;
-    border-radius:50%;
-    margin:20px auto 0 auto;
-    background: radial-gradient(circle at center, #ffffff 60%, #cce6ff 100%);
+    position: relative;
+    width: 180px;
+    height: 180px;
+    border: 3px solid #003366;
+    border-radius: 50%;
+    margin: 20px auto; /* centrado horizontal automático */
+    background: radial-gradient(circle at center, #ffffff 70%, #e6f2ff 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .flecha{
-    position:absolute;
-    width:6px;
-    height:70px;
-    background:#003366;
-    top:50%;
-    left:50%;
-    transform-origin:50% 90%;
-    transform:translate(-50%, -50%) rotate(0deg);
-    border-radius:3px;
+    position: absolute;
+    width: 6px;
+    height: 70px;
+    background: #003366;
+    bottom: 50%;
+    left: 50%;
+    transform-origin: bottom center;
+    transform: translateX(-50%) rotate(0deg);
+    border-radius: 3px;
     transition: transform 0.8s ease;
 }
 
+/* ===========================
+   PUNTOS CARDINALES
+=========================== */
 .cardinal{
-    position:absolute;
-    font-size:14px;
-    font-weight:bold;
-    color:#003366;
-    transform:translate(-50%,-50%);
+    position: absolute;
+    font-size: 14px;
+    font-weight: bold;
+    color: #003366;
+    transform: translate(-50%, -50%);
 }
 
-.norte{ top:5%; left:50%; }
-.sur{ bottom:-2%; left:50%; }
-.este{ top:50%; right:-2%; }
-.oeste{ top:50%; left:5%; }
+.norte{ top: 0%; left: 50%; }
+.sur{ bottom: 0%; left: 50%; }
+.este{ top: 50%; right: 0%; }
+.oeste{ top: 50%; left: 0%; }
 
-.noreste{ top:18%; right:10%; }
-.sureste{ bottom:18%; right:10%; }
-.suroeste{ bottom:18%; left:10%; }
-.noroeste{ top:18%; left:10%; }
-
-#ultimaActualizacion{
-    margin:20px;
-    font-size:14px;
-    opacity:0.8;
-}
+.noreste{ top: 15%; right: 15%; }
+.sureste{ bottom: 15%; right: 15%; }
+.suroeste{ bottom: 15%; left: 15%; }
+.noroeste{ top: 15%; left: 15%; }
