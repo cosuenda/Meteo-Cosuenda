@@ -159,11 +159,43 @@ async function obtenerDatos(){
         document.getElementById("rainMonth").textContent = rainMonthMm.toFixed(1)+" mm";
         document.getElementById("press").textContent = pressHpa.toFixed(1)+" hPa";
 
-        const uvEl = document.getElementById("uv");
+                const uvEl = document.getElementById("uv");
         uvEl.textContent = uvIndex;
         uvEl.style.color = colorUV(uvIndex);
 
         document.getElementById("solar").textContent = solar+" W/m²";
+
+
+        // 🔥 Animaciones elegantes dinámicas
+
+        // Temperatura pulse al actualizar
+        tempEl.style.animation = "pulseSoft 0.6s ease";
+        setTimeout(() => tempEl.style.animation = "", 600);
+
+        // UV brillo fuerte si es alto
+        if(uvIndex >= 7){
+            uvEl.style.animation = "glowStrong 1.5s infinite";
+        } else {
+            uvEl.style.animation = "";
+        }
+
+        // Viento vibra si supera 30 km/h
+        if(windKm >= 30){
+            windEl.style.animation = "windShake 0.4s infinite";
+        } else {
+            windEl.style.animation = "";
+        }
+
+        // Humedad respira si supera 80%
+        if(hum >= 80){
+            humEl.style.animation = "breathe 2s infinite";
+        } else {
+            humEl.style.animation = "";
+        }
+
+        // Rotar flecha del viento
+        document.getElementById("flechaViento").style.transform =
+            `translateX(-50%) rotate(${windDeg}deg)`;
 
         // Rotar flecha del viento
         document.getElementById("flechaViento").style.transform =
