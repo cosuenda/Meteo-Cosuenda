@@ -1,20 +1,28 @@
-https://meteo-cosuenda-api.luisromea.workers.dev/
+// ----------------------------
+// script.js final para Meteo-Cosuenda
+// ----------------------------
 
+const url = "https://meteo-cosuenda-api.luisromea.workers.dev/";
+
+// Conversiones
 const fToC = f => (parseFloat(f)-32)*5/9;
 const mphToKmh = mph => parseFloat(mph)*1.60934;
 const inToMm = inches => parseFloat(inches)*25.4;
 const inHgToHpa = inHg => parseFloat(inHg)*33.8639;
 
+// Direcciones del viento
 function gradosADireccion(g){
     const d = ["N","NE","E","SE","S","SW","W","NW"];
     return d[Math.round(g/45)%8];
 }
 
+// Fecha de hoy
 function hoyString(){
     const h = new Date();
     return h.getFullYear()+"-"+(h.getMonth()+1)+"-"+h.getDate();
 }
 
+// Comprobar cambio de día para máximos y mínimos
 function comprobarCambioDia(){
     const hoy = hoyString();
     const guardado = localStorage.getItem("diaActual");
@@ -29,6 +37,7 @@ function comprobarCambioDia(){
 
 comprobarCambioDia();
 
+// Obtener datos desde el Worker
 async function obtenerDatos(){
     try{
         const response = await fetch(url);
@@ -40,20 +49,28 @@ async function obtenerDatos(){
         const rain = data.data.rainfall;
         const p = data.data.pressure;
 
+        // Temperaturas
         const tempC = fToC(o.temperature.value);
         const feels = o.feels_like ? fToC(o.feels_like.value) : tempC;
         const hum = parseFloat(o.humidity.value);
+
+        // Viento
         const windKm = mphToKmh(w.wind_speed.value);
         const windDeg = parseFloat(w.wind_direction.value);
         const windGust = mphToKmh(w.wind_gust.value ?? 0);
+
+        // Lluvia
         const rainMm = inToMm(rain.daily.value);
         const rainMonthMm = inToMm(rain.monthly?.value ?? 0);
+
+        // Presión
         const pressHpa = inHgToHpa(p.relative.value);
-        
-        // RADIACIÓN Y UV (corrección por estructura de JSON)
+
+        // UV y radiación solar
         const uvIndex = data.data.solar_and_uvi?.uvi?.value ?? "--";
         const solar = data.data.solar_and_uvi?.solar?.value ?? "--";
 
+        // Máximos y mínimos diarios
         let tempMin = parseFloat(localStorage.getItem("tempMin"));
         let tempMax = parseFloat(localStorage.getItem("tempMax"));
         let windMax = parseFloat(localStorage.getItem("windMax"));
@@ -73,6 +90,7 @@ async function obtenerDatos(){
             localStorage.setItem("windMax", windMax);
         }
 
+        // Actualizar HTML
         document.getElementById("tempBig").textContent = tempC.toFixed(1)+"°";
         document.getElementById("sensacion").textContent = "Sensación térmica: "+feels.toFixed(1)+"°";
         document.getElementById("tempMin").textContent = "Mínima diaria: "+tempMin.toFixed(1)+"°";
@@ -86,44 +104,15 @@ async function obtenerDatos(){
         document.getElementById("rain").textContent = rainMm.toFixed(1)+" mm";
         document.getElementById("rainMonth").textContent = rainMonthMm.toFixed(1)+" mm";
         document.getElementById("press").textContent = pressHpa.toFixed(1)+" hPa";
+
         document.getElementById("uv").textContent = uvIndex;
         document.getElementById("solar").textContent = solar+" W/m²";
 
-        // ROTAR ROSA
+        // Rotar flecha del viento
         document.getElementById("flechaViento").style.transform =
-    `translate(-50%, -50%) rotate(${windDeg}deg)`;
+            `translateX(-50%) rotate(${windDeg}deg)`;
 
-// HUMEDAD COLOR DINÁMICO
-const humElement = document.getElementById("hum");
-humElement.textContent = hum+"%";
-
-if(hum < 40){
-    humElement.style.color = "#ffd700";
-}
-else if(hum < 70){
-    humElement.style.color = "#00e0ff";
-}
-else{
-    humElement.style.color = "#0066ff";
-}
-
-// UV COLOR
-const uvElement = document.getElementById("uv");
-uvElement.textContent = uvIndex;
-
-if(uvIndex <= 2){
-    uvElement.style.color = "#00ff00";
-}
-else if(uvIndex <= 5){
-    uvElement.style.color = "#ffff00";
-}
-else if(uvIndex <= 7){
-    uvElement.style.color = "#ff9900";
-}
-else{
-    uvElement.style.color = "#ff0000";
-}
-
+        // Última actualización
         const ahora = new Date();
         document.getElementById("ultimaActualizacion").textContent =
             "Última actualización: "+
@@ -134,5 +123,6 @@ else{
     }
 }
 
+// Ejecutar al cargar y actualizar cada 5 minutos
 obtenerDatos();
-setInterval(obtenerDatos,300000);
+setInterval(obtenerDatos, 300000);
