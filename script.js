@@ -1,4 +1,4 @@
-const url="https://meteo-cosuenda.luisromea.workers.dev/";
+https://meteo-cosuenda-api.luisromea.workers.dev/
 
 const fToC = f => (parseFloat(f)-32)*5/9;
 const mphToKmh = mph => parseFloat(mph)*1.60934;
