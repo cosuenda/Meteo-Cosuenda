@@ -142,3 +142,36 @@ header{
 #rain[data-value]{
     color:#00ffff; /* efecto neón sutil para humedad, viento y lluvia */
 }
+/* ===========================
+   ANIMACIONES SUAVES
+=========================== */
+
+/* Pulse suave */
+@keyframes pulseSoft {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Brillo UV alto */
+@keyframes glowStrong {
+  0%   { text-shadow: 0 0 5px currentColor; }
+  50%  { text-shadow: 0 0 20px currentColor; }
+  100% { text-shadow: 0 0 5px currentColor; }
+}
+
+/* Vibración viento fuerte */
+@keyframes windShake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-1px); }
+  50% { transform: translateX(1px); }
+  75% { transform: translateX(-1px); }
+  100% { transform: translateX(0); }
+}
+
+/* Respiración humedad alta */
+@keyframes breathe {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
