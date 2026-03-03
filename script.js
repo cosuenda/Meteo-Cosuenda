@@ -1,8 +1,4 @@
-const appKey="26C4D6AD21CF8F8C4F3BA85E1CAF6701";
-const apiKey="adf65434-1ace-43dd-b9a9-27915843d243";
-const mac="84:CC:A8:B4:B1:F6";
-
-const url=`https://api.ecowitt.net/api/v3/device/real_time?application_key=${appKey}&api_key=${apiKey}&mac=${mac}&call_back=all`;
+const url="https://meteo-cosuenda.luisromea.workers.dev/";
 
 const fToC = f => (parseFloat(f)-32)*5/9;
 const mphToKmh = mph => parseFloat(mph)*1.60934;
