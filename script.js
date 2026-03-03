@@ -47,7 +47,7 @@ async function obtenerDatos(){
         const windDeg = parseFloat(w.wind_direction.value);
         const windGust = mphToKmh(w.wind_gust.value ?? 0);
         const rainMm = inToMm(rain.daily.value);
-        const rainMonthMm = inToMm(rain.month?.value ?? 0);
+        const rainMonthMm = inToMm(rain.monthly?.value ?? 0);
         const pressHpa = inHgToHpa(p.relative.value);
         
         // RADIACIÓN Y UV (corrección por estructura de JSON)
