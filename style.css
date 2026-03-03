@@ -54,7 +54,9 @@ header{
     opacity:0.8;
 }
 
-/* ROSA DE LOS VIENTOS */
+/* ===========================
+   ROSA DE LOS VIENTOS (AJUSTADA)
+=========================== */
 
 .rosa{
     position:relative;
@@ -64,9 +66,11 @@ header{
     border-radius:50%;
     margin:20px auto 0 auto;
     background: radial-gradient(circle at center, #ffffff 60%, #cce6ff 100%);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
 }
 
-    .flecha{
+/* 🔧 Flecha perfectamente centrada */
+.flecha{
     position:absolute;
     width:6px;
     height:70px;
@@ -77,9 +81,10 @@ header{
     transform:translateX(-50%) rotate(0deg);
     border-radius:3px;
     transition: transform 0.8s ease;
-   }
+}
 
-    .cardinal{
+/* Puntos cardinales */
+.cardinal{
     position:absolute;
     font-size:14px;
     font-weight:bold;
@@ -87,10 +92,11 @@ header{
     transform:translate(-50%,-50%);
 }
 
-   .norte{ top:0%; left:50%; }
+/* 🔧 Ajustados para quedar perfectamente dentro del círculo */
+.norte{ top:0%; left:50%; }
 .sur{ bottom:0%; left:50%; }
-.este{ top:50%; right:0%; }
-.oeste{ top:50%; left:0%; }
+.este{ top:50%; right:0%; transform:translate(50%,-50%); }
+.oeste{ top:50%; left:0%; transform:translate(-50%,-50%); }
 
 .noreste{ top:15%; right:15%; }
 .sureste{ bottom:15%; right:15%; }
@@ -102,4 +108,3 @@ header{
     font-size:14px;
     opacity:0.8;
 }
-
