@@ -29,10 +29,11 @@ header{
     padding:20px;
     border-radius:15px;
     box-shadow:0 4px 15px rgba(0,0,0,0.4);
+    transition: all 0.8s ease;
 }
 
 /* ===========================
-   NÚMEROS IMPORTANTES
+   NÚMEROS IMPORTANTES CON NEÓN
 =========================== */
 .bigTemp{
     font-size:70px;
@@ -71,7 +72,7 @@ header{
 }
 
 /* ===========================
-   ROSA DE LOS VIENTOS (AJUSTADA)
+   ROSA DE LOS VIENTOS
 =========================== */
 .rosa{
     position:relative;
@@ -84,7 +85,6 @@ header{
     box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
 }
 
-/* Flecha perfectamente centrada */
 .flecha{
     position:absolute;
     width:6px;
@@ -98,7 +98,6 @@ header{
     transition: transform 0.8s ease;
 }
 
-/* Puntos cardinales */
 .cardinal{
     position:absolute;
     font-size:14px;
@@ -128,12 +127,18 @@ header{
 }
 
 /* ===========================
-   COLORES DINÁMICOS (solo CSS, valores genéricos)
+   COLORES DINÁMICOS
 =========================== */
 .bigTemp[data-value]{
-    color: #00ffff; /* valor por defecto, JS puede cambiar con temperatura */
+    color: #00ffff; /* JS actualizará según temperatura */
 }
 
 #uv[data-value]{
-    color:#00ff00; /* valor por defecto, JS puede cambiar según índice UV */
+    color:#00ff00; /* JS actualizará según índice UV */
+}
+
+#hum[data-value],
+#windValue[data-value],
+#rain[data-value]{
+    color:#00ffff; /* efecto neón sutil para humedad, viento y lluvia */
 }
