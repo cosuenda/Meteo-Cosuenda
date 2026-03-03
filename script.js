@@ -1,5 +1,5 @@
 // ----------------------------
-// script.js final para Meteo-Cosuenda
+// script.js final para Meteo-Cosuenda con colores dinámicos
 // ----------------------------
 
 const url = "https://meteo-cosuenda-api.luisromea.workers.dev/";
@@ -36,6 +36,24 @@ function comprobarCambioDia(){
 }
 
 comprobarCambioDia();
+
+// 🔹 Funciones de color dinámico
+function colorTemp(temp){
+    if(temp<=0) return "#00f2ff";
+    if(temp<=10) return "#00ffff";
+    if(temp<=20) return "#00ff80";
+    if(temp<=30) return "#ffff00";
+    if(temp<=40) return "#ff8000";
+    return "#ff0000";
+}
+
+function colorUV(uv){
+    if(uv<=2) return "#00ff00";
+    if(uv<=5) return "#ffff00";
+    if(uv<=7) return "#ff8000";
+    if(uv<=10) return "#ff0000";
+    return "#800080";
+}
 
 // Obtener datos desde el Worker
 async function obtenerDatos(){
@@ -91,13 +109,20 @@ async function obtenerDatos(){
         }
 
         // Actualizar HTML
-        document.getElementById("tempBig").textContent = tempC.toFixed(1)+"°";
+        const tempEl = document.getElementById("tempBig");
+        tempEl.textContent = tempC.toFixed(1)+"°";
+        tempEl.style.color = colorTemp(tempC); // 🔹 Color dinámico
+
         document.getElementById("sensacion").textContent = "Sensación térmica: "+feels.toFixed(1)+"°";
         document.getElementById("tempMin").textContent = "Mínima diaria: "+tempMin.toFixed(1)+"°";
         document.getElementById("tempMax").textContent = "Máxima diaria: "+tempMax.toFixed(1)+"°";
 
-        document.getElementById("hum").textContent = hum+"%";
-        document.getElementById("windValue").textContent = windKm.toFixed(1);
+        const humEl = document.getElementById("hum");
+        humEl.textContent = hum+"%";
+
+        const windEl = document.getElementById("windValue");
+        windEl.textContent = windKm.toFixed(1);
+
         document.getElementById("windMax").textContent = "Racha máxima diaria: "+windMax.toFixed(1);
         document.getElementById("windDirText").textContent = "Dirección: "+gradosADireccion(windDeg);
 
@@ -105,7 +130,10 @@ async function obtenerDatos(){
         document.getElementById("rainMonth").textContent = rainMonthMm.toFixed(1)+" mm";
         document.getElementById("press").textContent = pressHpa.toFixed(1)+" hPa";
 
-        document.getElementById("uv").textContent = uvIndex;
+        const uvEl = document.getElementById("uv");
+        uvEl.textContent = uvIndex;
+        uvEl.style.color = colorUV(uvIndex); // 🔹 Color dinámico
+
         document.getElementById("solar").textContent = solar+" W/m²";
 
         // Rotar flecha del viento
@@ -115,8 +143,7 @@ async function obtenerDatos(){
         // Última actualización
         const ahora = new Date();
         document.getElementById("ultimaActualizacion").textContent =
-            "Última actualización: "+
-            ahora.getHours()+":"+String(ahora.getMinutes()).padStart(2,"0");
+            "Última actualización: "+ahora.getHours()+":"+String(ahora.getMinutes()).padStart(2,"0");
 
     }catch(error){
         console.log("Error conexión", error);
