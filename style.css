@@ -1,3 +1,6 @@
+/* ===========================
+   ESTILOS GENERALES
+=========================== */
 body{
     margin:0;
     font-family: Arial, sans-serif;
@@ -28,6 +31,9 @@ header{
     box-shadow:0 4px 15px rgba(0,0,0,0.4);
 }
 
+/* ===========================
+   NÚMEROS IMPORTANTES
+=========================== */
 .bigTemp{
     font-size:70px;
     font-weight:bold;
@@ -37,13 +43,23 @@ header{
         0 0 10px #00f2ff,
         0 0 20px #00f2ff,
         0 0 40px rgba(0,242,255,0.4);
+    transition: all 0.8s ease;
 }
 
 .bigNumber{
     font-size:40px;
     font-weight:bold;
+    color:#ffffff;
+    text-shadow:
+        0 0 3px #00f2ff,
+        0 0 6px #00f2ff,
+        0 0 10px rgba(0,242,255,0.3);
+    transition: all 0.8s ease;
 }
 
+/* ===========================
+   LLUVIA Y ETIQUETAS
+=========================== */
 .rainBox{
     display:flex;
     justify-content:space-around;
@@ -57,7 +73,6 @@ header{
 /* ===========================
    ROSA DE LOS VIENTOS (AJUSTADA)
 =========================== */
-
 .rosa{
     position:relative;
     width:180px;
@@ -69,7 +84,7 @@ header{
     box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
 }
 
-/* 🔧 Flecha perfectamente centrada */
+/* Flecha perfectamente centrada */
 .flecha{
     position:absolute;
     width:6px;
@@ -92,7 +107,6 @@ header{
     transform:translate(-50%,-50%);
 }
 
-/* 🔧 Ajustados para quedar perfectamente dentro del círculo */
 .norte{ top:0%; left:50%; }
 .sur{ bottom:0%; left:50%; }
 .este{ top:50%; right:0%; transform:translate(50%,-50%); }
@@ -103,8 +117,23 @@ header{
 .suroeste{ bottom:15%; left:15%; }
 .noroeste{ top:15%; left:15%; }
 
+/* ===========================
+   ÚLTIMA ACTUALIZACIÓN
+=========================== */
 #ultimaActualizacion{
     margin:20px;
     font-size:14px;
     opacity:0.8;
+    transition: all 0.8s ease;
+}
+
+/* ===========================
+   COLORES DINÁMICOS (solo CSS, valores genéricos)
+=========================== */
+.bigTemp[data-value]{
+    color: #00ffff; /* valor por defecto, JS puede cambiar con temperatura */
+}
+
+#uv[data-value]{
+    color:#00ff00; /* valor por defecto, JS puede cambiar según índice UV */
 }
