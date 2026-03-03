@@ -66,20 +66,20 @@ header{
     background: radial-gradient(circle at center, #ffffff 60%, #cce6ff 100%);
 }
 
-.flecha{
+    .flecha{
     position:absolute;
     width:6px;
     height:70px;
     background:#003366;
-    top:50%;
+    bottom:50%;
     left:50%;
-    transform-origin:50% 90%;
-    transform:translate(-50%, -50%) rotate(0deg);
+    transform-origin:bottom center;
+    transform:translateX(-50%) rotate(0deg);
     border-radius:3px;
     transition: transform 0.8s ease;
-}
+   }
 
-.cardinal{
+    .cardinal{
     position:absolute;
     font-size:14px;
     font-weight:bold;
@@ -87,15 +87,15 @@ header{
     transform:translate(-50%,-50%);
 }
 
-.norte{ top:5%; left:50%; }
-.sur{ bottom:-2%; left:50%; }
-.este{ top:50%; right:-2%; }
-.oeste{ top:50%; left:5%; }
+   .norte{ top:0%; left:50%; }
+.sur{ bottom:0%; left:50%; }
+.este{ top:50%; right:0%; }
+.oeste{ top:50%; left:0%; }
 
-.noreste{ top:18%; right:10%; }
-.sureste{ bottom:18%; right:10%; }
-.suroeste{ bottom:18%; left:10%; }
-.noroeste{ top:18%; left:10%; }
+.noreste{ top:15%; right:15%; }
+.sureste{ bottom:15%; right:15%; }
+.suroeste{ bottom:15%; left:15%; }
+.noroeste{ top:15%; left:15%; }
 
 #ultimaActualizacion{
     margin:20px;
