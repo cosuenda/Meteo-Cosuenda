@@ -55,6 +55,30 @@ function colorUV(uv){
     return "#800080";
 }
 
+function colorHum(hum){
+    // De azul a verde según humedad
+    if(hum<=30) return "#00f2ff";
+    if(hum<=60) return "#00ff80";
+    return "#00ff00";
+}
+
+function colorViento(v){
+    // De azul a rojo según velocidad del viento
+    if(v<=5) return "#00f2ff";
+    if(v<=15) return "#00ffff";
+    if(v<=25) return "#00ff80";
+    if(v<=35) return "#ffff00";
+    return "#ff8000";
+}
+
+function colorLluvia(mm){
+    // De azul suave a azul intenso según cantidad
+    if(mm<=1) return "#00f2ff";
+    if(mm<=5) return "#00ffff";
+    if(mm<=10) return "#00ccff";
+    return "#0099ff";
+}
+
 // Obtener datos desde el Worker
 async function obtenerDatos(){
     try{
@@ -85,7 +109,7 @@ async function obtenerDatos(){
         const pressHpa = inHgToHpa(p.relative.value);
 
         // UV y radiación solar
-        const uvIndex = data.data.solar_and_uvi?.uvi?.value ?? "--";
+        const uvIndex = data.data.solar_and_uvi?.uvi?.value ?? 0;
         const solar = data.data.solar_and_uvi?.solar?.value ?? "--";
 
         // Máximos y mínimos diarios
@@ -108,10 +132,10 @@ async function obtenerDatos(){
             localStorage.setItem("windMax", windMax);
         }
 
-        // Actualizar HTML
+        // Actualizar HTML con colores dinámicos
         const tempEl = document.getElementById("tempBig");
         tempEl.textContent = tempC.toFixed(1)+"°";
-        tempEl.style.color = colorTemp(tempC); // 🔹 Color dinámico
+        tempEl.style.color = colorTemp(tempC);
 
         document.getElementById("sensacion").textContent = "Sensación térmica: "+feels.toFixed(1)+"°";
         document.getElementById("tempMin").textContent = "Mínima diaria: "+tempMin.toFixed(1)+"°";
@@ -119,20 +143,25 @@ async function obtenerDatos(){
 
         const humEl = document.getElementById("hum");
         humEl.textContent = hum+"%";
+        humEl.style.color = colorHum(hum);
 
         const windEl = document.getElementById("windValue");
         windEl.textContent = windKm.toFixed(1);
+        windEl.style.color = colorViento(windKm);
 
         document.getElementById("windMax").textContent = "Racha máxima diaria: "+windMax.toFixed(1);
         document.getElementById("windDirText").textContent = "Dirección: "+gradosADireccion(windDeg);
 
-        document.getElementById("rain").textContent = rainMm.toFixed(1)+" mm";
+        const rainEl = document.getElementById("rain");
+        rainEl.textContent = rainMm.toFixed(1)+" mm";
+        rainEl.style.color = colorLluvia(rainMm);
+
         document.getElementById("rainMonth").textContent = rainMonthMm.toFixed(1)+" mm";
         document.getElementById("press").textContent = pressHpa.toFixed(1)+" hPa";
 
         const uvEl = document.getElementById("uv");
         uvEl.textContent = uvIndex;
-        uvEl.style.color = colorUV(uvIndex); // 🔹 Color dinámico
+        uvEl.style.color = colorUV(uvIndex);
 
         document.getElementById("solar").textContent = solar+" W/m²";
 
